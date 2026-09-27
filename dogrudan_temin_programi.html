@@ -317,7 +317,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             </div>
             <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Tüm Veriler Sıfırlansın mı?</h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Tüm kayıtlı form verileri kalıcı olarak silinecek ve varsayılan ayarlara dönülecek.</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Tüm kayıtlı form verileri kalıcı olarak silinecek ve varsayılan ayarlara dönülecek. <b>Geçmiş İhaleler</b> bölümündeki kayıtlar korunur.</p>
             <div class="flex justify-end gap-3">
                 <button @click="showResetModal = false" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-semibold text-sm transition">İptal</button>
                 <button @click="performReset" class="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-sm shadow-md shadow-red-600/20 transition">Evet, Sıfırla</button>
@@ -402,6 +402,10 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             <div>
                 <button @click="navigate('dashboard')" :class="['w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all', currentView === 'dashboard' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-slate-800/80 hover:bg-slate-800 text-indigo-300']">
                     <span>📊</span> <span>Özet Dashboard</span>
+                </button>
+                <button @click="navigate('gecmis_ihaleler')" :class="['w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all mt-1.5', currentView === 'gecmis_ihaleler' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30']">
+                    <div class="flex items-center gap-3"><span>🗂️</span> <span>Geçmiş İhaleler</span></div>
+                    <span class="bg-slate-800 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-700">{{ gecmisIhaleler.length }}</span>
                 </button>
             </div>
 
@@ -500,6 +504,9 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <h2 class="text-sm sm:text-lg font-bold text-slate-900 dark:text-white truncate">{{ viewTitle }}</h2>
+                <button v-if="aktifArsivKaydi && currentView !== 'gecmis_ihaleler'" @click="navigate('gecmis_ihaleler')" type="button" class="hidden sm:inline-flex items-center gap-1 max-w-[240px] text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 px-2 py-0.5 rounded-lg shrink-0" title="Geçmiş ihalelerden düzenlemek için açılan kayıt">
+                    <span>📁</span><span class="truncate">{{ aktifArsivKaydi.ad }}</span>
+                </button>
                 <span v-if="currentView === 'rpt_piyasa' || currentView === 'rpt_yaklasik'" class="hidden sm:inline text-[11px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 px-2 py-0.5 rounded-lg shrink-0" title="Bu tablo geniş olduğu için yazdırma penceresinde Sayfa Yapısı: Yatay seçilmesi önerilir">📄 Yatay önerilir</span>
             </div>
             
@@ -680,6 +687,89 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         </div>
                     </div>
 
+                </div>
+
+                <!-- GEÇMİŞ İHALELER VIEW -->
+                <div v-show="currentView === 'gecmis_ihaleler'" class="space-y-6 animate-fade-in no-print">
+
+                    <!-- Mevcut ihaleyi kaydet -->
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 rounded-2xl shadow-xs space-y-4">
+                        <div>
+                            <h3 class="font-bold text-slate-900 dark:text-white text-base">💾 Mevcut İhaleyi Geçmişe Kaydet</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Çalışma alanındaki tüm veriler (idare, evraklar, ihtiyaç listesi, firmalar, teklifler, komisyon, ön mali kontrol, EKAP) tek bir kayıt olarak saklanır. Kayıtlar "Yeni Dosya (Sıfırla)" ile silinmez.</p>
+                        </div>
+                        <div v-if="aktifArsivKaydi" class="p-3 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 text-xs text-amber-800 dark:text-amber-300">
+                            📁 Şu an düzenlenen kayıt: <b>{{ aktifArsivKaydi.ad }}</b>. Yaptığınız değişiklikleri bu kayda yazmak için <b>"Kaydı Güncelle"</b> düğmesini kullanınız.
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="flex-1">
+                                <label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">İhale Adı</label>
+                                <input v-model="yeniArsivAdi" @keyup.enter="arsiveKaydet" type="text" class="data-input" :placeholder="varsayilanArsivAdi">
+                            </div>
+                            <div class="flex flex-wrap items-end gap-2">
+                                <button v-if="aktifArsivKaydi" @click="arsivKaydiniGuncelle" type="button" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-md shadow-amber-600/20 transition">🔄 Kaydı Güncelle</button>
+                                <button @click="arsiveKaydet" type="button" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md shadow-indigo-600/20 transition">➕ {{ aktifArsivKaydi ? 'Yeni Kayıt Olarak Kaydet' : 'Geçmişe Kaydet' }}</button>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-400">İhale adı boş bırakılırsa "{{ varsayilanArsivAdi }}" adı verilir. Adı daha sonra listeden değiştirebilirsiniz.</p>
+                    </div>
+
+                    <!-- Kayıtlı ihaleler listesi -->
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 rounded-2xl shadow-xs space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <h3 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+                                <span>🗂️</span> <span>Kayıtlı İhaleler</span>
+                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-bold px-2 py-0.5 rounded-full">{{ gecmisIhaleler.length }}</span>
+                            </h3>
+                            <div class="flex flex-wrap gap-2">
+                                <input type="file" ref="arsivFileInput" @change="arsivIceAktar" accept=".json,application/json" class="hidden">
+                                <button @click="$refs.arsivFileInput.click()" type="button" class="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-xs transition">📂 JSON'dan İçe Aktar</button>
+                                <button @click="tumArsiviDisaAktar" :disabled="!gecmisIhaleler.length" type="button" class="px-3 py-2 bg-sky-600 hover:bg-sky-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl font-bold text-xs transition">📤 Tümünü Dışa Aktar</button>
+                            </div>
+                        </div>
+
+                        <input v-if="gecmisIhaleler.length" v-model="arsivArama" type="text" class="data-input" placeholder="🔍 İhale adı, DT No, işin adı, okul veya firma adına göre ara...">
+
+                        <div v-if="!gecmisIhaleler.length" class="p-8 text-center rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-sm text-slate-500">
+                            Henüz kaydedilmiş ihale yok. Biten ihalenizi yukarıdaki "Geçmişe Kaydet" düğmesiyle kaydedebilirsiniz.
+                        </div>
+                        <div v-else-if="!filtrelenmisArsiv.length" class="p-6 text-center text-sm text-slate-500">Aramanıza uygun kayıt bulunamadı.</div>
+
+                        <div class="space-y-3">
+                            <div v-for="k in filtrelenmisArsiv" :key="k.id" :class="['p-4 rounded-xl border transition', k.id === aktifArsivId ? 'border-amber-300 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/20' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700']">
+                                <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
+                                    <div class="min-w-0 flex-1 space-y-1.5">
+                                        <div v-if="duzenlenenArsivId === k.id" class="flex items-center gap-2">
+                                            <input :id="'arsiv-ad-' + k.id" v-model="duzenlenenArsivAd" @keyup.enter="arsivAdKaydet(k)" @keyup.esc="duzenlenenArsivId = null" type="text" class="data-input">
+                                            <button @click="arsivAdKaydet(k)" type="button" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shrink-0" title="Adı kaydet">✓</button>
+                                            <button @click="duzenlenenArsivId = null" type="button" class="px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-xs shrink-0" title="Vazgeç">✕</button>
+                                        </div>
+                                        <div v-else class="flex items-center gap-2 min-w-0">
+                                            <h4 class="font-bold text-sm text-slate-900 dark:text-white truncate">{{ k.ad }}</h4>
+                                            <span v-if="k.id === aktifArsivId" class="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 rounded-full shrink-0">Düzenleniyor</span>
+                                            <button @click="arsivAdDuzenle(k)" type="button" class="text-xs text-slate-400 hover:text-indigo-600 shrink-0" title="Yeniden adlandır">✏️</button>
+                                        </div>
+                                        <div class="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap gap-x-4 gap-y-1">
+                                            <span>DT No: <b class="text-slate-700 dark:text-slate-200">{{ k.ozet.dtNo || '-' }}</b></span>
+                                            <span>İşin Adı: <b class="text-slate-700 dark:text-slate-200">{{ k.ozet.isinAdi || '-' }}</b></span>
+                                            <span v-if="k.ozet.okulAdi">{{ k.ozet.okulAdi }}</span>
+                                            <span>{{ k.ozet.kalemSayisi }} kalem</span>
+                                            <span>Yaklaşık Maliyet: <b class="text-indigo-600 dark:text-indigo-400">{{ formatCur(k.ozet.yaklasikMaliyet) }}</b></span>
+                                            <span>Kazanan: <b class="text-emerald-600 dark:text-emerald-400">{{ k.ozet.kazananFirma || '-' }}</b><template v-if="k.ozet.kazananFirma"> ({{ formatCur(k.ozet.kazananTutar) }})</template></span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400">
+                                            Kaydedildi: {{ tarihSaatFormat(k.olusturma) }}<template v-if="k.guncelleme && k.guncelleme !== k.olusturma"> · Son güncelleme: {{ tarihSaatFormat(k.guncelleme) }}</template>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2 shrink-0">
+                                        <button @click="arsivDuzenleOnay(k)" type="button" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md shadow-indigo-600/20 transition">📝 Düzenle</button>
+                                        <button @click="arsivKaydiDisaAktar(k)" type="button" class="px-3 py-2 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-900 rounded-xl font-bold text-xs transition">📤 JSON</button>
+                                        <button @click="arsivSilOnay(k)" type="button" class="px-3 py-2 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 rounded-xl font-bold text-xs transition">🗑️ Sil</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- VIEW 1: İDARE BİLGİLERİ -->
@@ -2641,6 +2731,62 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
 <script>
     let { createApp, watch, nextTick } = Vue;
     let STORAGE_KEY = 'ekap_dogrudan_temin_tam_surum_v35';
+    let ARSIV_KEY = 'ekap_dogrudan_temin_gecmis_ihaleler_v1';
+    let ARSIV_DOSYA_TURU = 'DT_GECMIS_IHALE';
+    // Bir ihale kaydına (arşive) alınan çalışma alanı verileri
+    let IHALE_ALANLARI = [
+        'idare', 'sartlar', 'teknikSartname', 'ihaleOnayEbysReferans', 'evraklar', 'yetkililer',
+        'omk', 'omk2', 'ekap', 'onayMuayeneDahil', 'komisyon',
+        'malzemeler', 'nextMalzemeId', 'ymFirmalar', 'nextYmFirmaId', 'ymTeklifler',
+        'pfaFirmalar', 'nextPfaFirmaId', 'pfaTeklifler', 'seciliTeklifFirmasi'
+    ];
+
+    function yeniArsivId() {
+        return 'ihale_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+    }
+
+    function ihaleOzetiHesapla(v) {
+        v = v || {};
+        let idare = v.idare || {};
+        let malzemeler = Array.isArray(v.malzemeler) ? v.malzemeler : [];
+        let ymFirmalar = Array.isArray(v.ymFirmalar) ? v.ymFirmalar : [];
+        let ymTeklifler = v.ymTeklifler || {};
+        let pfaFirmalar = Array.isArray(v.pfaFirmalar) ? v.pfaFirmalar : [];
+        let pfaTeklifler = v.pfaTeklifler || {};
+
+        let yaklasik = 0;
+        malzemeler.forEach(m => {
+            let sum = 0, count = 0;
+            ymFirmalar.forEach(f => {
+                let val = parseFloat(ymTeklifler[f.id + '_' + m.id]);
+                if (!isNaN(val) && val > 0) { sum += val; count++; }
+            });
+            let ort = count > 0 ? sum / count : 0;
+            yaklasik += (ort * (parseFloat(m.miktar) || 0)) * (1 + ((parseFloat(m.kdv) || 0) / 100));
+        });
+
+        let kazanan = null;
+        pfaFirmalar.forEach(f => {
+            let top = 0, topKdv = 0;
+            malzemeler.forEach(m => {
+                let price = parseFloat(pfaTeklifler[f.id + '_' + m.id]) || 0;
+                let miktar = parseFloat(m.miktar) || 0;
+                top += price * miktar;
+                topKdv += (price * miktar) * (1 + ((parseFloat(m.kdv) || 0) / 100));
+            });
+            if (top > 0 && (!kazanan || top < kazanan.toplam)) kazanan = { ad: f.ad || '', toplam: top, kdvDahil: topKdv };
+        });
+
+        return {
+            dtNo: idare.dtNo || '',
+            isinAdi: idare.isinAdi || '',
+            okulAdi: idare.okulAdi || '',
+            kalemSayisi: malzemeler.length,
+            yaklasikMaliyet: yaklasik,
+            kazananFirma: kazanan ? kazanan.ad : '',
+            kazananTutar: kazanan ? kazanan.kdvDahil : 0
+        };
+    }
     let today = new Date().toISOString().split('T')[0];
     let chartInstance = null;
 
@@ -3668,6 +3814,13 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
         ebysMode: false,
         ebysEvraklariGizle: false,
         seciliTeklifFirmasi: 'bos',
+        gecmisIhaleler: [],
+        aktifArsivId: null,
+        yeniArsivAdi: '',
+        arsivArama: '',
+        duzenlenenArsivId: null,
+        duzenlenenArsivAd: '',
+        bekleyenArsivId: null,
         topluPrintMode: false,
         topluRaporlamSecimleri: {
             ihtiyac: false,
@@ -3953,67 +4106,14 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             if (savedData) {
                 try {
                     let parsed = JSON.parse(savedData);
-                    this.idare = { ...defaultData.idare, ...(parsed.idare || {}) };
-                    this.sartlar = { ...defaultData.sartlar, ...(parsed.sartlar || {}) };
-                    this.teknikSartname = { ...defaultData.teknikSartname, ...(parsed.teknikSartname || {}) };
-                    this.ihaleOnayEbysReferans = { ...defaultData.ihaleOnayEbysReferans, ...(parsed.ihaleOnayEbysReferans || {}) };
-                    
-                    if (parsed.evraklar) {
-                        Object.keys(defaultData.evraklar).forEach(key => {
-                            this.evraklar[key] = { ...defaultData.evraklar[key], ...(parsed.evraklar[key] || {}) };
-                        });
-                    }
-                    if (parsed.yetkililer) {
-                        this.yetkililer.gercek = { ...defaultData.yetkililer.gercek, ...(parsed.yetkililer.gercek || {}) };
-                        this.yetkililer.harcama = { ...defaultData.yetkililer.harcama, ...(parsed.yetkililer.harcama || {}) };
-                        this.yetkililer.tasinir = { ...defaultData.yetkililer.tasinir, ...(parsed.yetkililer.tasinir || {}) };
-                    }
-                    if (parsed.ekapListeBilgi) this.ekapListeBilgi = parsed.ekapListeBilgi;
-                    if (parsed.ekap) {
-                        this.ekap = { ...defaultData.ekap, ...parsed.ekap };
-                        this.ekap.satirlar = parsed.ekap.satirlar || {};
-                    }
-                    if (parsed.omk2) {
-                        this.omk2 = { ...defaultData.omk2, ...parsed.omk2 };
-                        this.omk2.kontrolEden = { ...defaultData.omk2.kontrolEden, ...(parsed.omk2.kontrolEden || {}) };
-                        this.omk2.onaylayan = { ...defaultData.omk2.onaylayan, ...(parsed.omk2.onaylayan || {}) };
-                        this.omk2.aciklamalar = parsed.omk2.aciklamalar || {};
-                        if (!Array.isArray(this.omk2.aktifBolumler)) this.omk2.aktifBolumler = defaultData.omk2.aktifBolumler.slice();
-                    }
-                    if (parsed.omk) {
-                        this.omk = { ...defaultData.omk, ...parsed.omk };
-                        this.omk.kontrolEden = { ...defaultData.omk.kontrolEden, ...(parsed.omk.kontrolEden || {}) };
-                        this.omk.onaylayan = { ...defaultData.omk.onaylayan, ...(parsed.omk.onaylayan || {}) };
-                        this.omk.aciklamalar = parsed.omk.aciklamalar || {};
-                        if (!Array.isArray(this.omk.aktifBolumler)) this.omk.aktifBolumler = [1,2,3,4,5,9,10];
-                    }
-                    if (typeof parsed.onayMuayeneDahil === 'boolean') this.onayMuayeneDahil = parsed.onayMuayeneDahil;
-                    if (parsed.komisyon) this.komisyon = parsed.komisyon;
-                    let bilinenUnvanlar = ['Öğretmen','Memur','Şef','VHKİ','Teknisyen','Hizmetli','Müdür Yardımcısı'];
-                    ['piyasa','muayene'].forEach(grup => {
-                        (this.komisyon[grup] || []).forEach(k => {
-                            if (typeof k.unvanDiger !== 'boolean') {
-                                k.unvanDiger = !!(k.unvan && !bilinenUnvanlar.includes(k.unvan));
-                            }
-                        });
-                    });
-                    this.malzemeler = parsed.malzemeler || defaultData.malzemeler;
-                    this.ymFirmalar = parsed.ymFirmalar || defaultData.ymFirmalar;
-                    this.ymTeklifler = parsed.ymTeklifler || defaultData.ymTeklifler;
-                    this.pfaFirmalar = parsed.pfaFirmalar || defaultData.pfaFirmalar;
-                    this.pfaTeklifler = parsed.pfaTeklifler || defaultData.pfaTeklifler;
-                    this.seciliTeklifFirmasi = parsed.seciliTeklifFirmasi || 'bos';
-                    this.isDarkMode = parsed.isDarkMode || false;
-                    this.themeColor = parsed.themeColor || 'teal';
-
-                    let enBuyukMalzemeId = this.malzemeler.reduce((max, m) => Math.max(max, m.id || 0), 0);
-                    this.nextMalzemeId = Math.max(parsed.nextMalzemeId || 0, enBuyukMalzemeId + 1, 1);
-                    let enBuyukYmId = this.ymFirmalar.reduce((max, f) => Math.max(max, f.id || 0), 0);
-                    this.nextYmFirmaId = Math.max(parsed.nextYmFirmaId || 0, enBuyukYmId + 1, 1);
-                    let enBuyukPfaId = this.pfaFirmalar.reduce((max, f) => Math.max(max, f.id || 0), 0);
-                    this.nextPfaFirmaId = Math.max(parsed.nextPfaFirmaId || 0, enBuyukPfaId + 1, 1);
+                    this.durumuUygula(parsed);
+                    this.aktifArsivId = parsed.aktifArsivId || null;
                 } catch(e) {}
             }
+            try {
+                let arsiv = JSON.parse(localStorage.getItem(ARSIV_KEY) || '[]');
+                if (Array.isArray(arsiv)) this.gecmisIhaleler = arsiv.filter(k => k && k.id && k.veri);
+            } catch(e) {}
 
             if (this.isDarkMode) {
                 document.documentElement.classList.add('dark');
@@ -4021,8 +4121,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 document.documentElement.classList.remove('dark');
             }
 
-            watch(this.$data, (newData) => {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+            watch(this.$data, () => {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(this.kaliciVeri()));
                 this.updateChart();
             }, { deep: true });
 
@@ -4059,9 +4159,28 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             printStyle() {
                 return `<style>@media print { @page { margin: 10mm; } }</style>`;
             },
+            aktifArsivKaydi() {
+                if (!this.aktifArsivId) return null;
+                return this.gecmisIhaleler.find(k => k.id === this.aktifArsivId) || null;
+            },
+            varsayilanArsivAdi() {
+                let parcalar = [this.idare.dtNo, this.idare.isinAdi].map(x => (x || '').trim()).filter(x => x);
+                return parcalar.length ? parcalar.join(' - ') : ('İhale ' + this.trTarihFormat(new Date().toISOString().split('T')[0]));
+            },
+            filtrelenmisArsiv() {
+                let q = (this.arsivArama || '').toLocaleLowerCase('tr-TR').trim();
+                if (!q) return this.gecmisIhaleler;
+                let kelimeler = q.split(/\s+/).filter(k => k);
+                return this.gecmisIhaleler.filter(k => {
+                    let o = k.ozet || {};
+                    let metin = [k.ad, o.dtNo, o.isinAdi, o.okulAdi, o.kazananFirma].join(' ').toLocaleLowerCase('tr-TR');
+                    return kelimeler.every(x => metin.indexOf(x) !== -1);
+                });
+            },
             viewTitle() {
                 let titles = { 
                     dashboard: '📊 Yönetici Özeti & Süreç Takibi',
+                    gecmis_ihaleler: '🗂️ Geçmiş İhaleler',
                     idare: '🏠 İdare ve Evrak Bilgileri', 
                     tarih_sayi: '📅 Evrak Tarih ve Sayıları',
                     ihtiyac: '📋 İhtiyaç Listesi Veri Girişi', 
@@ -4312,6 +4431,253 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             }
         },
         methods: {
+            durumuUygula(parsed) {
+                this.idare = { ...defaultData.idare, ...(parsed.idare || {}) };
+                this.sartlar = { ...defaultData.sartlar, ...(parsed.sartlar || {}) };
+                this.teknikSartname = { ...defaultData.teknikSartname, ...(parsed.teknikSartname || {}) };
+                this.ihaleOnayEbysReferans = { ...defaultData.ihaleOnayEbysReferans, ...(parsed.ihaleOnayEbysReferans || {}) };
+                
+                if (parsed.evraklar) {
+                    Object.keys(defaultData.evraklar).forEach(key => {
+                        this.evraklar[key] = { ...defaultData.evraklar[key], ...(parsed.evraklar[key] || {}) };
+                    });
+                }
+                if (parsed.yetkililer) {
+                    this.yetkililer.gercek = { ...defaultData.yetkililer.gercek, ...(parsed.yetkililer.gercek || {}) };
+                    this.yetkililer.harcama = { ...defaultData.yetkililer.harcama, ...(parsed.yetkililer.harcama || {}) };
+                    this.yetkililer.tasinir = { ...defaultData.yetkililer.tasinir, ...(parsed.yetkililer.tasinir || {}) };
+                }
+                if (parsed.ekapListeBilgi) this.ekapListeBilgi = parsed.ekapListeBilgi;
+                if (parsed.ekap) {
+                    this.ekap = { ...defaultData.ekap, ...parsed.ekap };
+                    this.ekap.satirlar = parsed.ekap.satirlar || {};
+                }
+                if (parsed.omk2) {
+                    this.omk2 = { ...defaultData.omk2, ...parsed.omk2 };
+                    this.omk2.kontrolEden = { ...defaultData.omk2.kontrolEden, ...(parsed.omk2.kontrolEden || {}) };
+                    this.omk2.onaylayan = { ...defaultData.omk2.onaylayan, ...(parsed.omk2.onaylayan || {}) };
+                    this.omk2.aciklamalar = parsed.omk2.aciklamalar || {};
+                    if (!Array.isArray(this.omk2.aktifBolumler)) this.omk2.aktifBolumler = defaultData.omk2.aktifBolumler.slice();
+                }
+                if (parsed.omk) {
+                    this.omk = { ...defaultData.omk, ...parsed.omk };
+                    this.omk.kontrolEden = { ...defaultData.omk.kontrolEden, ...(parsed.omk.kontrolEden || {}) };
+                    this.omk.onaylayan = { ...defaultData.omk.onaylayan, ...(parsed.omk.onaylayan || {}) };
+                    this.omk.aciklamalar = parsed.omk.aciklamalar || {};
+                    if (!Array.isArray(this.omk.aktifBolumler)) this.omk.aktifBolumler = [1,2,3,4,5,9,10];
+                }
+                if (typeof parsed.onayMuayeneDahil === 'boolean') this.onayMuayeneDahil = parsed.onayMuayeneDahil;
+                if (parsed.komisyon) this.komisyon = parsed.komisyon;
+                let bilinenUnvanlar = ['Öğretmen','Memur','Şef','VHKİ','Teknisyen','Hizmetli','Müdür Yardımcısı'];
+                ['piyasa','muayene'].forEach(grup => {
+                    (this.komisyon[grup] || []).forEach(k => {
+                        if (typeof k.unvanDiger !== 'boolean') {
+                            k.unvanDiger = !!(k.unvan && !bilinenUnvanlar.includes(k.unvan));
+                        }
+                    });
+                });
+                this.malzemeler = parsed.malzemeler || defaultData.malzemeler;
+                this.ymFirmalar = parsed.ymFirmalar || defaultData.ymFirmalar;
+                this.ymTeklifler = parsed.ymTeklifler || defaultData.ymTeklifler;
+                this.pfaFirmalar = parsed.pfaFirmalar || defaultData.pfaFirmalar;
+                this.pfaTeklifler = parsed.pfaTeklifler || defaultData.pfaTeklifler;
+                this.seciliTeklifFirmasi = parsed.seciliTeklifFirmasi || 'bos';
+                if ('isDarkMode' in parsed) this.isDarkMode = parsed.isDarkMode || false;
+                if ('themeColor' in parsed) this.themeColor = parsed.themeColor || 'teal';
+
+                let enBuyukMalzemeId = this.malzemeler.reduce((max, m) => Math.max(max, m.id || 0), 0);
+                this.nextMalzemeId = Math.max(parsed.nextMalzemeId || 0, enBuyukMalzemeId + 1, 1);
+                let enBuyukYmId = this.ymFirmalar.reduce((max, f) => Math.max(max, f.id || 0), 0);
+                this.nextYmFirmaId = Math.max(parsed.nextYmFirmaId || 0, enBuyukYmId + 1, 1);
+                let enBuyukPfaId = this.pfaFirmalar.reduce((max, f) => Math.max(max, f.id || 0), 0);
+                this.nextPfaFirmaId = Math.max(parsed.nextPfaFirmaId || 0, enBuyukPfaId + 1, 1);
+            },
+            kaliciVeri() {
+                let veri = { ...this.$data };
+                delete veri.gecmisIhaleler;
+                return veri;
+            },
+            ihaleVerisiAl() {
+                let veri = {};
+                IHALE_ALANLARI.forEach(alan => { veri[alan] = JSON.parse(JSON.stringify(this[alan])); });
+                return veri;
+            },
+            tarihSaatFormat(iso) {
+                if (!iso) return '-';
+                let d = new Date(iso);
+                if (isNaN(d.getTime())) return iso;
+                return d.toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            },
+            uyar(mesaj) {
+                this.alertMessage = mesaj;
+                this.showAlertModal = true;
+            },
+            arsiviDepoyaYaz() {
+                try {
+                    localStorage.setItem(ARSIV_KEY, JSON.stringify(this.gecmisIhaleler));
+                    return true;
+                } catch (e) {
+                    this.uyar('Geçmiş ihaleler kaydedilemedi (tarayıcı depolama alanı dolmuş olabilir). Eski kayıtları JSON olarak dışa aktarıp silerek yer açabilirsiniz.');
+                    return false;
+                }
+            },
+            arsiveKaydet() {
+                let ad = (this.yeniArsivAdi || '').trim() || this.varsayilanArsivAdi;
+                let simdi = new Date().toISOString();
+                let veri = this.ihaleVerisiAl();
+                let kayit = { id: yeniArsivId(), ad: ad, olusturma: simdi, guncelleme: simdi, ozet: ihaleOzetiHesapla(veri), veri: veri };
+                this.gecmisIhaleler.unshift(kayit);
+                if (!this.arsiviDepoyaYaz()) {
+                    this.gecmisIhaleler.shift();
+                    return;
+                }
+                this.aktifArsivId = kayit.id;
+                this.yeniArsivAdi = '';
+                this.uyar('"' + ad + '" geçmiş ihalelere kaydedildi.');
+            },
+            arsivKaydiniGuncelle() {
+                let kayit = this.aktifArsivKaydi;
+                if (!kayit) return;
+                let yedek = { ad: kayit.ad, guncelleme: kayit.guncelleme, ozet: kayit.ozet, veri: kayit.veri };
+                let veri = this.ihaleVerisiAl();
+                let yeniAd = (this.yeniArsivAdi || '').trim();
+                if (yeniAd) kayit.ad = yeniAd;
+                kayit.veri = veri;
+                kayit.ozet = ihaleOzetiHesapla(veri);
+                kayit.guncelleme = new Date().toISOString();
+                if (!this.arsiviDepoyaYaz()) {
+                    Object.assign(kayit, yedek);
+                    return;
+                }
+                this.yeniArsivAdi = '';
+                this.uyar('"' + kayit.ad + '" kaydı güncellendi.');
+            },
+            arsivDuzenleOnay(kayit) {
+                this.bekleyenArsivId = kayit.id;
+                this.pendingAction = 'arsivYukle';
+                this.confirmMessage = '"' + kayit.ad + '" düzenlemek için açılacak. Çalışma alanındaki mevcut veriler bu ihalenin verileriyle değiştirilecek; kaydetmediğiniz değişiklikler varsa önce "Geçmişe Kaydet" veya "Kaydı Güncelle" ile kaydediniz. Devam edilsin mi?';
+                this.showConfirmModal = true;
+            },
+            arsivYukle(id) {
+                let kayit = this.gecmisIhaleler.find(k => k.id === id);
+                if (!kayit) return;
+                this.durumuUygula(JSON.parse(JSON.stringify(kayit.veri)));
+                this.aktifArsivId = kayit.id;
+                this.yeniArsivAdi = '';
+                this.navigate('dashboard');
+                this.uyar('"' + kayit.ad + '" düzenleme için açıldı. Değişikliklerinizi yaptıktan sonra Geçmiş İhaleler ekranındaki "Kaydı Güncelle" düğmesiyle kaydı güncelleyebilirsiniz.');
+            },
+            arsivSilOnay(kayit) {
+                this.bekleyenArsivId = kayit.id;
+                this.pendingAction = 'arsivSil';
+                this.confirmMessage = '"' + kayit.ad + '" geçmiş ihalelerden kalıcı olarak silinecek. Emin misiniz? (Silmeden önce JSON olarak dışa aktarabilirsiniz.)';
+                this.showConfirmModal = true;
+            },
+            arsivSil(id) {
+                let onceki = this.gecmisIhaleler;
+                this.gecmisIhaleler = onceki.filter(k => k.id !== id);
+                if (!this.arsiviDepoyaYaz()) {
+                    this.gecmisIhaleler = onceki;
+                    return;
+                }
+                if (this.aktifArsivId === id) this.aktifArsivId = null;
+                if (this.duzenlenenArsivId === id) this.duzenlenenArsivId = null;
+            },
+            arsivAdDuzenle(kayit) {
+                this.duzenlenenArsivId = kayit.id;
+                this.duzenlenenArsivAd = kayit.ad;
+                nextTick(() => {
+                    let el = document.getElementById('arsiv-ad-' + kayit.id);
+                    if (el) { el.focus(); el.select(); }
+                });
+            },
+            arsivAdKaydet(kayit) {
+                let ad = (this.duzenlenenArsivAd || '').trim();
+                if (ad && ad !== kayit.ad) {
+                    let eskiAd = kayit.ad;
+                    kayit.ad = ad;
+                    if (!this.arsiviDepoyaYaz()) {
+                        kayit.ad = eskiAd;
+                        return;
+                    }
+                }
+                this.duzenlenenArsivId = null;
+            },
+            dosyaAdiYap(ad) {
+                let harfler = { 'ı': 'i', 'İ': 'I', 'ş': 's', 'Ş': 'S', 'ğ': 'g', 'Ğ': 'G', 'ü': 'u', 'Ü': 'U', 'ö': 'o', 'Ö': 'O', 'ç': 'c', 'Ç': 'C' };
+                let temiz = String(ad || '').replace(/[ıİşŞğĞüÜöÖçÇ]/g, h => harfler[h])
+                    .replace(/[^A-Za-z0-9._-]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+                return (temiz || 'ihale').slice(0, 80);
+            },
+            jsonIndir(nesne, dosyaAdi) {
+                let blob = new Blob([JSON.stringify(nesne, null, 2)], { type: 'application/json;charset=utf-8' });
+                let link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = dosyaAdi;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+            },
+            arsivKaydiDisaAktar(kayit) {
+                this.jsonIndir({ tur: ARSIV_DOSYA_TURU, surum: 1, disaAktarimTarihi: new Date().toISOString(), ihale: kayit }, this.dosyaAdiYap(kayit.ad) + '.json');
+            },
+            tumArsiviDisaAktar() {
+                if (!this.gecmisIhaleler.length) return;
+                let bugun = new Date().toISOString().split('T')[0];
+                this.jsonIndir({ tur: ARSIV_DOSYA_TURU, surum: 1, disaAktarimTarihi: new Date().toISOString(), ihaleler: this.gecmisIhaleler }, 'Gecmis_Ihaleler_' + bugun + '.json');
+            },
+            arsivIceAktar(e) {
+                let file = e.target.files && e.target.files[0];
+                if (!file) return;
+                let reader = new FileReader();
+                reader.onload = (evt) => {
+                    e.target.value = '';
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(evt.target.result);
+                    } catch (err) {
+                        this.uyar('Dosya okunamadı: geçerli bir JSON dosyası değil.');
+                        return;
+                    }
+                    this.arsivVerisiniIceAl(parsed, file.name);
+                };
+                reader.readAsText(file);
+            },
+            arsivVerisiniIceAl(parsed, dosyaAdi) {
+                let liste = [];
+                if (parsed && parsed.tur === ARSIV_DOSYA_TURU) {
+                    if (Array.isArray(parsed.ihaleler)) liste = parsed.ihaleler;
+                    else if (parsed.ihale) liste = [parsed.ihale];
+                } else if (parsed && parsed.idare && Array.isArray(parsed.malzemeler)) {
+                    // "Verileri Dışa Aktar" ile alınmış tam yedek dosyası
+                    let veri = {};
+                    IHALE_ALANLARI.forEach(alan => { if (parsed[alan] !== undefined) veri[alan] = parsed[alan]; });
+                    liste = [{ ad: String(dosyaAdi || '').replace(/\.json$/i, ''), veri: veri }];
+                }
+                liste = liste.filter(k => k && k.veri && typeof k.veri === 'object');
+                if (!liste.length) {
+                    this.uyar('Dosyada içe aktarılabilecek ihale kaydı bulunamadı.');
+                    return;
+                }
+                let kullanilanIdler = new Set(this.gecmisIhaleler.map(k => k.id));
+                let simdi = new Date().toISOString();
+                let eklenenler = liste.map(k => {
+                    let id = (k.id && !kullanilanIdler.has(k.id)) ? k.id : yeniArsivId();
+                    kullanilanIdler.add(id);
+                    let ozet = ihaleOzetiHesapla(k.veri);
+                    let ad = String(k.ad || '').trim() || [ozet.dtNo, ozet.isinAdi].filter(x => x).join(' - ') || 'İçe Aktarılan İhale';
+                    return { id: id, ad: ad, olusturma: k.olusturma || simdi, guncelleme: k.guncelleme || k.olusturma || simdi, ozet: ozet, veri: k.veri };
+                });
+                let onceki = this.gecmisIhaleler;
+                this.gecmisIhaleler = eklenenler.concat(onceki);
+                if (!this.arsiviDepoyaYaz()) {
+                    this.gecmisIhaleler = onceki;
+                    return;
+                }
+                this.navigate('gecmis_ihaleler');
+                this.uyar(eklenenler.length + ' ihale geçmiş ihalelere eklendi.');
+            },
             toggleDarkMode() {
                 this.isDarkMode = !this.isDarkMode;
                 if (this.isDarkMode) {
@@ -4447,6 +4813,10 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                     this.pfaTeklifler = JSON.parse(JSON.stringify(this.ymTeklifler));
                     this.alertMessage = "YM Birim Fiyatları başarıyla firma tekliflerine aktarıldı!";
                     this.showAlertModal = true;
+                } else if(this.pendingAction === 'arsivYukle') {
+                    this.arsivYukle(this.bekleyenArsivId);
+                } else if(this.pendingAction === 'arsivSil') {
+                    this.arsivSil(this.bekleyenArsivId);
                 } else if(this.pendingAction === 'tumMalzemeleriSil') {
                     let silinecekIdler = this.malzemeler.map(m => m.id);
                     this.malzemeler = [];
@@ -4460,6 +4830,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 }
                 this.showConfirmModal = false;
                 this.pendingAction = null;
+                this.bekleyenArsivId = null;
             },
             isMinPfa(malzemeId, val) {
                 if(!val || isNaN(val) || val <= 0) return false;
@@ -4567,7 +4938,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 location.reload();
             },
             exportData() {
-                let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.$data, null, 2));
+                let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.kaliciVeri(), null, 2));
                 let dl = document.createElement('a');
                 dl.setAttribute("href", dataStr);
                 dl.setAttribute("download", "DT_Yedek.json");
@@ -4581,6 +4952,12 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 reader.onload = (evt) => {
                     try {
                         let parsed = JSON.parse(evt.target.result);
+                        e.target.value = '';
+                        if (parsed && parsed.tur === ARSIV_DOSYA_TURU) {
+                            this.arsivVerisiniIceAl(parsed, file.name);
+                            return;
+                        }
+                        delete parsed.gecmisIhaleler;
                         Object.assign(this.$data, parsed);
                         this.alertMessage = "Veriler başarıyla yüklendi!";
                         this.showAlertModal = true;
