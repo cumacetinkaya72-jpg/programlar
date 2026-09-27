@@ -4627,6 +4627,36 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 let bugun = new Date().toISOString().split('T')[0];
                 this.jsonIndir({ tur: ARSIV_DOSYA_TURU, surum: 1, disaAktarimTarihi: new Date().toISOString(), ihaleler: this.gecmisIhaleler }, 'Gecmis_Ihaleler_' + bugun + '.json');
             },
+            arsivKayitlariniBirlestir(liste) {
+                // Yedekteki kayıtları mevcut arşivle birleştirir: yeni kayıtlar eklenir,
+                // aynı kayıt zaten varsa daha yeni tarihli olan tutulur.
+                let kayitlar = this.gecmisIhaleler.slice();
+                let yeni = 0, guncellenen = 0;
+                let simdi = new Date().toISOString();
+                (liste || []).forEach(k => {
+                    if (!k || !k.veri || typeof k.veri !== 'object') return;
+                    let ozet = ihaleOzetiHesapla(k.veri);
+                    let kayit = {
+                        id: k.id || yeniArsivId(),
+                        ad: String(k.ad || '').trim() || [ozet.dtNo, ozet.isinAdi].filter(x => x).join(' - ') || 'İçe Aktarılan İhale',
+                        olusturma: k.olusturma || simdi,
+                        guncelleme: k.guncelleme || k.olusturma || simdi,
+                        ozet: ozet,
+                        veri: k.veri
+                    };
+                    let i = kayitlar.findIndex(x => x.id === kayit.id);
+                    if (i === -1) { kayitlar.push(kayit); yeni++; }
+                    else if (String(kayit.guncelleme) > String(kayitlar[i].guncelleme || '')) { kayitlar[i] = kayit; guncellenen++; }
+                });
+                kayitlar.sort((a, b) => String(b.olusturma || '').localeCompare(String(a.olusturma || '')));
+                let onceki = this.gecmisIhaleler;
+                this.gecmisIhaleler = kayitlar;
+                if (!this.arsiviDepoyaYaz()) {
+                    this.gecmisIhaleler = onceki;
+                    return null;
+                }
+                return { yeni: yeni, guncellenen: guncellenen };
+            },
             arsivIceAktar(e) {
                 let file = e.target.files && e.target.files[0];
                 if (!file) return;
@@ -4656,6 +4686,13 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                     liste = [{ ad: String(dosyaAdi || '').replace(/\.json$/i, ''), veri: veri }];
                 }
                 liste = liste.filter(k => k && k.veri && typeof k.veri === 'object');
+                if (parsed && parsed.tur !== ARSIV_DOSYA_TURU && Array.isArray(parsed.gecmisIhaleler) && parsed.gecmisIhaleler.length) {
+                    let sonuc = this.arsivKayitlariniBirlestir(parsed.gecmisIhaleler);
+                    if (!sonuc) return;
+                    this.navigate('gecmis_ihaleler');
+                    this.uyar('Yedek dosyasındaki geçmiş ihaleler alındı: ' + sonuc.yeni + ' yeni kayıt eklendi, ' + sonuc.guncellenen + ' kayıt güncellendi.');
+                    return;
+                }
                 if (!liste.length) {
                     this.uyar('Dosyada içe aktarılabilecek ihale kaydı bulunamadı.');
                     return;
@@ -4938,11 +4975,10 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 location.reload();
             },
             exportData() {
-                let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.kaliciVeri(), null, 2));
-                let dl = document.createElement('a');
-                dl.setAttribute("href", dataStr);
-                dl.setAttribute("download", "DT_Yedek.json");
-                dl.click();
+                // Tam yedek: çalışma alanı + kayıtlı tüm geçmiş ihaleler
+                let yedek = this.kaliciVeri();
+                yedek.gecmisIhaleler = JSON.parse(JSON.stringify(this.gecmisIhaleler));
+                this.jsonIndir(yedek, "DT_Yedek.json");
             },
             triggerImport() { this.$refs.fileInput.click(); },
             importData(e) {
@@ -4957,9 +4993,15 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                             this.arsivVerisiniIceAl(parsed, file.name);
                             return;
                         }
+                        let arsivListesi = Array.isArray(parsed.gecmisIhaleler) ? parsed.gecmisIhaleler : null;
                         delete parsed.gecmisIhaleler;
                         Object.assign(this.$data, parsed);
-                        this.alertMessage = "Veriler başarıyla yüklendi!";
+                        let mesaj = "Veriler başarıyla yüklendi!";
+                        if (arsivListesi && arsivListesi.length) {
+                            let sonuc = this.arsivKayitlariniBirlestir(arsivListesi);
+                            if (sonuc) mesaj += " Geçmiş ihaleler: " + sonuc.yeni + " yeni kayıt eklendi, " + sonuc.guncellenen + " kayıt güncellendi.";
+                        }
+                        this.alertMessage = mesaj;
                         this.showAlertModal = true;
                     } catch(err) {}
                 };
