@@ -4637,6 +4637,305 @@
       };
     }
 
+    /* =====================================================================
+       FET MOTORU — ÖZYİNELEMELİ YER DEĞİŞTİRME (Recursive Swapping)
+       =====================================================================
+       FET (Free Timetabling Software, Liviu Lalescu) programının yayımlanmış
+       algoritma tanımından esinlenerek SIFIRDAN yazılmıştır; FET'in kaynak
+       kodunu içermez. Temel fikir:
+
+         1. Bloklar "zorluk" sırasına dizilir: boş programda en az yere
+            sığabilen blok en önce yerleştirilir.
+         2. Sıradaki blok için tüm saatler taranır. Her saat için o saate
+            konulursa ÇIKARILMASI GEREKEN blokların kümesi (çakışanlar)
+            hesaplanır. Hiç çakışmayan uygun saat varsa blok oraya konur.
+         3. Yoksa en az çakışmalı saat seçilir, çakışan bloklar çıkarılır,
+            blok yerleştirilir ve çıkarılan bloklar AYNI YÖNTEMLE
+            özyinelemeli olarak yeniden yerleştirilir (en fazla 14 seviye).
+            Bu zincirde yerleştirilmiş bir blok, aynı zincirde tekrar
+            yerinden oynatılamaz (döngüyü önler).
+         4. Zincir başarısız olursa her şey eski hâline döner ve sıradaki
+            en az çakışmalı saat denenir.
+         5. Blok hiçbir şekilde yerleşemezse FET'te olduğu gibi zorla en az
+            çakışmalı yere konur, çıkan bloklar kuyruğun başına alınır; tur
+            sonunda yerleşemeyen bloklar sıranın başına taşınıp yeni tur
+            başlatılır.
+
+       Uygunluk denetimi, diğer motorlarla AYNI ortak çekirdek
+       fonksiyonlarıyla (slotFitsBlock, commitBlock, evictBlock) yapılır;
+       dolayısıyla kapalı saatler, derslik kapasitesi, günlük sınırlar,
+       öğretmen boşluk sınırı, ardışık ders sınırı gibi tüm kısıtlar aynen
+       geçerlidir. Raptiyeli (sabit) hücreler hiçbir zaman oynatılmaz. */
+
+    var FET_MAKS_SEVIYE = 14;
+
+    // Bloğu (gun, startH) saatine koymak için çıkarılması gereken yerleşik
+    // blokların uid kümesi. Saat bu blok için hiçbir koşulda kullanılamıyorsa
+    // (aralık dışı, kapalı saat, raptiye, zincirde kilitli blok) null döner.
+    function fetSlotCakismalari(block, legs, closedList, gun, startH, classGrid, teacherGrid, roomGrid, placedIndex, kilitli) {
+      const range = getClassHourRange(block.sinifId, gun);
+      if (startH < range.minH || startH + block.blockSize - 1 > range.maxH) return null;
+      const kume = new Set();
+      const oynatilabilir = (uid) => !!uid && !!placedIndex[uid] && !kilitli.has(uid) && uid !== block.uid;
+      for (let off = 0; off < block.blockSize; off++) {
+        const ck = `${gun}_${startH + off}`;
+        const hucre = classGrid[pmKey(block.sinifId, ck)];
+        if (hucre) {
+          if (!oynatilabilir(hucre.blockUid)) return null;
+          kume.add(hucre.blockUid);
+        }
+        for (let li = 0; li < legs.length; li++) {
+          if (closedList[li][ck]) return null;
+          const t = teacherGrid[`${legs[li].ogretmenId}||${ck}`];
+          if (t) {
+            if (!oynatilabilir(t.blockUid)) return null;
+            kume.add(t.blockUid);
+          }
+        }
+        const rNeeds = {};
+        legs.forEach(leg => { if (leg.derslikId) rNeeds[leg.derslikId] = (rNeeds[leg.derslikId] || 0) + 1; });
+        for (const rId in rNeeds) {
+          const doluluk = roomGrid[`${rId}||${ck}`] || [];
+          let fazla = doluluk.length + rNeeds[rId] - getRoomCapacity(rId);
+          if (fazla <= 0) continue;
+          doluluk.forEach(o => { if (fazla > 0 && kume.has(o.blockUid)) fazla--; });
+          for (const o of doluluk) {
+            if (fazla <= 0) break;
+            if (kume.has(o.blockUid)) continue;
+            if (!oynatilabilir(o.blockUid)) continue;
+            kume.add(o.blockUid);
+            fazla--;
+          }
+          if (fazla > 0) return null;
+        }
+      }
+      return kume;
+    }
+
+    // Bir blok için aday saatleri, çakışma ağırlığına göre sıralı döndürür.
+    function fetAdaySaatler(block, ctx) {
+      const legs = blockLegs(block);
+      if (block.grupSplit && legs.length !== 2) return [];
+      if (groupBlockSelfConflict(block)) return [];
+      if (violatesDevreTercihi(block.sinifId, legs)) return [];
+      const closedList = legs.map(leg => getClosedHoursSet(leg.ogretmenId, block.sinifId));
+      const hedefBosGun = teacherOffDayMap ? (teacherOffDayMap[block.ogretmenId] || '') : '';
+      const { classGrid, teacherGrid, roomGrid, placedIndex, bloklar } = ctx;
+      const adaylar = [];
+      ctx.gunler.forEach(gun => {
+        const range = getClassHourRange(block.sinifId, gun);
+        for (let h = range.minH; h <= range.maxH - block.blockSize + 1; h++) {
+          const kume = fetSlotCakismalari(block, legs, closedList, gun, h, classGrid, teacherGrid, roomGrid, placedIndex, ctx.kilitli);
+          if (!kume) continue;
+          let agirlik = 0;
+          kume.forEach(u => { const b = bloklar[u]; agirlik += b ? b.blockSize : 1; });
+          if (gun === hedefBosGun) agirlik += 0.6;
+          // Öğretmenin o günkü dersine bitişik saatleri hafifçe öne al
+          // (daha az boşluklu program).
+          const bitisik = legs.some(leg => teacherGrid[`${leg.ogretmenId}||${gun}_${h - 1}`] || teacherGrid[`${leg.ogretmenId}||${gun}_${h + block.blockSize}`]);
+          if (bitisik) agirlik -= 0.3;
+          adaylar.push({ gun, h, cak: [...kume], agirlik: agirlik + Math.random() * 0.45 });
+        }
+      });
+      adaylar.sort((a, b) => a.agirlik - b.agirlik);
+      return adaylar;
+    }
+
+    // Doluluk çakışmaları çıkarıldıktan sonra saat hâlâ uygun değilse (günlük
+    // saat sınırı, boşluk sınırı, ardışık ders sınırı gibi), engele yol
+    // açabilecek AYNI GÜNDEKİ bloklar da (aynı öğretmen/aynı sınıf) sırayla
+    // çıkarılmayı dener — FET bunları da "çakışan etkinlik" sayar. Başarılı
+    // olursa çıkarılanları cikanlar dizisine ekler.
+    function fetEkCikarmaIleSigdir(block, gun, h, ctx, cikanlar) {
+      const { classGrid, teacherGrid, roomGrid, placedIndex, gunlukDers } = ctx;
+      if (slotFitsBlock(block, gun, h, classGrid, teacherGrid, roomGrid, gunlukDers)) return true;
+      const ogretmenler = new Set(blockLegs(block).map(l => l.ogretmenId));
+      const adaylar = [];
+      for (const uid in placedIndex) {
+        const r = placedIndex[uid];
+        if (r.gun !== gun || ctx.kilitli.has(uid) || !ctx.bloklar[uid]) continue;
+        if (r.sinifId === block.sinifId || ogretmenler.has(r.ogretmenId) || (r.ogretmenIdB && ogretmenler.has(r.ogretmenIdB))) adaylar.push(uid);
+      }
+      adaylar.sort((a, b) => (placedIndex[a].blockSize - placedIndex[b].blockSize) || (Math.random() - 0.5));
+      for (let i = 0; i < adaylar.length && i < 4; i++) {
+        const uid = adaylar[i];
+        const kopya = _izgaraKopyala(classGrid, teacherGrid, roomGrid, placedIndex);
+        evictBlock(uid, classGrid, teacherGrid, roomGrid, placedIndex);
+        if (slotFitsBlock(block, gun, h, classGrid, teacherGrid, roomGrid, gunlukDers)) {
+          cikanlar.push(ctx.bloklar[uid]);
+          return true;
+        }
+        _izgaraGeriYukle(kopya, classGrid, teacherGrid, roomGrid, placedIndex);
+      }
+      return false;
+    }
+
+    function fetYerlestirOzyinelemeli(block, seviye, ctx) {
+      ctx.cagri++;
+      if (ctx.cagri > ctx.cagriButcesi || Date.now() > ctx.bitis) return false;
+      const { classGrid, teacherGrid, roomGrid, placedIndex, gunlukDers } = ctx;
+      const adaylar = fetAdaySaatler(block, ctx);
+
+      // Çakışmasız ve tüm kısıtlara uyan ilk saat varsa doğrudan yerleştir.
+      for (const a of adaylar) {
+        if (a.cak.length) continue;
+        if (slotFitsBlock(block, a.gun, a.h, classGrid, teacherGrid, roomGrid, gunlukDers)) {
+          commitBlock(block, a.gun, a.h, classGrid, teacherGrid, roomGrid, placedIndex);
+          return true;
+        }
+      }
+      if (seviye >= ctx.maksSeviye) return false;
+
+      const dal = seviye === 0 ? 10 : (seviye < 3 ? 3 : 2);
+      let denenen = 0;
+      for (const a of adaylar) {
+        if (!a.cak.length) continue;
+        if (denenen >= dal) break;
+        if (ctx.cagri > ctx.cagriButcesi || Date.now() > ctx.bitis) return false;
+        denenen++;
+        const kopya = _izgaraKopyala(classGrid, teacherGrid, roomGrid, placedIndex);
+        const cikanlar = a.cak.map(u => ctx.bloklar[u]).filter(Boolean);
+        a.cak.forEach(u => evictBlock(u, classGrid, teacherGrid, roomGrid, placedIndex));
+        if (!fetEkCikarmaIleSigdir(block, a.gun, a.h, ctx, cikanlar)) {
+          _izgaraGeriYukle(kopya, classGrid, teacherGrid, roomGrid, placedIndex);
+          continue;
+        }
+        commitBlock(block, a.gun, a.h, classGrid, teacherGrid, roomGrid, placedIndex);
+        ctx.kilitli.add(block.uid);
+        cikanlar.sort((x, y) => y.blockSize - x.blockSize);
+        let tamam = true;
+        for (const c of cikanlar) {
+          if (!fetYerlestirOzyinelemeli(c, seviye + 1, ctx)) { tamam = false; break; }
+        }
+        ctx.kilitli.delete(block.uid);
+        if (tamam) return true;
+        _izgaraGeriYukle(kopya, classGrid, teacherGrid, roomGrid, placedIndex);
+      }
+      return false;
+    }
+
+    // Özyineleme de başarısız olduğunda: bloğu en az çakışmalı saate ZORLA
+    // koyar, çıkarılan blokları döndürür (null = hiçbir saate konamıyor).
+    function fetZorlaYerlestir(block, ctx) {
+      const { classGrid, teacherGrid, roomGrid, placedIndex, gunlukDers } = ctx;
+      ctx.kilitli = new Set();
+      const adaylar = fetAdaySaatler(block, ctx);
+      for (const a of adaylar) {
+        if (!a.cak.length) continue;
+        if (a.cak.some(u => (ctx.korunan[u] || 0) > ctx.adim)) continue; // kısa süreli tabu
+        const kopya = _izgaraKopyala(classGrid, teacherGrid, roomGrid, placedIndex);
+        const cikanlar = a.cak.map(u => ctx.bloklar[u]).filter(Boolean);
+        a.cak.forEach(u => evictBlock(u, classGrid, teacherGrid, roomGrid, placedIndex));
+        if (fetEkCikarmaIleSigdir(block, a.gun, a.h, ctx, cikanlar)) {
+          commitBlock(block, a.gun, a.h, classGrid, teacherGrid, roomGrid, placedIndex);
+          ctx.korunan[block.uid] = ctx.adim + 8;
+          return cikanlar;
+        }
+        _izgaraGeriYukle(kopya, classGrid, teacherGrid, roomGrid, placedIndex);
+      }
+      return null;
+    }
+
+    function fetOzyinelemeliCoz(config) {
+      config = config || {};
+      const gunler = appState.okul.gunler;
+      const gunlukDers = getGridHourCount();
+      teacherOffDayMap = buildTeacherOffDayMap();
+      const baslangic = Date.now();
+      const bitis = baslangic + (config.timeoutMs || 8000);
+
+      const rawBlocks = buildAllRawBlocks();
+      const totalHours = rawBlocks.reduce((s, b) => s + b.blockSize, 0);
+      const bloklar = {};
+      rawBlocks.forEach(b => { bloklar[b.uid] = b; });
+
+      // Raptiyeli (sabit) hücrelerden taban ızgaralar.
+      const tabanC = {}, tabanT = {}, tabanR = {};
+      for (const k in appState.programHaftalik) {
+        const cell = appState.programHaftalik[k];
+        if (!cell.sabit) continue;
+        const pk = pmParse(k);
+        tabanC[k] = { ...cell };
+        expandCellLegs(cell).forEach((leg, i) => {
+          if (!leg.ogretmenId) return;
+          tabanT[`${leg.ogretmenId}||${pk.cellKey}`] = { sinifId: pk.sinifId, dersId: cell.dersId };
+          const rId = leg.derslikId || (i === 0 ? getBlockDerslikId(pk.sinifId, cell.dersId) : null);
+          if (rId) { const rk = `${rId}||${pk.cellKey}`; if (!tabanR[rk]) tabanR[rk] = []; tabanR[rk].push({ sinifId: pk.sinifId, dersId: cell.dersId }); }
+        });
+      }
+
+      // Zorluk: boş (yalnız raptiyeli) programda bloğun sığabildiği yer sayısı.
+      const zorluk = {};
+      rawBlocks.forEach(b => {
+        zorluk[b.uid] = collectCandidateSlots(b, tabanC, tabanT, tabanR, gunler, gunlukDers).length;
+      });
+      let sira = [...rawBlocks].sort((a, b) =>
+        (zorluk[a.uid] - zorluk[b.uid]) || (b.blockSize - a.blockSize) || (Math.random() - 0.5));
+
+      let enIyi = null;
+      let tur = 0;
+      while (Date.now() < bitis) {
+        tur++;
+        const kopya = _izgaraKopyala(tabanC, tabanT, tabanR, {});
+        const ctx = {
+          classGrid: kopya.c, teacherGrid: kopya.t, roomGrid: kopya.r, placedIndex: {},
+          bloklar, gunler, gunlukDers, bitis,
+          maksSeviye: config.maksSeviye || FET_MAKS_SEVIYE,
+          cagriButcesi: config.cagriButcesi || 400,
+          cagri: 0, kilitli: new Set(), korunan: {}, adim: 0
+        };
+        const kuyruk = sira.slice();
+        const zorlaSayisi = {};
+        let yerlesen = 0, turEnIyi = -1, turEnIyiKopya = null;
+
+        while (kuyruk.length && Date.now() < bitis) {
+          const b = kuyruk.shift();
+          if (ctx.placedIndex[b.uid]) continue;
+          ctx.adim++;
+          ctx.cagri = 0;
+          ctx.kilitli = new Set();
+          const once = yerlesen;
+          if (fetYerlestirOzyinelemeli(b, 0, ctx)) {
+            yerlesen = Object.values(ctx.placedIndex).reduce((s, r) => s + r.blockSize, 0);
+          } else {
+            zorlaSayisi[b.uid] = (zorlaSayisi[b.uid] || 0) + 1;
+            if (zorlaSayisi[b.uid] > 4) continue; // bu turda bu bloktan vazgeç
+            const cikanlar = fetZorlaYerlestir(b, ctx);
+            if (!cikanlar) continue;
+            kuyruk.unshift(...cikanlar);
+            yerlesen = Object.values(ctx.placedIndex).reduce((s, r) => s + r.blockSize, 0);
+          }
+          if (yerlesen > turEnIyi && yerlesen >= once) {
+            turEnIyi = yerlesen;
+            turEnIyiKopya = { c: { ...ctx.classGrid }, p: { ...ctx.placedIndex } };
+          }
+        }
+        if (turEnIyiKopya) {
+          const gap = computeGapScore(turEnIyiKopya.c);
+          if (!enIyi || turEnIyi > enIyi.placed || (turEnIyi === enIyi.placed && gap < enIyi.gapScore)) {
+            enIyi = { classGrid: turEnIyiKopya.c, placedIndex: turEnIyiKopya.p, placed: turEnIyi, gapScore: gap };
+          }
+        }
+        if (enIyi && enIyi.placed >= totalHours) break;
+        // FET'teki gibi: yerleşemeyen blokları sıranın başına al, yeniden dene.
+        const yerlesmeyen = new Set(rawBlocks.filter(b => !(enIyi && enIyi.placedIndex[b.uid])).map(b => b.uid));
+        sira = [...sira.filter(b => yerlesmeyen.has(b.uid)), ...sira.filter(b => !yerlesmeyen.has(b.uid))];
+      }
+
+      if (!enIyi) enIyi = { classGrid: { ...tabanC }, placedIndex: {}, placed: 0, gapScore: 0 };
+      const unplacedBlocks = rawBlocks.filter(b => !enIyi.placedIndex[b.uid]);
+      return {
+        classGrid: enIyi.classGrid,
+        placedIndex: enIyi.placedIndex,
+        unplacedBlocks,
+        placed: enIyi.placed,
+        total: totalHours,
+        attempts: tur,
+        gapScore: enIyi.gapScore,
+        pedagogicalRelaxation: null
+      };
+    }
+
   </script>
 
   <script type="text/js-worker" id="advanced-search-src">
@@ -14501,7 +14800,8 @@
       strong: "Güçlü Dağıtım",
       smart: "Akıllı Motor (SA)",
       genetic: "Genetik Motor (GA)",
-      cpExact: "Kesin Motor (CP)"
+      cpExact: "Kesin Motor (CP)",
+      fet: "FET Motoru"
     };
 
     // Bir motor çalışmaya başladığında ekranın üstünde beliren, geçen
@@ -16461,6 +16761,12 @@
                     </button>
                     <button onclick="runGeneticSolver()" class="btn-primary !bg-fuchsia-600 !shadow-fuchsia-200" title="Farklı çekirdeklerde paralel olarak üretilen program adaylarını sınıf-gün blokları bazında çaprazlar (crossover), mutasyona uğratır ve nesiller boyunca evrimleştirerek en iyi bireyi seçer.">
                       <i class="fa-solid fa-dna"></i> <span class="hidden sm:inline">Genetik Motor (GA)</span><span class="sm:hidden">Genetik</span>
+                    </button>
+                    <button onclick="runFetSolver()" class="btn-primary !bg-amber-600 !shadow-amber-200" title="FET Motoru: FET programının özyinelemeli yer değiştirme (recursive swapping) algoritmasıyla çalışır. Yerleşemeyen dersi en az çakışmalı saate koyar, çıkan dersleri zincirleme (14 seviyeye kadar) yeniden yerleştirir. Ardından boşlukları tavlama ile azaltır.">
+                      <i class="fa-solid fa-shuffle"></i> <span class="hidden sm:inline">FET Motoru</span><span class="sm:hidden">FET</span>
+                    </button>
+                    <button onclick="showFetAktarimModal()" class="btn-secondary" title="Verileri gerçek FET programına aktarın (.fet) veya FET'in ürettiği programı geri yükleyin">
+                      <i class="fa-solid fa-right-left"></i> <span class="hidden sm:inline">FET Dosyası</span>
                     </button>
                     <div class="flex items-center gap-1 border-l border-slate-200 pl-2 ml-0.5">
                       <button class="undo-redo-btn js-btn-undo" onclick="undo()" disabled title="Geri Al (Ctrl+Z)">
@@ -19798,6 +20104,566 @@
     // yeni tur, BİR ÖNCEKİ TURUN EN İYİ SONUCUNU da popülasyona dahil
     // ederek başlar, böylece ilerleme asla kaybolmaz (yalnızca iyileşir).
     const GENETIC_MAX_ROUNDS = 3;
+    /* =====================================================================
+       FET MOTORU — ÇALIŞTIRICI (çok çekirdekli havuz)
+       =====================================================================
+       Her çekirdek, ortak çekirdekteki fetOzyinelemeliCoz() ile kendi
+       rastgele sırasıyla bağımsız bir FET araması yapar, ardından boşluk
+       kalitesini tavlama ile iyileştirir. En iyi sonuç seçilir; tam
+       yerleşim çıkmazsa ortak onarım katmanları son bir kez denenir. */
+    function runFetSolver() {
+      if (engineBusyGuard()) return;
+      ensureTeacherAssignmentsExist();
+      if (!window.__feasibilityOverride && !feasibilityGate()) return;
+      window.__feasibilityOverride = false;
+      if (!ensureEngineSourcesOnMainThread()) {
+        showToast("FET Motoru yüklenemedi, lütfen sayfayı yenileyin.", "error");
+        return;
+      }
+      pushHistory('FET Motoru');
+      lastDistributionSnapshot = JSON.parse(JSON.stringify(appState.programHaftalik));
+      applyTorenSaatiPins(false);
+      applyRehberlikOrtakPins(false);
+
+      const { tightness, tightnessFactor, sizeFactor, phase2Config } = computeAdaptiveBudgetFactors();
+      const fetConfig = {
+        timeoutMs: Math.min(20000, 4000 * sizeFactor * Math.max(1, tightnessFactor / 2)),
+        maksSeviye: FET_MAKS_SEVIYE,
+        cagriButcesi: 400
+      };
+      const hwCores = (navigator.hardwareConcurrency || 4);
+      const coreCount = Math.max(2, Math.min(hwCores, 16));
+      const FET_MAKS_TUR = 3;
+      const t0 = performance.now();
+
+      engineBusy = true;
+      showEngineBusyBanner(ENGINE_JOB_LABELS.fet);
+      showToast(`FET Motoru — ${coreCount} çekirdekte özyinelemeli yer değiştirme araması başladı (%${Math.round(tightness * 100)} doluluk)...`, "info");
+
+      const daha_iyi = (a, b) => !b || a.placed > b.placed || (a.placed === b.placed && a.gapScore < b.gapScore);
+
+      const finalize = (best, turSayisi) => {
+        appState.programHaftalik = best.classGrid;
+        if (best.placed < best.total) {
+          try {
+            const kazanc = runFinalRepairPass(6000);
+            if (kazanc > 0) {
+              best = { ...best, classGrid: appState.programHaftalik, placed: best.placed + kazanc,
+                       gapScore: computeGapScore(appState.programHaftalik) };
+            }
+          } catch (err) { console.error("FET Motoru son tur onarım hatası:", err); }
+        }
+        lastSolveDurationMs = performance.now() - t0;
+        saveState();
+        renderProgramOlustur(document.getElementById("mainContent"));
+        renderQualityScoreCards();
+        runDiagnosisAfterSolve();
+        setTimeout(() => dagitimEksikTeshisi(best.placed, best.total), 400);
+        const turNotu = turSayisi > 1 ? ` (${turSayisi} tur)` : "";
+        if (best.placed >= best.total) {
+          showToast(`FET Motoru tamamlandı${turNotu}: ${best.placed}/${best.total} saatin tamamı yerleşti (boşluk skoru: ${best.gapScore}).`);
+        } else {
+          showToast(`FET Motoru tamamlandı${turNotu}: ${best.placed}/${best.total} saat yerleşti, boşluk skoru: ${best.gapScore}. Kalan saatleri "Elle Ders Atama" panelinden yerleştirebilirsiniz.`, "info");
+        }
+      };
+
+      const anaThreadYedek = () => {
+        setTimeout(() => {
+          try {
+            ensureEngineSourcesOnMainThread();
+            let best = null;
+            for (let i = 0; i < 2; i++) {
+              const p1 = fetOzyinelemeliCoz(fetConfig);
+              const p2 = simulatedAnnealingOptimize(p1, phase2Config);
+              const iyi = p2.placed >= p1.placed;
+              const cand = { classGrid: iyi ? p2.classGrid : p1.classGrid, placed: iyi ? p2.placed : p1.placed,
+                             total: p1.total, gapScore: iyi ? p2.gapScore : p1.gapScore };
+              if (daha_iyi(cand, best)) best = cand;
+              if (best.placed >= best.total) break;
+            }
+            finalize(best, 1);
+          } catch (err) {
+            console.error("FET Motoru hatası:", err);
+            showToast("FET Motoru çalışırken bir hata oluştu, lütfen tekrar deneyin.", "error");
+          } finally {
+            engineBusy = false;
+            hideEngineBusyBanner();
+          }
+        }, 50);
+      };
+
+      let enIyi = null;
+      let tur = 0;
+      const turCalistir = () => {
+        tur++;
+        const pool = createEnginePool(coreCount);
+        if (pool.length === 0) { engineBusy = true; anaThreadYedek(); return; }
+        let bitenSayisi = 0;
+        pool.forEach((worker, wi) => {
+          const handler = (e) => {
+            const data = e.data || {};
+            if (data.jobType !== "fetSwap") return;
+            worker.removeEventListener("message", handler);
+            if (data.type === "error") console.error(`FET Motoru çekirdeği #${wi} hatası:`, data.message);
+            else if (data.result && daha_iyi(data.result, enIyi)) enIyi = data.result;
+            bitenSayisi++;
+            if (bitenSayisi < pool.length) return;
+            disposeEnginePool();
+            if (!enIyi) {
+              engineBusy = false; hideEngineBusyBanner();
+              showToast("FET Motoru: hiçbir çekirdekten sonuç alınamadı, lütfen tekrar deneyin.", "error");
+              return;
+            }
+            if (enIyi.placed < enIyi.total && tur < FET_MAKS_TUR) {
+              showToast(`FET Motoru ${tur}. tur: ${enIyi.placed}/${enIyi.total} — ${tur + 1}. tur başlıyor...`, "info");
+              fetConfig.timeoutMs = Math.min(30000, Math.round(fetConfig.timeoutMs * 1.5));
+              turCalistir();
+              return;
+            }
+            engineBusy = false; hideEngineBusyBanner();
+            finalize(enIyi, tur);
+          };
+          worker.addEventListener("message", handler);
+          worker.postMessage({ type: "fetSwap", fetConfig, phase2Config, appState: buildEngineSnapshot() });
+        });
+      };
+      turCalistir();
+    }
+
+    /* =====================================================================
+       FET DOSYASI AKTARIMI — gerçek FET programıyla veri alışverişi
+       =====================================================================
+       Dışa aktarma: sınıflar, öğretmenler, dersler, derslikler, ders
+       blokları (etkinlikler), kapalı saatler, raptiyeli saatler ve eşlenebilen
+       dağıtım parametreleri FET'in .fet (XML) biçiminde indirilir.
+       İçe aktarma: FET'in ürettiği "..._data_and_timetable.fet" ya da
+       "..._activities.xml" dosyası okunur, her etkinliğin günü/saati bu
+       programın haftalık ızgarasına yerleştirilir. Etkinliklerin bu
+       programdaki karşılığı, etkinlik açıklamasına (Comments) yazılan
+       "DDP|..." etiketinden okunur; açıklaması olmayan _activities.xml
+       dosyaları için son dışa aktarmanın eşleme tablosu (appState.fetAktarim)
+       kullanılır. */
+    function fetXml(v) {
+      return String(v == null ? '' : v)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+    }
+
+    // FET'te aynı türdeki adlar benzersiz olmalı: tekrar eden adlara ek konur.
+    function fetBenzersizAdlar(liste, adAl, kullanilan) {
+      const sonuc = {};
+      liste.forEach(x => {
+        let ad = String(adAl(x) || '').trim() || 'Adsız';
+        let aday = ad, i = 2;
+        while (kullanilan.has(aday.toLocaleLowerCase('tr'))) aday = `${ad} (${i++})`;
+        kullanilan.add(aday.toLocaleLowerCase('tr'));
+        sonuc[x.id] = aday;
+      });
+      return sonuc;
+    }
+
+    function fetEtiketCoz(metin) {
+      const m = /DDP\|([^<\s]*)/.exec(String(metin || ''));
+      if (!m) return null;
+      const p = m[1].split('|');
+      if (p[0] === 'SABIT') return { sabit: true };
+      if (p.length < 9) return null;
+      return {
+        sinifId: p[0], dersId: p[1], ogretmenId: p[2] || null, ogretmenIdB: p[3] || null,
+        derslikId: p[4] || null, derslikIdB: p[5] || null, blockSize: parseInt(p[6], 10) || 1,
+        grupSplit: p[7] === '1', rol: p[8]
+      };
+    }
+
+    function buildFetXml() {
+      ensureEngineSourcesOnMainThread();
+      const ok = appState.okul;
+      const gunler = ok.gunler || [];
+      const saatSayisi = getGridHourCount();
+      const kullanilan = new Set();
+      const ogrAd = fetBenzersizAdlar(appState.ogretmenler, t => t.ad, new Set());
+      const dersAd = fetBenzersizAdlar(appState.dersler, d => d.ad, new Set());
+      const sinifAd = fetBenzersizAdlar(appState.siniflar, s => s.ad, kullanilan);
+      // Bölünmüş (Grup A/B) dersi olan sınıflar için grup adları.
+      const grupluSiniflar = new Set();
+      appState.ogretmenDersAtamalari.forEach(a => { if (a.grupId) grupluSiniflar.add(a.sinifId); });
+      const grupAd = {};
+      grupluSiniflar.forEach(sid => {
+        ['A', 'B'].forEach(g => {
+          let ad = `${sinifAd[sid]} ${g} Grubu`, aday = ad, i = 2;
+          while (kullanilan.has(aday.toLocaleLowerCase('tr'))) aday = `${ad} (${i++})`;
+          kullanilan.add(aday.toLocaleLowerCase('tr'));
+          grupAd[sid + '|' + g] = aday;
+        });
+      });
+      // Derslikler: FET'te bir oda aynı anda tek etkinlik alır; kapasitesi
+      // 1'den büyük derslikler kapasitesi kadar kopya odaya bölünür.
+      const odaAdlari = {};
+      const odaKullanilan = new Set();
+      appState.derslikler.forEach(r => {
+        const kap = Math.max(1, getRoomCapacity(r.id) || 1);
+        const temel = String(r.ad || r.kisaAd || 'Derslik').trim();
+        odaAdlari[r.id] = [];
+        for (let i = 1; i <= kap; i++) {
+          let ad = kap > 1 ? `${temel} #${i}` : temel, aday = ad, j = 2;
+          while (odaKullanilan.has(aday.toLocaleLowerCase('tr'))) aday = `${ad} (${j++})`;
+          odaKullanilan.add(aday.toLocaleLowerCase('tr'));
+          odaAdlari[r.id].push(aday);
+        }
+      });
+
+      const etkinlikler = [];     // { id, ogretmen, ders, ogrenci, sure, grupId, toplam, yorum }
+      const ayniAnda = [];        // [[id, id]] — grup A/B bacakları
+      const minGun = [];          // [[id, id, ...]] — aynı dersin blokları
+      const odaKisit = [];        // { id, odalar: [] }
+      const sabitKisit = [];      // { id, gun, saat }
+      const esleme = {};
+      let sonId = 0;
+      const etkinlikEkle = (e) => { e.id = ++sonId; etkinlikler.push(e); esleme[e.id] = e.yorum; return e.id; };
+      const odaEkle = (id, derslikId) => { if (derslikId && odaAdlari[derslikId]) odaKisit.push({ id, odalar: odaAdlari[derslikId] }); };
+
+      const bloklar = buildAllRawBlocks();
+      const grupla = {};
+      bloklar.forEach(b => {
+        const k = b.grupSplit ? `${b.sinifId}|${b.dersId}|G` : `${b.sinifId}|${b.dersId}|${b.ogretmenId}`;
+        (grupla[k] = grupla[k] || []).push(b);
+      });
+      Object.values(grupla).forEach(liste => {
+        const toplam = liste.reduce((s, b) => s + b.blockSize, 0);
+        const idlerA = [], idlerB = [];
+        let grupIdA = 0, grupIdB = 0;
+        liste.forEach(b => {
+          const etiket = (rol) => `DDP|${b.sinifId}|${b.dersId}|${b.ogretmenId || ''}|${b.ogretmenIdB || ''}|${b.derslikId || ''}|${b.derslikIdB || ''}|${b.blockSize}|${b.grupSplit ? 1 : 0}|${rol}`;
+          if (b.grupSplit) {
+            const idA = etkinlikEkle({ ogretmen: ogrAd[b.ogretmenId], ders: dersAd[b.dersId], ogrenci: grupAd[b.sinifId + '|A'], sure: b.blockSize, toplam, yorum: etiket('A') });
+            const idB = etkinlikEkle({ ogretmen: ogrAd[b.ogretmenIdB], ders: dersAd[b.dersId], ogrenci: grupAd[b.sinifId + '|B'], sure: b.blockSize, toplam, yorum: etiket('B') });
+            if (!grupIdA) grupIdA = idA;
+            if (!grupIdB) grupIdB = idB;
+            etkinlikler[etkinlikler.length - 2].grupId = grupIdA;
+            etkinlikler[etkinlikler.length - 1].grupId = grupIdB;
+            idlerA.push(idA); idlerB.push(idB);
+            ayniAnda.push([idA, idB]);
+            odaEkle(idA, b.derslikId); odaEkle(idB, b.derslikIdB);
+          } else {
+            const id = etkinlikEkle({ ogretmen: ogrAd[b.ogretmenId], ders: dersAd[b.dersId], ogrenci: sinifAd[b.sinifId], sure: b.blockSize, toplam, yorum: etiket('N') });
+            if (!grupIdA) grupIdA = id;
+            etkinlikler[etkinlikler.length - 1].grupId = grupIdA;
+            idlerA.push(id);
+            odaEkle(id, b.derslikId);
+          }
+        });
+        if (liste.length === 1) {
+          etkinlikler.forEach(e => { if (e.id === grupIdA || e.id === grupIdB) e.grupId = 0; });
+        }
+        if (idlerA.length > 1) minGun.push(idlerA);
+        if (idlerB.length > 1) minGun.push(idlerB);
+      });
+
+      // Raptiyeli (sabit) hücreler: kilitli, 1 saatlik etkinlikler.
+      for (const k in appState.programHaftalik) {
+        const cell = appState.programHaftalik[k];
+        if (!cell.sabit) continue;
+        const pk = pmParse(k);
+        if (!sinifAd[pk.sinifId] || gunler.indexOf(pk.gun) < 0) continue;
+        if (cell.grupSplit) {
+          const idA = etkinlikEkle({ ogretmen: ogrAd[cell.ogretmenId], ders: dersAd[cell.dersId], ogrenci: grupAd[pk.sinifId + '|A'] || sinifAd[pk.sinifId], sure: 1, toplam: 1, grupId: 0, yorum: 'DDP|SABIT' });
+          const idB = etkinlikEkle({ ogretmen: ogrAd[cell.ogretmenIdB], ders: dersAd[cell.dersId], ogrenci: grupAd[pk.sinifId + '|B'] || sinifAd[pk.sinifId], sure: 1, toplam: 1, grupId: 0, yorum: 'DDP|SABIT' });
+          sabitKisit.push({ id: idA, gun: pk.gun, saat: pk.saat }, { id: idB, gun: pk.gun, saat: pk.saat });
+          odaEkle(idA, cell.derslikId); odaEkle(idB, cell.derslikIdB);
+        } else {
+          const id = etkinlikEkle({ ogretmen: ogrAd[cell.ogretmenId], ders: dersAd[cell.dersId], ogrenci: sinifAd[pk.sinifId], sure: 1, toplam: 1, grupId: 0, yorum: 'DDP|SABIT' });
+          sabitKisit.push({ id, gun: pk.gun, saat: pk.saat });
+          odaEkle(id, cell.derslikId || getBlockDerslikId(pk.sinifId, cell.dersId));
+        }
+      }
+
+      const X = fetXml;
+      const L = [];
+      L.push('<?xml version="1.0" encoding="UTF-8"?>');
+      L.push('<fet version="6.0.0">');
+      L.push(`<Institution_Name>${X(ok.ad || 'Okul')}</Institution_Name>`);
+      L.push(`<Comments>Ders Dağıtım Programı tarafından oluşturuldu (${X(new Date().toLocaleString('tr-TR'))}). Etkinlik açıklamalarındaki DDP etiketlerini silmeyin; sonucu programa geri yüklemek için gereklidir.</Comments>`);
+      L.push(`<Days_List>\n<Number_of_Days>${gunler.length}</Number_of_Days>`);
+      gunler.forEach(g => L.push(`<Day><Name>${X(g)}</Name></Day>`));
+      L.push('</Days_List>');
+      L.push(`<Hours_List>\n<Number_of_Hours>${saatSayisi}</Number_of_Hours>`);
+      for (let h = 1; h <= saatSayisi; h++) L.push(`<Hour><Name>${h}</Name></Hour>`);
+      L.push('</Hours_List>');
+      L.push('<Subjects_List>');
+      appState.dersler.forEach(d => L.push(`<Subject><Name>${X(dersAd[d.id])}</Name><Comments></Comments></Subject>`));
+      L.push('</Subjects_List>');
+      L.push('<Activity_Tags_List>\n</Activity_Tags_List>');
+      L.push('<Teachers_List>');
+      appState.ogretmenler.forEach(t => L.push(`<Teacher><Name>${X(ogrAd[t.id])}</Name><Target_Number_of_Hours>0</Target_Number_of_Hours><Qualified_Subjects></Qualified_Subjects><Comments>${X(t.brans || '')}</Comments></Teacher>`));
+      L.push('</Teachers_List>');
+      L.push('<Students_List>');
+      appState.siniflar.forEach(s => {
+        L.push(`<Year><Name>${X(sinifAd[s.id])}</Name><Number_of_Students>0</Number_of_Students><Comments></Comments>`);
+        if (grupluSiniflar.has(s.id)) {
+          ['A', 'B'].forEach(g => L.push(`<Group><Name>${X(grupAd[s.id + '|' + g])}</Name><Number_of_Students>0</Number_of_Students><Comments></Comments></Group>`));
+        }
+        L.push('</Year>');
+      });
+      L.push('</Students_List>');
+      L.push('<Activities_List>');
+      etkinlikler.forEach(e => {
+        L.push('<Activity>' +
+          (e.ogretmen ? `<Teacher>${X(e.ogretmen)}</Teacher>` : '') +
+          `<Subject>${X(e.ders)}</Subject>` +
+          (e.ogrenci ? `<Students>${X(e.ogrenci)}</Students>` : '') +
+          `<Duration>${e.sure}</Duration><Total_Duration>${e.toplam}</Total_Duration>` +
+          `<Id>${e.id}</Id><Activity_Group_Id>${e.grupId || 0}</Activity_Group_Id>` +
+          `<Active>true</Active><Comments>${X(e.yorum)}</Comments></Activity>`);
+      });
+      L.push('</Activities_List>');
+      L.push('<Buildings_List>\n</Buildings_List>');
+      L.push('<Rooms_List>');
+      appState.derslikler.forEach(r => (odaAdlari[r.id] || []).forEach(ad =>
+        L.push(`<Room><Name>${X(ad)}</Name><Building></Building><Capacity>30000</Capacity><Virtual>false</Virtual><Comments></Comments></Room>`)));
+      L.push('</Rooms_List>');
+
+      const K = (ic) => `${ic}<Active>true</Active><Comments></Comments>`;
+      L.push('<Time_Constraints_List>');
+      L.push(`<ConstraintBasicCompulsoryTime>${K('<Weight_Percentage>100</Weight_Percentage>')}</ConstraintBasicCompulsoryTime>`);
+      // Öğretmen kapalı saatleri
+      appState.ogretmenler.forEach(t => {
+        const kapali = getClosedHoursSet(t.id, null);
+        const liste = [];
+        gunler.forEach(g => { for (let h = 1; h <= saatSayisi; h++) if (kapali[`${g}_${h}`]) liste.push([g, h]); });
+        if (!liste.length) return;
+        L.push(`<ConstraintTeacherNotAvailableTimes><Weight_Percentage>100</Weight_Percentage><Teacher>${X(ogrAd[t.id])}</Teacher><Number_of_Not_Available_Times>${liste.length}</Number_of_Not_Available_Times>` +
+          liste.map(([g, h]) => `<Not_Available_Time><Day>${X(g)}</Day><Hour>${h}</Hour></Not_Available_Time>`).join('') +
+          K('') + '</ConstraintTeacherNotAvailableTimes>');
+      });
+      // Haftalık en fazla gün sayısı sınırı olan öğretmenler
+      appState.ogretmenler.forEach(t => {
+        if (!t.maksGunSayisi) return;
+        L.push(`<ConstraintTeacherMaxDaysPerWeek>${K(`<Weight_Percentage>100</Weight_Percentage><Teacher_Name>${X(ogrAd[t.id])}</Teacher_Name><Max_Days_Per_Week>${Number(t.maksGunSayisi)}</Max_Days_Per_Week>`)}</ConstraintTeacherMaxDaysPerWeek>`);
+      });
+      // Sınıf kapalı saatleri + sınıfın ders saati aralığı dışındaki saatler
+      appState.siniflar.forEach(s => {
+        const kapali = getClosedHoursSet(null, s.id);
+        const liste = [];
+        gunler.forEach(g => {
+          const r = getClassHourRange(s.id, g);
+          for (let h = 1; h <= saatSayisi; h++) if (kapali[`${g}_${h}`] || h < r.minH || h > r.maxH) liste.push([g, h]);
+        });
+        if (!liste.length) return;
+        L.push(`<ConstraintStudentsSetNotAvailableTimes><Weight_Percentage>100</Weight_Percentage><Students>${X(sinifAd[s.id])}</Students><Number_of_Not_Available_Times>${liste.length}</Number_of_Not_Available_Times>` +
+          liste.map(([g, h]) => `<Not_Available_Time><Day>${X(g)}</Day><Hour>${h}</Hour></Not_Available_Time>`).join('') +
+          K('') + '</ConstraintStudentsSetNotAvailableTimes>');
+      });
+      ayniAnda.forEach(([a, b]) => L.push(`<ConstraintActivitiesSameStartingTime>${K(`<Weight_Percentage>100</Weight_Percentage><Number_of_Activities>2</Number_of_Activities><Activity_Id>${a}</Activity_Id><Activity_Id>${b}</Activity_Id>`)}</ConstraintActivitiesSameStartingTime>`));
+      minGun.forEach(ids => {
+        if (ids.length > gunler.length) return;
+        L.push(`<ConstraintMinDaysBetweenActivities>${K(`<Weight_Percentage>95</Weight_Percentage><Consecutive_If_Same_Day>true</Consecutive_If_Same_Day><Number_of_Activities>${ids.length}</Number_of_Activities>${ids.map(i => `<Activity_Id>${i}</Activity_Id>`).join('')}<MinDays>1</MinDays>`)}</ConstraintMinDaysBetweenActivities>`);
+      });
+      sabitKisit.forEach(s => L.push(`<ConstraintActivityPreferredStartingTime>${K(`<Weight_Percentage>100</Weight_Percentage><Activity_Id>${s.id}</Activity_Id><Preferred_Day>${X(s.gun)}</Preferred_Day><Preferred_Hour>${s.saat}</Preferred_Hour><Permanently_Locked>true</Permanently_Locked>`)}</ConstraintActivityPreferredStartingTime>`));
+      const bosluk = ok.maxOgretmenBoslukSaat;
+      if (bosluk !== null && bosluk !== undefined && bosluk !== '' && !isNaN(Number(bosluk))) {
+        L.push(`<ConstraintTeachersMaxGapsPerDay>${K(`<Weight_Percentage>100</Weight_Percentage><Max_Gaps>${Number(bosluk)}</Max_Gaps>`)}</ConstraintTeachersMaxGapsPerDay>`);
+      }
+      const gunlukOgr = ok.maxOgretmenGunlukSaat;
+      if (gunlukOgr !== null && gunlukOgr !== undefined && gunlukOgr !== '' && Number(gunlukOgr) > 0) {
+        L.push(`<ConstraintTeachersMaxHoursDaily>${K(`<Weight_Percentage>100</Weight_Percentage><Maximum_Hours_Daily>${Number(gunlukOgr)}</Maximum_Hours_Daily>`)}</ConstraintTeachersMaxHoursDaily>`);
+      }
+      L.push('</Time_Constraints_List>');
+      L.push('<Space_Constraints_List>');
+      L.push(`<ConstraintBasicCompulsorySpace>${K('<Weight_Percentage>100</Weight_Percentage>')}</ConstraintBasicCompulsorySpace>`);
+      odaKisit.forEach(o => {
+        if (o.odalar.length === 1) {
+          L.push(`<ConstraintActivityPreferredRoom>${K(`<Weight_Percentage>100</Weight_Percentage><Activity_Id>${o.id}</Activity_Id><Room>${X(o.odalar[0])}</Room><Permanently_Locked>true</Permanently_Locked>`)}</ConstraintActivityPreferredRoom>`);
+        } else {
+          L.push(`<ConstraintActivityPreferredRooms>${K(`<Weight_Percentage>100</Weight_Percentage><Activity_Id>${o.id}</Activity_Id><Number_of_Preferred_Rooms>${o.odalar.length}</Number_of_Preferred_Rooms>${o.odalar.map(r => `<Preferred_Room>${X(r)}</Preferred_Room>`).join('')}`)}</ConstraintActivityPreferredRooms>`);
+        }
+      });
+      L.push('</Space_Constraints_List>');
+      L.push('</fet>');
+
+      return { xml: L.join('\n'), esleme, etkinlikSayisi: etkinlikler.length, gunler: gunler.slice() };
+    }
+
+    function fetDisaAktar() {
+      let sonuc;
+      try { sonuc = buildFetXml(); }
+      catch (err) {
+        console.error("FET dışa aktarma hatası:", err);
+        showToast("FET dosyası oluşturulamadı: " + esc(err.message || err), "error");
+        return;
+      }
+      appState.fetAktarim = { tarih: new Date().toISOString(), gunler: sonuc.gunler, esleme: sonuc.esleme };
+      saveState();
+      const blob = new Blob([sonuc.xml], { type: 'application/xml;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      const dosyaAdi = String(appState.okul.ad || 'okul').replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '_') || 'okul';
+      a.download = `${dosyaAdi}.fet`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      showToast(`FET dosyası indirildi (${sonuc.etkinlikSayisi} etkinlik).`);
+    }
+
+    // FET sonucunu (XML metni) haftalık programa dönüştürür. Arayüzden
+    // bağımsızdır; sonuç nesnesi döndürür, appState'e dokunmaz.
+    function fetSonucunuCoz(xmlMetni) {
+      const doc = new DOMParser().parseFromString(String(xmlMetni || '').replace(/^\uFEFF/, ''), 'application/xml');
+      if (doc.getElementsByTagName('parsererror').length) throw new Error('Dosya geçerli bir XML değil.');
+      const kok = doc.documentElement;
+      const metin = (el, ad) => { const x = el.getElementsByTagName(ad)[0]; return x ? x.textContent.trim() : ''; };
+      const cocuklar = (el, ad) => Array.from(el.children).filter(c => c.tagName === ad);
+      const gunler = appState.okul.gunler || [];
+
+      let dosyaGunleri = [], dosyaSaatleri = [];
+      const etiketler = {};   // id -> çözülmüş DDP etiketi
+      const zamanlar = {};    // id -> { gunAd, saatAd }
+
+      if (kok.tagName === 'fet') {
+        const dl = kok.getElementsByTagName('Days_List')[0];
+        const hl = kok.getElementsByTagName('Hours_List')[0];
+        if (dl) dosyaGunleri = cocuklar(dl, 'Day').map(d => metin(d, 'Name'));
+        if (hl) dosyaSaatleri = cocuklar(hl, 'Hour').map(h => metin(h, 'Name'));
+        Array.from(kok.getElementsByTagName('Activity')).forEach(a => {
+          const id = metin(a, 'Id');
+          if (id) etiketler[id] = fetEtiketCoz(metin(a, 'Comments'));
+        });
+        Array.from(kok.getElementsByTagName('ConstraintActivityPreferredStartingTime')).forEach(c => {
+          if (metin(c, 'Active') === 'false') return;
+          zamanlar[metin(c, 'Activity_Id')] = { gunAd: metin(c, 'Preferred_Day'), saatAd: metin(c, 'Preferred_Hour') };
+        });
+      } else if (kok.tagName === 'Activities_Timetable') {
+        const esleme = (appState.fetAktarim && appState.fetAktarim.esleme) || {};
+        Array.from(kok.getElementsByTagName('Activity')).forEach(a => {
+          const id = metin(a, 'Id');
+          zamanlar[id] = { gunAd: metin(a, 'Day'), saatAd: metin(a, 'Hour') };
+          if (esleme[id]) etiketler[id] = fetEtiketCoz(esleme[id]);
+        });
+      } else {
+        throw new Error('Tanınmayan dosya. FET\'in "..._data_and_timetable.fet" veya "..._activities.xml" dosyasını seçin.');
+      }
+
+      const gunBul = (ad) => {
+        if (gunler.indexOf(ad) >= 0) return ad;
+        const i = dosyaGunleri.indexOf(ad);
+        return (i >= 0 && i < gunler.length) ? gunler[i] : null;
+      };
+      const saatBul = (ad) => {
+        const i = dosyaSaatleri.indexOf(ad);
+        if (i >= 0) return i + 1;
+        const n = parseInt(ad, 10);
+        return isNaN(n) ? null : n;
+      };
+
+      const siniflar = new Set(appState.siniflar.map(s => s.id));
+      const dersler = new Set(appState.dersler.map(d => d.id));
+      const grid = {};
+      const rapor = { yerlesen: 0, sabit: 0, zamansiz: 0, eslesmeyen: 0, cakisan: 0, toplamEtkinlik: 0 };
+      for (const k in appState.programHaftalik) if (appState.programHaftalik[k].sabit) { grid[k] = { ...appState.programHaftalik[k] }; rapor.sabit++; }
+      const saatSayisi = getGridHourCount();
+
+      Object.keys(etiketler).forEach(id => {
+        const e = etiketler[id];
+        if (e && e.sabit) return;
+        if (e && e.rol === 'B') return; // grup B bacağı, A ile birlikte işlenir
+        rapor.toplamEtkinlik++;
+        if (!e || !siniflar.has(e.sinifId) || !dersler.has(e.dersId)) { rapor.eslesmeyen++; return; }
+        const z = zamanlar[id];
+        const gun = z ? gunBul(z.gunAd) : null;
+        const saat = z ? saatBul(z.saatAd) : null;
+        if (!gun || !saat) { rapor.zamansiz++; return; }
+        if (saat < 1 || saat + e.blockSize - 1 > saatSayisi) { rapor.cakisan++; return; }
+        const anahtarlar = [];
+        for (let off = 0; off < e.blockSize; off++) anahtarlar.push(pmKey(e.sinifId, `${gun}_${saat + off}`));
+        if (anahtarlar.some(k => grid[k])) { rapor.cakisan++; return; }
+        const uid = `fet_${id}`;
+        anahtarlar.forEach(k => {
+          grid[k] = e.grupSplit
+            ? { dersId: e.dersId, ogretmenId: e.ogretmenId, derslikId: e.derslikId, sabit: false, blockUid: uid, grupSplit: true, ogretmenIdB: e.ogretmenIdB, derslikIdB: e.derslikIdB }
+            : { dersId: e.dersId, ogretmenId: e.ogretmenId, sabit: false, blockUid: uid, derslikId: e.derslikId };
+        });
+        rapor.yerlesen += e.blockSize;
+      });
+      return { grid, rapor };
+    }
+
+    function fetIceAktarDosya(input) {
+      const dosya = input && input.files && input.files[0];
+      if (!dosya) return;
+      const okuyucu = new FileReader();
+      okuyucu.onload = () => {
+        let sonuc;
+        try { sonuc = fetSonucunuCoz(String(okuyucu.result || '')); }
+        catch (err) {
+          console.error("FET içe aktarma hatası:", err);
+          showToast("FET sonucu okunamadı: " + esc(err.message || err), "error");
+          return;
+        } finally { input.value = ''; }
+        const r = sonuc.rapor;
+        if (r.yerlesen === 0) {
+          showToast(`FET dosyasında bu programa ait yerleşmiş etkinlik bulunamadı (etkinlik: ${r.toplamEtkinlik}, eşleşmeyen: ${r.eslesmeyen}, saati olmayan: ${r.zamansiz}). FET'te programı oluşturduktan sonra sonuç klasöründeki "..._data_and_timetable.fet" dosyasını seçin.`, "error");
+          return;
+        }
+        pushHistory('FET sonucunu içe aktarma');
+        lastDistributionSnapshot = JSON.parse(JSON.stringify(appState.programHaftalik));
+        appState.programHaftalik = sonuc.grid;
+        saveState();
+        closeFetAktarimModal();
+        renderProgramOlustur(document.getElementById("mainContent"));
+        renderQualityScoreCards();
+        runDiagnosisAfterSolve();
+        const sorunlar = [];
+        if (r.eslesmeyen) sorunlar.push(`${r.eslesmeyen} etkinlik bu programdaki bir derse eşlenemedi`);
+        if (r.zamansiz) sorunlar.push(`${r.zamansiz} etkinliğin FET'te saati yok`);
+        if (r.cakisan) sorunlar.push(`${r.cakisan} etkinlik çakıştığı için atlandı`);
+        showToast(`FET programı yüklendi: ${r.yerlesen} saat yerleşti${r.sabit ? ` (+${r.sabit} raptiyeli saat korundu)` : ''}.${sorunlar.length ? ' ' + sorunlar.join(', ') + '.' : ''} Geri almak için Ctrl+Z.`, sorunlar.length ? "info" : "success");
+      };
+      okuyucu.onerror = () => showToast("Dosya okunamadı.", "error");
+      okuyucu.readAsText(dosya, 'utf-8');
+    }
+
+    function showFetAktarimModal() {
+      closeFetAktarimModal();
+      const son = appState.fetAktarim && appState.fetAktarim.tarih
+        ? new Date(appState.fetAktarim.tarih).toLocaleString('tr-TR') : null;
+      const modal = document.createElement('div');
+      modal.id = "fetAktarimModalOverlay";
+      modal.className = "fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 no-print";
+      modal.onclick = (e) => { if (e.target === modal) closeFetAktarimModal(); };
+      modal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-lg max-w-xl w-full max-h-[88vh] flex flex-col">
+          <div class="p-4 border-b flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-right-left text-amber-500 mr-1.5"></i> FET ile Veri Alışverişi</h3>
+            <button onclick="closeFetAktarimModal()" class="text-slate-400 hover:text-slate-700" aria-label="Kapat"><i class="fa-solid fa-xmark text-lg"></i></button>
+          </div>
+          <div class="p-4 overflow-y-auto custom-scrollbar space-y-4 text-xs text-slate-600 leading-relaxed">
+            <p>Dağıtımı bilgisayarınızda kurulu <b>FET</b> programına yaptırmak için verilerinizi FET dosyasına aktarın, FET'in ürettiği programı da buradan geri yükleyin. (Programın kendi içindeki <b>FET Motoru</b> düğmesi ise aynı algoritmayı FET kurulumu gerektirmeden çalıştırır.)</p>
+            <div class="border border-slate-200 rounded-lg p-3 space-y-2">
+              <div class="font-bold text-slate-800">1. Verileri FET'e aktar</div>
+              <p>Sınıflar, öğretmenler, dersler, derslikler, ders blokları, kapalı saatler, raptiyeli saatler, grup (A/B) dersleri, öğretmen boşluk / günlük saat / gün sayısı sınırları aktarılır. Hedef boş gün, ağır ders ve ardışık ders sınırı gibi pedagojik tercihler FET'te karşılığı olmadığı için aktarılmaz.</p>
+              <button onclick="fetDisaAktar()" class="btn-primary !bg-amber-600 !shadow-amber-200"><i class="fa-solid fa-file-export"></i> FET dosyasını indir (.fet)</button>
+              ${son ? `<div class="text-[11px] text-slate-400">Son aktarma: ${esc(son)}</div>` : ''}
+            </div>
+            <div class="border border-slate-200 rounded-lg p-3 space-y-2">
+              <div class="font-bold text-slate-800">2. FET'te programı oluşturun</div>
+              <p>Dosyayı FET'te açın → <b>Zaman Çizelgesi → Oluştur</b>. İşlem bitince FET, sonuçları <i>Belgeler/fet-results/timetables/&lt;dosya adı&gt;</i> klasörüne yazar.</p>
+            </div>
+            <div class="border border-slate-200 rounded-lg p-3 space-y-2">
+              <div class="font-bold text-slate-800">3. FET sonucunu geri yükle</div>
+              <p>Sonuç klasöründeki <b>..._data_and_timetable.fet</b> dosyasını seçin (<b>..._activities.xml</b> de kabul edilir). Mevcut dağıtım, raptiyeli saatler korunarak FET'in programıyla değiştirilir; <b>Ctrl+Z</b> ile geri alabilirsiniz.</p>
+              <button onclick="document.getElementById('fetSonucDosyaInput').click()" class="btn-secondary"><i class="fa-solid fa-file-import"></i> FET sonucunu yükle</button>
+              <input id="fetSonucDosyaInput" type="file" accept=".fet,.xml,application/xml,text/xml" class="hidden" onchange="fetIceAktarDosya(this)">
+            </div>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
+    function closeFetAktarimModal() {
+      const m = document.getElementById("fetAktarimModalOverlay");
+      if (m) m.remove();
+    }
+
     function runGeneticSolver() {
       if (engineBusyGuard()) return;
       ensureTeacherAssignmentsExist();
@@ -25848,6 +26714,22 @@ End If
             });
           }
           self.postMessage({ type: "done", jobType: "cpExact", result: res });
+        } else if (msg.type === "fetSwap") {
+          // FET MOTORU: özyinelemeli yer değiştirme (Faz 1) + tavlama ile
+          // boşluk iyileştirmesi (Faz 2). Her çekirdek bağımsız çalışır.
+          const phase1 = fetOzyinelemeliCoz(msg.fetConfig);
+          const phase2 = simulatedAnnealingOptimize(phase1, msg.phase2Config);
+          const iyi = phase2.placed >= phase1.placed;
+          self.postMessage({
+            type: "done", jobType: "fetSwap",
+            result: {
+              classGrid: iyi ? phase2.classGrid : phase1.classGrid,
+              placed: iyi ? phase2.placed : phase1.placed,
+              total: phase1.total,
+              gapScore: iyi ? phase2.gapScore : phase1.gapScore,
+              turlar: phase1.attempts
+            }
+          });
         } else if (msg.type === "gaSeed") {
           // Bu çekirdek, kendi bağımsız rastgele tohumuyla popülasyona
           // katkıda bulunacak aday program(lar) üretir.
