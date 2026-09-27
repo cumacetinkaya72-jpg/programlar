@@ -94,7 +94,32 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
 
         /* Typography system: Manrope for headings/brand, Inter for body & data */
         body { font-family: 'Inter', system-ui, sans-serif; letter-spacing: -0.005em; }
-        h1, h2, h3, .font-display { font-family: 'Manrope', 'Inter', sans-serif; letter-spacing: -0.01em; }
+        h1, h2, h3, h4, .font-display { font-family: 'Manrope', 'Inter', system-ui, sans-serif; letter-spacing: -0.01em; }
+
+        /* Gece modunda ana renk yazıları koyu zemin üzerinde okunur kalsın */
+        .dark .text-indigo-600, .dark .text-indigo-500, .dark .text-indigo-700 { color: var(--primary-border) !important; }
+
+        /* Özet ekranı */
+        .hero-card {
+            background:
+                radial-gradient(120% 140% at 100% 0%, rgba(255,255,255,0.14) 0%, transparent 55%),
+                linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        }
+        .stat-card { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; transition: transform .15s ease, box-shadow .15s ease; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -12px rgba(15, 23, 42, 0.35); }
+        .stat-icon { width: 2.25rem; height: 2.25rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; margin-bottom: 0.4rem; }
+        .stat-label { font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stat-value { font-size: 1.125rem; font-weight: 900; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+        @media (min-width: 640px) { .stat-value { font-size: 1.45rem; } }
+        .stat-sub { font-size: 0.6875rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dark .stat-sub { color: #94a3b8; }
+        .adim-satir:hover { transform: translateX(2px); }
+        .adim-sirada { --tw-ring-color: var(--primary-ring); }
+
+        /* Sayısal tablolarda rakamlar hizalı dursun */
+        .input-table td, .input-table tfoot td { font-variant-numeric: tabular-nums; }
+        .input-table tbody tr { transition: background-color .15s ease; }
+        .input-table tbody tr:hover { background-color: rgba(148, 163, 184, 0.08); }
 
         /* Refined data cards used across all data-entry screens */
         .panel-card { position: relative; overflow: hidden; }
@@ -504,7 +529,10 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 <button @click="isMobileMenuOpen = true" class="md:hidden text-slate-600 dark:text-slate-300 p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
-                <h2 class="text-sm sm:text-lg font-bold text-slate-900 dark:text-white truncate">{{ viewTitle }}</h2>
+                <div class="min-w-0">
+                    <h2 class="text-sm sm:text-lg font-bold text-slate-900 dark:text-white truncate leading-tight">{{ viewTitle }}</h2>
+                    <p v-if="idare.isinAdi || idare.dtNo" class="hidden sm:block text-[11px] text-slate-500 dark:text-slate-400 truncate leading-tight">{{ [idare.dtNo, idare.isinAdi].filter(x => x).join(' · ') }}</p>
+                </div>
                 <button v-if="aktifArsivKaydi && currentView !== 'gecmis_ihaleler'" @click="navigate('gecmis_ihaleler')" type="button" class="hidden sm:inline-flex items-center gap-1 max-w-[240px] text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 px-2 py-0.5 rounded-lg shrink-0" title="Geçmiş ihalelerden düzenlemek için açılan kayıt">
                     <span>📁</span><span class="truncate">{{ aktifArsivKaydi.ad }}</span>
                 </button>
@@ -613,81 +641,128 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             <div class="max-w-5xl mx-auto pb-12">
 
                 <!-- DASHBOARD / YÖNETİCİ ÖZETİ VIEW -->
-                <div v-show="currentView === 'dashboard'" class="space-y-6 animate-fade-in no-print">
+                <div v-show="currentView === 'dashboard'" class="space-y-5 animate-fade-in no-print">
                     <div v-if="odenekUyarilari.length" class="flex items-start gap-2 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-medium rounded-xl p-3">
                         <span>⚠️</span> <span><span v-for="(u, i) in odenekUyarilari" :key="'odenek_u_'+i" class="block">{{ u }}</span></span>
                     </div>
-                    
-                    <!-- Top Summary Stats Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-xs space-y-1">
-                            <span class="text-xs font-bold text-slate-400 uppercase">Toplam İhtiyaç Kalemi</span>
-                            <div class="text-2xl font-black text-slate-900 dark:text-white">{{ malzemeler.length }} Kalem</div>
-                            <p class="text-[11px] text-slate-500">Miktar: {{ toplamMalzemeMiktari }} birim</p>
-                        </div>
 
-                        <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-xs space-y-1">
-                            <span class="text-xs font-bold text-indigo-500 uppercase">Yaklaşık Maliyet (KDV Dahil)</span>
-                            <div class="text-2xl font-black text-indigo-600 dark:text-indigo-400">{{ formatCur(genelYaklasikMaliyetKdvDahil) }}</div>
-                            <p class="text-[11px] text-slate-500">Ortalama hesaplama</p>
-                        </div>
-
-                        <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-xs space-y-1">
-                            <span class="text-xs font-bold text-emerald-500 uppercase">En Uygun Teklif (Kazanan)</span>
-                            <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400">{{ formatCur(kazananFirma.kdvDahil) }}</div>
-                            <p class="text-[11px] text-slate-500 font-semibold truncate">{{ kazananFirma.ad }}</p>
-                        </div>
-
-                        <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-xs space-y-1">
-                            <span class="text-xs font-bold text-amber-500 uppercase">İhale Süreç Durumu</span>
-                            <div class="text-2xl font-black text-amber-600 dark:text-amber-400">%{{ surecYuzdesi }}</div>
-                            <p class="text-[11px] text-slate-500">{{ surecYuzdesi === 100 ? '✅ Tüm belgeler hazır' : '⚙️ Veri girişi devam ediyor' }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Process Checklist Tracker -->
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4">
-                        <h3 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
-                            <span>📌</span> <span>Doğrudan Temin Adım Kontrol Listesi</span>
-                        </h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            <div :class="['p-3 rounded-xl border flex items-center gap-3 transition', idare.okulAdi && yetkililer.harcama.ad ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500']">
-                                <span class="text-lg">{{ idare.okulAdi && yetkililer.harcama.ad ? '✅' : '⚪' }}</span>
-                                <div><div class="font-bold text-xs">1. İdare & Yetkililer</div><span class="text-[10px] opacity-80">Kurum/Makam Bilgileri</span></div>
+                    <!-- Aktif ihale özeti -->
+                    <div class="hero-card rounded-2xl p-5 sm:p-6 text-white shadow-lg">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                            <div class="min-w-0 space-y-2">
+                                <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-white/70">
+                                    <span>Aktif İhale</span>
+                                    <span v-if="aktifArsivKaydi" class="normal-case tracking-normal font-semibold bg-white/15 border border-white/20 px-2 py-0.5 rounded-full">📁 {{ aktifArsivKaydi.ad }}</span>
+                                </div>
+                                <h3 class="text-xl sm:text-2xl font-extrabold leading-tight break-words">{{ idare.isinAdi || 'İşin adı girilmedi' }}</h3>
+                                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/80">
+                                    <span v-if="idare.dtNo">🔖 {{ idare.dtNo }}</span>
+                                    <span v-if="idare.okulAdi">🏫 {{ idareAdi }}</span>
+                                    <span>🗓️ {{ trTarihFormat(evraklar.onay.tarih) }}</span>
+                                </div>
                             </div>
-
-                            <div :class="['p-3 rounded-xl border flex items-center gap-3 transition', malzemeler.length > 0 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500']">
-                                <span class="text-lg">{{ malzemeler.length > 0 ? '✅' : '⚪' }}</span>
-                                <div><div class="font-bold text-xs">2. İhtiyaç Listesi</div><span class="text-[10px] opacity-80">{{ malzemeler.length }} Kalem Girildi</span></div>
-                            </div>
-
-                            <div :class="['p-3 rounded-xl border flex items-center gap-3 transition', ymFirmalar.length > 0 && pfaFirmalar.length > 0 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500']">
-                                <span class="text-lg">{{ ymFirmalar.length > 0 && pfaFirmalar.length > 0 ? '✅' : '⚪' }}</span>
-                                <div><div class="font-bold text-xs">3. Firma Tanımları</div><span class="text-[10px] opacity-80">YM & Piyasa Firmaları</span></div>
-                            </div>
-
-                            <div :class="['p-3 rounded-xl border flex items-center gap-3 transition', Object.keys(ymTeklifler).length > 0 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500']">
-                                <span class="text-lg">{{ Object.keys(ymTeklifler).length > 0 ? '✅' : '⚪' }}</span>
-                                <div><div class="font-bold text-xs">4. Yaklaşık Maliyet</div><span class="text-[10px] opacity-80">Firma Birim Fiyatları</span></div>
-                            </div>
-
-                            <div :class="['p-3 rounded-xl border flex items-center gap-3 transition', Object.keys(pfaTeklifler).length > 0 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500']">
-                                <span class="text-lg">{{ Object.keys(pfaTeklifler).length > 0 ? '✅' : '⚪' }}</span>
-                                <div><div class="font-bold text-xs">5. Firma Teklifleri</div><span class="text-[10px] opacity-80">Piyasa Fiyat Tutanağı</span></div>
-                            </div>
-
-                            <div :class="['p-3 rounded-xl border flex items-center gap-3 transition', surecYuzdesi === 100 ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500']">
-                                <span class="text-lg">{{ surecYuzdesi === 100 ? '🎉' : '⏳' }}</span>
-                                <div><div class="font-bold text-xs">6. Belge Çıktıları</div><span class="text-[10px] opacity-80">Rapor Alınabilir</span></div>
+                            <div class="lg:w-80 shrink-0 space-y-3">
+                                <div>
+                                    <div class="flex justify-between items-baseline mb-1.5">
+                                        <span class="text-xs font-semibold text-white/80">Süreç tamamlanma</span>
+                                        <span class="text-2xl font-black">%{{ surecYuzdesi }}</span>
+                                    </div>
+                                    <div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-white h-full rounded-full transition-all duration-500" :style="{ width: surecYuzdesi + '%' }"></div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button @click="navigate(siradakiAdim ? siradakiAdim.view : 'toplu_raporlama')" type="button" class="px-3 py-2 bg-white text-slate-900 hover:bg-white/90 rounded-xl font-bold text-xs transition shadow-sm">
+                                        {{ siradakiAdim ? 'Sıradaki: ' + siradakiAdim.baslik + ' →' : '🖨️ Belgeleri Yazdır →' }}
+                                    </button>
+                                    <button @click="navigate('gecmis_ihaleler')" type="button" class="px-3 py-2 bg-white/15 hover:bg-white/25 border border-white/25 rounded-xl font-bold text-xs transition">💾 Geçmişe Kaydet</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Interactive Chart Card -->
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4">
-                        <h3 class="font-bold text-slate-900 dark:text-white text-base">📊 Firma Teklif Karşılaştırma Grafiği (KDV Dahil)</h3>
+                    <!-- Özet kartları -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <div class="stat-card bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs p-4 sm:p-5">
+                            <div class="stat-icon bg-slate-100 dark:bg-slate-800">📋</div>
+                            <div class="stat-label text-slate-500 dark:text-slate-400">İhtiyaç Kalemi</div>
+                            <div class="stat-value text-slate-900 dark:text-white">{{ malzemeler.length }} <span class="text-sm font-bold text-slate-400">kalem</span></div>
+                            <div class="stat-sub">Toplam miktar: {{ toplamMalzemeMiktari }}</div>
+                        </div>
+                        <div class="stat-card bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs p-4 sm:p-5">
+                            <div class="stat-icon bg-sky-50 dark:bg-sky-950/50">💰</div>
+                            <div class="stat-label text-sky-700 dark:text-sky-300">Yaklaşık Maliyet</div>
+                            <div class="stat-value text-sky-700 dark:text-sky-300">{{ formatCur(genelYaklasikMaliyetKdvDahil) }}</div>
+                            <div class="stat-sub">KDV dahil · hariç {{ formatCur(genelYaklasikMaliyet) }}</div>
+                        </div>
+                        <div class="stat-card bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs p-4 sm:p-5">
+                            <div class="stat-icon bg-emerald-50 dark:bg-emerald-950/50">🏆</div>
+                            <div class="stat-label text-emerald-700 dark:text-emerald-300">En Uygun Teklif</div>
+                            <div class="stat-value text-emerald-700 dark:text-emerald-300">{{ kazananFirma.id ? formatCur(kazananFirma.kdvDahil) : '—' }}</div>
+                            <div class="stat-sub font-semibold truncate" :title="kazananFirma.ad">{{ kazananFirma.id ? kazananFirma.ad : 'Henüz belirlenmedi' }}</div>
+                        </div>
+                        <div class="stat-card bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs p-4 sm:p-5">
+                            <div class="stat-icon bg-amber-50 dark:bg-amber-950/50">🏦</div>
+                            <div class="stat-label text-amber-700 dark:text-amber-300">Ödenek</div>
+                            <div class="stat-value text-amber-700 dark:text-amber-300">{{ odenekSayisal > 0 ? formatCur(odenekSayisal) : '—' }}</div>
+                            <div class="stat-sub" :class="odenekKalan < 0 ? 'text-red-600 dark:text-red-400 font-bold' : ''">{{ odenekSayisal > 0 ? 'Kalan: ' + formatCur(odenekKalan) : 'İdare bilgilerinden giriniz' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+                        <!-- Adım kontrol listesi -->
+                        <div class="lg:col-span-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs p-5 sm:p-6 space-y-4">
+                            <h3 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2"><span>📌</span> <span>Doğrudan Temin Adımları</span></h3>
+                            <div class="space-y-2">
+                                <button v-for="a in surecAdimlari" :key="'adim_'+a.no" @click="navigate(a.view)" type="button"
+                                        :class="['adim-satir w-full text-left p-3 rounded-xl border flex items-center gap-3 transition', a.tamam ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900' : (siradakiAdim && siradakiAdim.no === a.no ? 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 ring-2 ring-offset-0 adim-sirada' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700')]">
+                                    <span :class="['w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0', a.tamam ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300']">{{ a.tamam ? '✓' : a.no }}</span>
+                                    <span class="min-w-0 flex-1">
+                                        <span :class="['block font-bold text-xs', a.tamam ? 'text-emerald-800 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200']">{{ a.baslik }}</span>
+                                        <span class="block text-[11px] text-slate-500 dark:text-slate-400 truncate">{{ a.alt }}</span>
+                                    </span>
+                                    <span v-if="siradakiAdim && siradakiAdim.no === a.no" class="text-[10px] font-bold uppercase tracking-wide text-white bg-slate-900 dark:bg-white dark:text-slate-900 px-2 py-0.5 rounded-full shrink-0">Sıradaki</span>
+                                    <span class="text-slate-300 dark:text-slate-600 shrink-0">›</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Son geçmiş ihaleler -->
+                        <div class="lg:col-span-2 self-start bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs p-5 sm:p-6 space-y-4">
+                            <div class="flex items-center justify-between gap-2">
+                                <h3 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2"><span>🗂️</span> <span>Son Geçmiş İhaleler</span></h3>
+                                <button @click="navigate('gecmis_ihaleler')" type="button" class="text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white">Tümü ({{ gecmisIhaleler.length }}) ›</button>
+                            </div>
+                            <div v-if="!gecmisIhaleler.length" class="flex flex-col items-center justify-center gap-3 text-center text-xs text-slate-500 dark:text-slate-400 p-6 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
+                                <span class="text-3xl opacity-60">🗂️</span>
+                                <span>Henüz kayıtlı ihale yok. Biten ihalelerinizi geçmişe kaydederek daha sonra tekrar açabilir ve JSON olarak dışa aktarabilirsiniz.</span>
+                                <button @click="navigate('gecmis_ihaleler')" type="button" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs">💾 Bu İhaleyi Kaydet</button>
+                            </div>
+                            <div v-else class="space-y-2">
+                                <div v-for="k in gecmisIhaleler.slice(0, 4)" :key="'son_'+k.id" class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-bold text-xs text-slate-800 dark:text-slate-200 truncate">{{ k.ad }}</div>
+                                        <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate">{{ k.ozet.kalemSayisi }} kalem · {{ formatCur(k.ozet.kazananTutar || k.ozet.yaklasikMaliyet) }}</div>
+                                    </div>
+                                    <button @click="arsivDuzenleOnay(k)" type="button" class="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-bold text-[11px] shrink-0">📝 Aç</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grafik -->
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs p-5 sm:p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="font-bold text-slate-900 dark:text-white text-base">📊 Firma Teklif Karşılaştırması <span class="text-xs font-semibold text-slate-400">(KDV dahil)</span></h3>
+                            <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm" style="background:#10b981"></span> En uygun teklif</span>
+                        </div>
                         <div class="h-64 relative">
-                            <canvas id="teklifChart"></canvas>
+                            <canvas id="teklifChart" :style="{ visibility: pfaToplamlar.some(f => f.kdvDahil > 0) ? 'visible' : 'hidden' }"></canvas>
+                            <div v-if="!pfaToplamlar.some(f => f.kdvDahil > 0)" class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-xs text-slate-500 dark:text-slate-400 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
+                                <span class="text-3xl opacity-60">📊</span>
+                                <span>Firma teklifleri girildiğinde karşılaştırma grafiği burada görünecek.</span>
+                                <button @click="navigate('piyasa_fiyat')" type="button" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs">🤝 Firma Tekliflerine Git</button>
+                            </div>
                         </div>
                     </div>
 
@@ -1143,7 +1218,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                             <thead>
                                 <tr>
                                     <th class="w-10">S.N</th>
-                                    <th>Malzeme Adı</th>
+                                    <th class="min-w-[160px]">Malzeme Adı</th>
                                     <th>Miktar</th>
                                     <th class="w-16">KDV</th>
                                     <th v-for="f in ymFirmalar" :key="f.id" class="text-center bg-amber-50/50 dark:bg-slate-800/80">{{ f.ad || 'Firma' }}</th>
@@ -1204,7 +1279,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                             <thead>
                                 <tr>
                                     <th class="w-10">S.N</th>
-                                    <th>Malzeme Adı</th>
+                                    <th class="min-w-[160px]">Malzeme Adı</th>
                                     <th>Miktar / Birim</th>
                                     <th class="w-16">KDV</th>
                                     <th v-for="f in pfaFirmalar" :key="f.id" class="text-center bg-emerald-50/50 dark:bg-slate-800/80">{{ f.ad || 'Firma' }}</th>
@@ -4231,6 +4306,23 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 let v = tutarOku(this.idare.odenekTutari);
                 return isNaN(v) ? 0 : v;
             },
+            odenekKalan() {
+                let harcanan = this.kazananFirma.id ? this.kazananFirma.kdvDahil : this.genelYaklasikMaliyetKdvDahil;
+                return this.odenekSayisal - (harcanan || 0);
+            },
+            surecAdimlari() {
+                return [
+                    { no: 1, baslik: 'İdare & Yetkililer', alt: this.idare.okulAdi ? this.idareAdi : 'Kurum ve yetkili bilgileri', tamam: !!(this.idare.okulAdi && this.yetkililer.harcama.ad), view: 'idare' },
+                    { no: 2, baslik: 'İhtiyaç Listesi', alt: this.malzemeler.length ? this.malzemeler.length + ' kalem girildi' : 'Alınacak kalemleri ekleyin', tamam: this.malzemeler.length > 0, view: 'ihtiyac' },
+                    { no: 3, baslik: 'Firma Tanımları', alt: this.ymFirmalar.length + ' YM, ' + this.pfaFirmalar.length + ' teklif firması', tamam: this.ymFirmalar.length > 0 && this.pfaFirmalar.length > 0, view: 'firmalar' },
+                    { no: 4, baslik: 'Yaklaşık Maliyet', alt: 'Firma birim fiyatları', tamam: Object.keys(this.ymTeklifler).length > 0, view: 'yaklasik_maliyet' },
+                    { no: 5, baslik: 'Firma Teklifleri', alt: this.kazananFirma.id ? 'En uygun: ' + this.kazananFirma.ad : 'Piyasa fiyat teklifleri', tamam: Object.keys(this.pfaTeklifler).length > 0, view: 'piyasa_fiyat' },
+                    { no: 6, baslik: 'Belge Çıktıları', alt: 'Toplu raporlama ve yazdırma', tamam: this.surecYuzdesi === 100, view: 'toplu_raporlama' }
+                ];
+            },
+            siradakiAdim() {
+                return this.surecAdimlari.find(a => !a.tamam && a.no < 6) || null;
+            },
             odenekUyarilari() {
                 let uyarilar = [];
                 if (this.odenekSayisal <= 0) return uyarilar;
@@ -4874,10 +4966,12 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false }
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: c => ' ' + new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c.parsed.y) + ' ₺' } }
                         },
                         scales: {
-                            y: { beginAtZero: true }
+                            y: { beginAtZero: true, ticks: { callback: v => new Intl.NumberFormat('tr-TR').format(v) + ' ₺' } },
+                            x: { grid: { display: false } }
                         }
                     }
                 });
