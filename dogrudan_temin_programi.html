@@ -403,10 +403,6 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 <button @click="navigate('dashboard')" :class="['w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all', currentView === 'dashboard' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-slate-800/80 hover:bg-slate-800 text-indigo-300']">
                     <span>📊</span> <span>Özet Dashboard</span>
                 </button>
-                <button @click="navigate('gecmis_ihaleler')" :class="['w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all mt-1.5', currentView === 'gecmis_ihaleler' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30']">
-                    <div class="flex items-center gap-3"><span>🗂️</span> <span>Geçmiş İhaleler</span></div>
-                    <span class="bg-slate-800 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-700">{{ gecmisIhaleler.length }}</span>
-                </button>
             </div>
 
             <!-- Group 1: Veri Girişi -->
@@ -472,6 +468,10 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             <div>
                 <div class="px-3 mb-2 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Sistem & Veri</div>
                 <div class="space-y-1">
+                    <button @click="navigate('gecmis_ihaleler')" :class="['w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition', currentView === 'gecmis_ihaleler' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30' : 'text-amber-300 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20']">
+                        <span class="flex items-center gap-2.5"><span>🗂️</span> <span>Geçmiş İhaleler</span></span>
+                        <span class="bg-slate-800 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-700">{{ gecmisIhaleler.length }}</span>
+                    </button>
                     <button @click="exportData" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-sky-300 hover:bg-sky-500/10 transition">
                         <span>💾</span> <span>Verileri Dışa Aktar</span>
                     </button>
