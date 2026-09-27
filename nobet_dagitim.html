@@ -1241,6 +1241,240 @@ img, svg { display: block; max-width: 100%; }
         }
         .print-only { display: none; }
     </style>
+    <!-- TASARIM KATMANI: yalnızca ekran görünümünü etkiler (@media screen). Resmî A4 yazdırma çıktısı değişmez. -->
+    <style id="ui-design-layer">
+        :root {
+            --ui-brand: #4f46e5;
+            --ui-brand-strong: #4338ca;
+            --ui-brand-soft: rgba(99, 102, 241, 0.14);
+            --ui-ink: #0f172a;
+            --ui-muted: #64748b;
+            --ui-line: #e3e8f1;
+            --ui-line-strong: #cfd6e3;
+            --ui-canvas: #f3f5fa;
+            --ui-surface: #ffffff;
+            --ui-radius: 14px;
+            --ui-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 6px 20px -8px rgba(15, 23, 42, 0.10);
+            --ui-shadow-lg: 0 18px 50px -12px rgba(15, 23, 42, 0.35);
+        }
+        /* Eksik yardımcı sınıflar */
+        .bg-violet-50\/60 { background-color: rgba(245, 243, 255, 0.6) !important; }
+        .hover\:bg-rose-700:hover { background-color: #be123c !important; }
+
+        @media screen {
+            html body { background: var(--ui-canvas) !important; }
+            body::before {
+                content: ""; position: fixed; inset: 0 0 auto 0; height: 340px; z-index: -1; pointer-events: none;
+                background: radial-gradient(1200px 300px at 50% -80px, rgba(99, 102, 241, 0.13), transparent 70%);
+            }
+            ::selection { background: rgba(99, 102, 241, 0.22); }
+
+            /* --- Üst başlık --- */
+            body > header.bg-indigo-950 {
+                background: linear-gradient(115deg, #1e1b4b 0%, #312e81 55%, #3730a3 100%) !important;
+                box-shadow: 0 8px 24px -12px rgba(30, 27, 75, 0.6) !important;
+            }
+            body > header #navSchoolName { font-size: 16px !important; letter-spacing: 0.01em !important; }
+            body > header .bg-indigo-800.rounded-xl {
+                background: rgba(255, 255, 255, 0.12) !important;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18) !important;
+            }
+            body > header button { transition: background-color .15s, border-color .15s, transform .08s, box-shadow .15s !important; }
+            body > header .bg-indigo-900 { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #e0e7ff !important; }
+            body > header .bg-indigo-900:hover { background: rgba(255, 255, 255, 0.16) !important; }
+            body > header .bg-slate-800 { background: rgba(15, 23, 42, 0.35) !important; border-color: rgba(255, 255, 255, 0.16) !important; }
+            body > header .bg-slate-800:hover { background: rgba(15, 23, 42, 0.55) !important; }
+            body > header .bg-emerald-600 {
+                background: linear-gradient(180deg, #10b981, #059669) !important;
+                box-shadow: 0 6px 16px -6px rgba(16, 185, 129, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+            }
+            body > header .bg-emerald-600:hover { filter: brightness(1.06); }
+
+            /* --- Sekmeler --- */
+            body > header .bg-slate-900 { background: rgba(10, 10, 35, 0.35) !important; border-top-color: rgba(255, 255, 255, 0.08) !important; }
+            body > header .bg-slate-900 > div { scrollbar-width: none; }
+            body > header .bg-slate-900 > div::-webkit-scrollbar { display: none; }
+            body > header [id^="tab-btn-"] {
+                position: relative; white-space: nowrap; border-bottom-width: 0 !important;
+                border-radius: 10px 10px 0 0 !important; padding: 10px 14px !important;
+            }
+            body > header [id^="tab-btn-"]:hover { background: rgba(255, 255, 255, 0.06) !important; }
+            body > header [id^="tab-btn-"]::after {
+                content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 3px;
+                border-radius: 3px 3px 0 0; background: transparent; transition: background-color .15s;
+            }
+            body > header [id^="tab-btn-"].text-white { background: rgba(255, 255, 255, 0.10) !important; }
+            body > header [id^="tab-btn-"].text-white::after { background: #a5b4fc; }
+
+            /* --- Kartlar --- */
+            main .bg-white.rounded-xl, main .bg-white.rounded-lg.border, #backupReminderBanner > div {
+                border-radius: var(--ui-radius) !important;
+            }
+            main .bg-white.rounded-xl { border-color: var(--ui-line) !important; box-shadow: var(--ui-shadow) !important; }
+            main h3.font-bold { color: var(--ui-ink) !important; letter-spacing: 0.005em; }
+            main .border-b.pb-3, main .border-b.pb-2\.5 { border-bottom-color: var(--ui-line) !important; }
+            #backupReminderBanner > div { box-shadow: 0 4px 14px -8px rgba(217, 119, 6, 0.45) !important; }
+
+            /* --- Düğmeler --- */
+            main button { transition: background-color .15s, border-color .15s, box-shadow .15s, transform .08s, filter .15s !important; }
+            main button:active, header button:active { transform: translateY(1px); }
+            main button.bg-indigo-600, main button.bg-emerald-600 {
+                box-shadow: 0 4px 12px -5px rgba(79, 70, 229, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+            }
+            main button.bg-emerald-600 { box-shadow: 0 4px 12px -5px rgba(5, 150, 105, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important; }
+            main button:disabled { opacity: .6; cursor: progress; }
+            button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible, label:focus-within {
+                outline: none;
+            }
+            button:focus-visible, summary:focus-visible { box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.55) !important; }
+            .icon-btn { width: 32px; height: 32px; display: inline-flex !important; align-items: center; justify-content: center; }
+
+            /* --- Form alanları --- */
+            main input[type="text"], main input[type="number"], main input[type="date"], main input[type="time"],
+            main select, main textarea {
+                background-color: #fff;
+                border: 1px solid var(--ui-line-strong) !important;
+                border-radius: 9px !important;
+                transition: border-color .15s, box-shadow .15s;
+                min-height: 34px;
+            }
+            main input.border-0, main select.border-0 { border: 0 !important; min-height: 0; background: transparent; }
+            main input:hover, main select:hover, main textarea:hover { border-color: #aab4c8 !important; }
+            main input:focus, main select:focus, main textarea:focus {
+                border-color: var(--ui-brand) !important;
+                box-shadow: 0 0 0 3px var(--ui-brand-soft) !important;
+                outline: none !important;
+            }
+            main input.border-0:focus, main select.border-0:focus { box-shadow: none !important; }
+            input[type="checkbox"], input[type="radio"] { accent-color: var(--ui-brand); width: 15px; height: 15px; cursor: pointer; }
+            main label.border.rounded-lg:has(input:checked) {
+                border-color: #a5b4fc !important; background: #eef2ff !important; color: #3730a3;
+            }
+            main ::placeholder { color: #9aa5b8; }
+
+            /* --- Kontrol paneli (çizelge) --- */
+            #tab-cizelge > .no-print:first-child { position: relative; }
+            #screenPeriodBanner {
+                border-radius: 12px !important; border-left: 4px solid var(--ui-brand) !important;
+                box-shadow: var(--ui-shadow); padding: 10px 14px !important;
+            }
+
+            /* --- Listeler / tablolar --- */
+            main table thead th { font-size: 11px; letter-spacing: 0.02em; color: #475569; }
+            main tbody.divide-y > tr { transition: background-color .12s; }
+            main tbody.divide-y > tr:hover { background-color: #f7f8ff !important; }
+            #teacherTableBody > tr:nth-child(even), #adminTableBody > tr:nth-child(even),
+            #locationTableBody > tr:nth-child(even), #holidayTableBody > tr:nth-child(even),
+            #statsTeacherTableBody > tr:nth-child(even) { background-color: #fafbfd; }
+            #statsTeacherTableHead th { position: sticky; top: 0; background: #f1f5f9; z-index: 1; vertical-align: bottom; }
+            #statsTeacherTableBody td:first-child, #statsTeacherTableHead th:first-child { min-width: 130px; }
+            main .overflow-x-auto { scrollbar-width: thin; }
+
+            /* --- Haftalık çizelge --- */
+            #scheduleContainer > div { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: 16px; padding: 10px; box-shadow: var(--ui-shadow); }
+            #scheduleContainer > div > .bg-slate-800 {
+                background: linear-gradient(100deg, #1e293b, #334155) !important;
+                border-radius: 10px !important; padding: 8px 12px !important; font-size: 12.5px !important; letter-spacing: 0.02em;
+            }
+            #scheduleContainer .rounded-xl { box-shadow: none !important; border-radius: 12px !important; overflow-x: auto !important; }
+            #scheduleContainer table { min-width: 720px; }
+            #scheduleContainer td > .flex { min-height: 30px; }
+            #scheduleContainer th, #scheduleContainer td { border-color: var(--ui-line) !important; }
+            #scheduleContainer td:first-child { background: #f8fafc !important; }
+            #teacherLeaveList, #auditLogList { list-style: none; }
+            #scheduleContainer select {
+                min-height: 30px; border-radius: 8px !important; cursor: pointer;
+                border: 1px solid var(--ui-line-strong) !important; background-color: #fff;
+            }
+            #scheduleContainer select:hover { border-color: #94a3b8 !important; }
+            #scheduleContainer select:focus { border-color: var(--ui-brand) !important; box-shadow: 0 0 0 3px var(--ui-brand-soft) !important; outline: none; }
+            /* Boş (atanmamış) hücreler dikkat çeksin */
+            #scheduleContainer select:has(> option[value=""]:checked) {
+                border: 1px dashed #f43f5e !important; background-color: #fff1f2 !important; color: #be123c;
+            }
+            #scheduleContainer select.ring-orange-300 { border-color: #f97316 !important; background-color: #fff7ed !important; }
+            #scheduleContainer th.is-today { background: #eef2ff !important; color: #3730a3 !important; box-shadow: inset 0 -2px 0 var(--ui-brand); }
+            #dutyInstructionsBox { border-radius: var(--ui-radius) !important; border-width: 1px !important; border-color: #cbd5e1 !important; box-shadow: var(--ui-shadow) !important; }
+
+            /* --- İstatistik kartları --- */
+            #statTotalDuties, #statAvgDuty, #statAdminDuties, #statActiveLocations {
+                font-size: 28px !important; font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+            }
+            #tab-istatistik > .grid > div { position: relative; overflow: hidden; }
+            #tab-istatistik > .grid > div::before {
+                content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--kpi, #6366f1);
+            }
+            #tab-istatistik > .grid > div:nth-child(1) { --kpi: #475569; }
+            #tab-istatistik > .grid > div:nth-child(2) { --kpi: #6366f1; }
+            #tab-istatistik > .grid > div:nth-child(3) { --kpi: #d97706; }
+            #tab-istatistik > .grid > div:nth-child(4) { --kpi: #e11d48; }
+
+            /* --- Takvim --- */
+            #holidayCalendar > div { border: 1px solid var(--ui-line); border-radius: 12px; padding: 10px; background: #fcfdff; }
+            #holidayCalendar button { transition: transform .08s, box-shadow .12s; }
+            #holidayCalendar button:hover { box-shadow: 0 2px 8px -3px rgba(15, 23, 42, .25); }
+
+            /* --- Details / özet --- */
+            main details > summary { list-style: none; display: flex; align-items: center; gap: 8px; }
+            main details > summary::-webkit-details-marker { display: none; }
+            main details > summary::before { content: "▸"; color: var(--ui-muted); transition: transform .15s; display: inline-block; }
+            main details[open] > summary::before { transform: rotate(90deg); }
+
+            /* --- Düzenleme modu --- */
+            .form-card { transition: box-shadow .2s, border-color .2s; scroll-margin-top: 120px; }
+            .form-card.is-editing { border-color: #f59e0b !important; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25), var(--ui-shadow) !important; }
+            .form-card .edit-tag:empty { display: none; }
+            .form-card .edit-tag {
+                margin-left: auto; font-size: 11px; font-weight: 700; color: #92400e; background: #fef3c7;
+                border: 1px solid #fcd34d; border-radius: 999px; padding: 2px 10px;
+            }
+
+            /* --- Bildirimler (toast) ve rapor penceresi --- */
+            #uiToastHost {
+                position: fixed; z-index: 100; top: 16px; left: 50%; transform: translateX(-50%);
+                display: flex; flex-direction: column; gap: 8px; width: min(520px, calc(100vw - 32px)); pointer-events: none;
+            }
+            .ui-toast {
+                pointer-events: auto; display: flex; gap: 10px; align-items: flex-start;
+                padding: 11px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; line-height: 1.45;
+                background: #ffffff; color: var(--ui-ink); border: 1px solid var(--ui-line);
+                border-left: 4px solid #10b981; box-shadow: var(--ui-shadow-lg);
+                animation: uiToastIn .22s ease-out; cursor: pointer; white-space: pre-line;
+            }
+            .ui-toast.warn { border-left-color: #f59e0b; background: #fffbeb; }
+            .ui-toast.leaving { opacity: 0; transform: translateY(-6px); transition: opacity .2s, transform .2s; }
+            @keyframes uiToastIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+            #uiReportDialog {
+                border: 0; padding: 0; border-radius: 16px; width: min(760px, calc(100vw - 24px));
+                box-shadow: var(--ui-shadow-lg); color: var(--ui-ink);
+            }
+            #uiReportDialog::backdrop { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(2px); }
+            #uiReportDialog .ui-dlg-head { padding: 14px 18px; border-bottom: 1px solid var(--ui-line); font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+            #uiReportDialog .ui-dlg-body { padding: 14px 18px; max-height: min(62vh, 560px); overflow: auto; white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: #334155; }
+            #uiReportDialog .ui-dlg-foot { padding: 12px 18px; border-top: 1px solid var(--ui-line); display: flex; justify-content: flex-end; gap: 8px; background: #f8fafc; }
+            #uiReportDialog .ui-dlg-foot button { padding: 7px 14px; border-radius: 9px; font-size: 12.5px; font-weight: 700; }
+            #uiReportDialog .ui-btn-primary { background: var(--ui-brand); color: #fff; }
+            #uiReportDialog .ui-btn-primary:hover { background: var(--ui-brand-strong); }
+            #uiReportDialog .ui-btn-ghost { background: #fff; border: 1px solid var(--ui-line-strong); color: #334155; }
+
+            /* --- Dar ekranlar --- */
+            @media (max-width: 640px) {
+                html, body { font-size: 14px; }
+                body > header .max-w-7xl { padding-left: 12px !important; padding-right: 12px !important; }
+                body > header .flex-wrap > .flex.items-center.gap-1\.5 { width: 100%; }
+                body > header .flex-wrap > .flex.items-center.gap-1\.5 > button { flex: 1 1 auto; justify-content: center; }
+                main { padding-left: 12px !important; padding-right: 12px !important; }
+                #tab-cizelge > .no-print:first-child > div { width: 100%; }
+                #tab-cizelge > .no-print:first-child > div:last-child { flex-wrap: wrap; }
+                #tab-cizelge > .no-print:first-child .bg-indigo-50.rounded-lg { flex-wrap: wrap; }
+                #tab-cizelge > .no-print:first-child input[type="date"] { flex: 1 1 120px; }
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+        }
+        @media print { #uiToastHost, #uiReportDialog { display: none !important; } }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
@@ -1422,7 +1656,7 @@ img, svg { display: block; max-width: 100%; }
             <div class="print-only flex justify-between items-start text-[8pt] leading-normal font-sans" style="margin-top: 2mm; padding-top: 1mm;" id="signatureBlock">
                 <!-- Sol Taraf: Düzenleyen / Müdür Yardımcısı -->
                 <div class="text-center w-56">
-                    <p class="font-medium text-slate-700">... / ... / 2026</p>
+                    <p class="font-medium text-slate-700 sig-date">... / ... / 2026</p>
                     <p class="font-bold text-slate-900 mt-0.5">Düzenleyen</p>
                     <div style="height: 6mm;"></div> <!-- İmza Boşluğu -->
                     <p class="font-bold text-slate-900 text-[8.5pt]" id="printVicePrincipalName">Hamit IŞIK</p>
@@ -1432,7 +1666,7 @@ img, svg { display: block; max-width: 100%; }
                 <!-- Orta: Onaylayan / Okul Müdürü -->
                 <div class="text-center w-56">
                     <p class="font-extrabold text-slate-900 tracking-wide text-[8.5pt]">UYGUNDUR</p>
-                    <p class="font-medium text-slate-700 mt-0.5">... / ... / 2026</p>
+                    <p class="font-medium text-slate-700 mt-0.5 sig-date">... / ... / 2026</p>
                     <div style="height: 6mm;"></div> <!-- İmza Boşluğu -->
                     <p class="font-bold text-slate-900 text-[8.5pt]" id="printPrincipalName">Okul Müdürü</p>
                     <p class="text-slate-800 font-medium text-[7.5pt]">Okul Müdürü</p>
@@ -1560,9 +1794,10 @@ img, svg { display: block; max-width: 100%; }
         <section id="tab-idareciler" class="hidden space-y-5">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Ekle / Düzenle Formu -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 h-fit space-y-4">
-                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2 border-b pb-3">
+                <div class="form-card bg-white p-5 rounded-xl shadow-sm border border-slate-200 h-fit space-y-4">
+                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2 border-b pb-3 flex-wrap">
                         <span class="text-indigo-600" aria-hidden="true">👔</span> İdareci Ekle / Düzenle
+                        <span class="edit-tag"></span>
                     </h3>
                     <input type="hidden" id="adminFormId">
                     <div>
@@ -1639,9 +1874,10 @@ img, svg { display: block; max-width: 100%; }
         <section id="tab-ogretmenler" class="hidden space-y-5">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Ekle / Düzenle Formu -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 h-fit space-y-4">
-                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2 border-b pb-3">
+                <div class="form-card bg-white p-5 rounded-xl shadow-sm border border-slate-200 h-fit space-y-4">
+                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2 border-b pb-3 flex-wrap">
                         <span class="text-indigo-600" aria-hidden="true">👤</span> Öğretmen Ekle / Düzenle
+                        <span class="edit-tag"></span>
                     </h3>
                     <input type="hidden" id="teacherFormId">
                     <div>
@@ -1787,9 +2023,10 @@ img, svg { display: block; max-width: 100%; }
             <div id="devreSetupBanner" class="hidden"></div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Ekle / Düzenle Formu -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 h-fit space-y-4">
-                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2 border-b pb-3">
-                        <span class="text-indigo-600" aria-hidden="true">📍</span> Nöbet Yeri Ekle
+                <div class="form-card bg-white p-5 rounded-xl shadow-sm border border-slate-200 h-fit space-y-4">
+                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2 border-b pb-3 flex-wrap">
+                        <span class="text-indigo-600" aria-hidden="true">📍</span> Nöbet Yeri Ekle / Düzenle
+                        <span class="edit-tag"></span>
                     </h3>
                     <input type="hidden" id="locationFormId">
                     <div>
@@ -2121,6 +2358,65 @@ img, svg { display: block; max-width: 100%; }
 
     <!-- JAVASCRIPT MOTORU -->
     <script>
+        // ================= BİLDİRİMLER =================
+        // Tarayıcının engelleyici alert() penceresi yerine: kısa mesajlar ekranın üstünde kendiliğinden
+        // kaybolan bir bildirim (toast), uzun raporlar (dağıtım uyarıları vb.) kaydırılabilir ve
+        // kopyalanabilir bir pencere olarak gösterilir. Onay soruları (confirm) değişmedi.
+        (function () {
+            const nativeAlert = window.alert ? window.alert.bind(window) : null;
+            const WARN_RE = /(hata|geçersiz|giriniz|seçin|seçmelisiniz|olamaz|olmalıdır|alınamadı|uygulanamadı|uyarı|en az|en fazla|yok \(|aşıldı|kaybol)/i;
+            function host() {
+                let h = document.getElementById('uiToastHost');
+                if (!h) { h = document.createElement('div'); h.id = 'uiToastHost'; h.setAttribute('role', 'status'); h.setAttribute('aria-live', 'polite'); document.body.appendChild(h); }
+                return h;
+            }
+            function showToast(msg, kind) {
+                const el = document.createElement('div');
+                el.className = 'ui-toast' + (kind === 'warn' ? ' warn' : '');
+                el.innerHTML = `<span aria-hidden="true">${kind === 'warn' ? '⚠️' : '✅'}</span><span></span>`;
+                el.lastChild.textContent = msg;
+                const close = () => { el.classList.add('leaving'); setTimeout(() => el.remove(), 220); };
+                el.addEventListener('click', close);
+                host().appendChild(el);
+                setTimeout(close, kind === 'warn' ? 7000 : 4200);
+            }
+            function showReport(msg, title) {
+                let dlg = document.getElementById('uiReportDialog');
+                if (!dlg || typeof dlg.showModal !== 'function') {
+                    if (!dlg && typeof document.createElement('dialog').showModal === 'function') {
+                        dlg = document.createElement('dialog');
+                        dlg.id = 'uiReportDialog';
+                        dlg.innerHTML = '<div class="ui-dlg-head"><span aria-hidden="true">📋</span><span class="ui-dlg-title"></span></div><div class="ui-dlg-body"></div>' +
+                            '<div class="ui-dlg-foot"><button type="button" class="ui-btn-ghost" data-act="copy">Metni Kopyala</button><button type="button" class="ui-btn-primary" data-act="close" autofocus>Tamam</button></div>';
+                        dlg.addEventListener('click', (e) => {
+                            const act = e.target && e.target.getAttribute && e.target.getAttribute('data-act');
+                            if (act === 'close' || e.target === dlg) dlg.close();
+                            if (act === 'copy') {
+                                const txt = dlg.querySelector('.ui-dlg-body').textContent;
+                                (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => showToast('Rapor panoya kopyalandı.'), () => showToast('Kopyalanamadı; metni seçip elle kopyalayın.', 'warn'));
+                            }
+                        });
+                        document.body.appendChild(dlg);
+                    } else if (!dlg) { if (nativeAlert) nativeAlert(msg); return; }
+                }
+                dlg.querySelector('.ui-dlg-title').textContent = title || 'Bilgi';
+                dlg.querySelector('.ui-dlg-body').textContent = msg;
+                if (!dlg.open) dlg.showModal();
+                dlg.querySelector('.ui-dlg-body').scrollTop = 0;
+            }
+            window.showToast = showToast;
+            window.showReport = showReport;
+            window.alert = function (message) {
+                const msg = String(message === undefined || message === null ? '' : message);
+                if (!document.body) { if (nativeAlert) nativeAlert(msg); return; }
+                if (msg.length > 260 || msg.split('\n').length > 4) {
+                    showReport(msg, /KURULUM|KÖK NEDEN|Uyarılar/.test(msg) ? 'Dağıtım Raporu — kontrol edilmesi gerekenler' : 'Bilgi');
+                } else {
+                    showToast(msg, WARN_RE.test(msg) ? 'warn' : 'ok');
+                }
+            };
+        })();
+
         const DAYS = [
             { id: 1, name: "Pazartesi" },
             { id: 2, name: "Salı" },
@@ -2194,11 +2490,13 @@ img, svg { display: block; max-width: 100%; }
             if (!state.lockedAdmins) state.lockedAdmins = {};
             if (!Array.isArray(state.auditLog)) state.auditLog = [];
             (state.teachers || []).forEach(t => {
+                if (!Array.isArray(t.days)) t.days = [1, 2, 3, 4, 5];
                 if (!Array.isArray(t.fixedDuties)) t.fixedDuties = [];
                 if (!Array.isArray(t.leaves)) t.leaves = [];
             });
             (state.locations || []).forEach(l => { if (!(parseFloat(l.weight) > 0)) l.weight = 1; });
             (state.administrators || []).forEach(a => {
+                if (!Array.isArray(a.days)) a.days = [1, 2, 3, 4, 5];
                 if (!Array.isArray(a.fixedDays)) a.fixedDays = [];
                 if (!Array.isArray(a.locationIds)) a.locationIds = [];
                 a.locationIds = a.locationIds.filter(id => (state.locations || []).some(l => l.id === id));
@@ -2298,7 +2596,7 @@ img, svg { display: block; max-width: 100%; }
             const days = getLocationDays(loc);
             if (days.length === 5) return 'Her Gün';
             return days.slice().sort((a, b) => a - b)
-                .map(d => (DAYS.find(x => x.id === d) || {}).name?.slice(0, 3) || '?')
+                .map(d => DAY_SHORT[d] || '?') // "Pazartesi".slice(0,3) = "Paz" (Pazar ile karışıyordu)
                 .join(', ');
         }
 
@@ -2315,9 +2613,11 @@ img, svg { display: block; max-width: 100%; }
 
         // Başlangıç ve Kayıt Yükleme
         window.addEventListener('DOMContentLoaded', () => {
-            loadFromLocalStorage();
-            if (state.teachers.length === 0 && state.administrators.length === 0) {
-                loadSampleData();
+            const hadSaved = loadFromLocalStorage();
+            // Örnek veri yalnızca programın İLK açılışında (hiç kayıt yokken) yüklenir. "Tüm Sistemi
+            // Sıfırla" sonrası boş kayıt da bir kayıttır; sayfa yenilenince örnek veri geri gelmez.
+            if (!hadSaved) {
+                loadSampleData(true);
             } else {
                 refreshAll();
             }
@@ -2337,7 +2637,8 @@ img, svg { display: block; max-width: 100%; }
         }
 
         function loadFromLocalStorage() {
-            const saved = localStorage.getItem('meb_nobet_final_v7');
+            let saved = null;
+            try { saved = localStorage.getItem('meb_nobet_final_v7'); } catch (e) { saved = null; }
             if (saved) {
                 try {
                     state = JSON.parse(saved);
@@ -2349,10 +2650,12 @@ img, svg { display: block; max-width: 100%; }
                     }
                     if (!state.rotationState) state.rotationState = {};
                     ensureStateDefaults();
+                    return true;
                 } catch (e) {
                     console.error("Local storage okuma hatası", e);
                 }
             }
+            return false;
         }
 
         // Okul Öncesi / Özel Eğitim gruplarında sabahçı/öğlenci devre ayrımının nöbet yeri
@@ -2424,20 +2727,32 @@ img, svg { display: block; max-width: 100%; }
         }
 
         // JSON Yedekleme / Geri Yükleme
+        // Dosya adlarında Türkçe karakterleri ASCII karşılıklarına çevirir (TEPECİK → TEPECIK).
+        function safeFileName(str) {
+            const map = { 'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G', 'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O', 'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U' };
+            return String(str || '').replace(/[çÇğĞıİöÖşŞüÜ]/g, c => map[c]).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_.-]/g, '').replace(/_+/g, '_');
+        }
+
+        // Blob'u dosya olarak indirir. URL, indirme başlamadan iptal edilmesin diye biraz sonra serbest bırakılır.
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+        }
+
         function exportJSONBackup() {
             state.settings.lastBackupAt = new Date().toISOString();
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-            const downloadAnchor = document.createElement('a');
-            const cleanSchool = (state.settings.schoolName || 'Nobet').replace(/[^a-zA-Z0-9_-]/g, '_');
-            const dateStr = new Date().toISOString().slice(0, 10);
-            
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `Nobet_Yedek_${cleanSchool}_${dateStr}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            const cleanSchool = safeFileName(state.settings.schoolName || 'Nobet') || 'Nobet';
+            const dateStr = toISODate(new Date());
+            downloadBlob(new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }), `Nobet_Yedek_${cleanSchool}_${dateStr}.json`);
             saveToLocalStorage();
             checkBackupReminder();
+            alert('Yedek dosyası indirildi.');
         }
 
         // Veriler yalnızca localStorage'da tutulduğundan, düzenli JSON yedeği alınmasını hatırlatır.
@@ -2739,8 +3054,10 @@ img, svg { display: block; max-width: 100%; }
 
         // Ay/Yıl hızlı seçimi: dönemi o ayın tamamı olarak ayarlar.
         function changeMonth() {
+            const y = parseInt(document.getElementById('selectYear').value, 10);
+            if (!(y >= 1900 && y <= 2200)) { document.getElementById('selectYear').value = state.settings.selectedYear; return; }
             state.settings.selectedMonth = parseInt(document.getElementById('selectMonth').value, 10);
-            state.settings.selectedYear = parseInt(document.getElementById('selectYear').value, 10);
+            state.settings.selectedYear = y;
             state.settings.periodStart = toISODate(new Date(state.settings.selectedYear, state.settings.selectedMonth, 1));
             state.settings.periodEnd = toISODate(new Date(state.settings.selectedYear, state.settings.selectedMonth + 1, 0));
             syncPeriodInputs();
@@ -2792,7 +3109,7 @@ img, svg { display: block; max-width: 100%; }
             document.getElementById('settingSchoolName').value = state.settings.schoolName || 'TEPECİK İLKOKULU MÜDÜRLÜĞÜ';
             document.getElementById('settingVicePrincipalName').value = state.settings.vicePrincipalName || 'Müdür Yardımcısı';
             document.getElementById('settingPrincipalName').value = state.settings.principalName || 'Okul Müdürü';
-            document.getElementById('settingTermInfo').value = state.settings.termInfo;
+            document.getElementById('settingTermInfo').value = state.settings.termInfo || '';
             document.getElementById('selectMonth').value = state.settings.selectedMonth;
             document.getElementById('selectYear').value = state.settings.selectedYear;
 
@@ -2827,6 +3144,8 @@ img, svg { display: block; max-width: 100%; }
             
             document.getElementById('printVicePrincipalName').textContent = state.settings.vicePrincipalName || 'Müdür Yardımcısı';
             document.getElementById('printPrincipalName').textContent = state.settings.principalName || 'Okul Müdürü';
+            // İmza tarihlerindeki yıl sabit "2026" değil, çizelge döneminin yılıdır.
+            document.querySelectorAll('#signatureBlock .sig-date').forEach(el => { el.textContent = `... / ... / ${state.settings.periodStart.slice(0, 4)}`; });
             document.getElementById('badgeEduType').textContent = (state.settings.educationType === 'ikili' ? 'İkili Eğitim' : 'Tekli (Normal) Eğitim')
                 + (state.settings.tasimaliMode ? ' · 🚌 Taşımalı' : '');
 
@@ -2836,8 +3155,21 @@ img, svg { display: block; max-width: 100%; }
         // sayısını karşılaştırır. Öğretmen sayısı nöbet yeri sayısına eşit/az olan günlerde, o gün gelen herkes
         // her hafta nöbetçi olmak zorundadır — bu, programın değil okul programının (ders günlerinin) sonucudur.
         function capacityAnalysisHtml() {
-            const genelT = state.teachers.filter(t => getTeacherGroup(t) === 'genel');
-            const genelL = state.locations.filter(l => getLocationGroup(l) === 'genel');
+            // İkili eğitimde sabahçı ve öğlenci öğretmenler birbirinin nöbet yerine yazılamaz; bu yüzden
+            // analiz her devre için ayrı yapılır (toplu bakınca sıkışık devre "esnek" görünüyordu).
+            if (state.settings.educationType === 'ikili') {
+                const parts = [['sabah', 'Sabah Devresi'], ['oglen', 'Öğle Devresi']].map(([dv, label]) => {
+                    const T = state.teachers.filter(t => getTeacherGroup(t) === 'genel' && (t.shift === dv || t.shift === 'tam'));
+                    const L = state.locations.filter(l => getLocationGroup(l) === 'genel' && (getLocationDevre(l) === dv || getLocationDevre(l) === 'tum'));
+                    const html = capacityAnalysisFor(T, L);
+                    return html ? `<p class="text-xs font-bold text-slate-700 mt-2">${label} <span class="font-normal text-slate-500">(${T.length} öğretmen · ${L.length} nöbet yeri)</span></p>${html}` : '';
+                }).join('');
+                return parts || '<p class="text-xs text-slate-400">Analiz için genel öğretmen ve nöbet yeri tanımlayın.</p>';
+            }
+            return capacityAnalysisFor(state.teachers.filter(t => getTeacherGroup(t) === 'genel'), state.locations.filter(l => getLocationGroup(l) === 'genel'));
+        }
+
+        function capacityAnalysisFor(genelT, genelL) {
             if (!genelT.length || !genelL.length) return '';
             const rows = DAYS.map(d => {
                 const pres = genelT.filter(t => (t.days || []).includes(d.id));
@@ -2853,6 +3185,11 @@ img, svg { display: block; max-width: 100%; }
             const tight = DAYS.filter(d => genelT.filter(t => (t.days || []).includes(d.id)).length <= genelL.filter(l => getLocationDays(l).includes(d.id)).length);
             let notes = '';
             if (tight.length && state.settings.tasimaliMode) notes += `<p class="mt-1">• ${tight.map(d => d.name).join(', ')} günü gelen öğretmenler o gün mecburen nöbet tuttuğu için başka bir günde bahçe nöbeti alamazlar (bahçe haftası tek nöbettir). Bu öğretmenlerin bahçe sayısı ancak o güne düşen bahçe nöbetleriyle sınırlıdır.</p>`;
+            {
+                const weekSlots = genelL.reduce((a, l) => a + getLocationDays(l).length, 0);
+                const avg = weekSlots / genelT.length;
+                notes += `<p class="mt-1">• Haftada toplam <b>${weekSlots}</b> nöbet var; öğretmen başına ortalama <b>${avg.toFixed(2).replace('.', ',')}</b> nöbet düşer.${genelT.some(t => (t.maxDuty || 1) < Math.ceil(avg)) ? ` "Haftalık Maksimum Nöbet" değeri bunun altında olan öğretmenlere zorunlu olarak fazladan nöbet yazılır.` : ''}</p>`;
+            }
             if (isMutlak()) {
                 const weekSlots = genelL.reduce((a, l) => a + getLocationDays(l).length, 0);
                 const avg = weekSlots / genelT.length;
@@ -3213,7 +3550,7 @@ img, svg { display: block; max-width: 100%; }
                     trCells += `<td class="p-1 text-center border-r border-slate-200 bg-rose-50/60 text-rose-700 text-[11px] font-semibold" title="${escapeHtml(dayObj.holiday.name)}">🎌 ${escapeHtml(dayObj.holiday.name)}</td>`;
                 } else if (dayObj) {
                     const admLocked = !!state.lockedAdmins[dayObj.dateStr];
-                    trHeaders += `<th class="p-1 text-center border-r border-slate-200">${dayObj.dayName} (${fmtTR(dayObj.dateStr).slice(0, 5)})</th>`;
+                    trHeaders += `<th class="p-1 text-center border-r border-slate-200${dayObj.dateStr === toISODate(new Date()) ? ' is-today' : ''}">${dayObj.dayName} (${fmtTR(dayObj.dateStr).slice(0, 5)})</th>`;
                     const currentAdminId = (state.monthlySchedule[dayObj.dateStr] || {}).adminId;
 
                     let options = `<option value="">-- Seçiniz --</option>`;
@@ -3238,7 +3575,7 @@ img, svg { display: block; max-width: 100%; }
 
             card.innerHTML = `
                 <table class="w-full text-xs text-left border-collapse">
-                    <thead class="bg-slate-100 text-slate-700 border-b border-slate-200">${trHeaders}</thead>
+                    <thead class="bg-slate-100 text-slate-700 border-b border-slate-200"><tr>${trHeaders}</tr></thead>
                     <tbody><tr>${trCells}</tr></tbody>
                 </table>
             `;
@@ -3253,7 +3590,7 @@ img, svg { display: block; max-width: 100%; }
             for (let i = 1; i <= 5; i++) {
                 const dayObj = weekDays.find(d => d.dayOfWeek === i);
                 trHeaders += dayObj 
-                    ? (dayObj.holiday ? `<th class="p-1 text-center border-r bg-rose-50 text-rose-700">${dayObj.dayName} (${fmtTR(dayObj.dateStr).slice(0, 5)}) 🎌</th>` : `<th class="p-1 text-center border-r">${dayObj.dayName} (${fmtTR(dayObj.dateStr).slice(0, 5)})</th>`)
+                    ? (dayObj.holiday ? `<th class="p-1 text-center border-r bg-rose-50 text-rose-700">${dayObj.dayName} (${fmtTR(dayObj.dateStr).slice(0, 5)}) 🎌</th>` : `<th class="p-1 text-center border-r${dayObj.dateStr === toISODate(new Date()) ? ' is-today' : ''}">${dayObj.dayName} (${fmtTR(dayObj.dateStr).slice(0, 5)})</th>`)
                     : `<th class="p-1 text-center border-r text-slate-300">-</th>`;
             }
 
@@ -3317,7 +3654,7 @@ img, svg { display: block; max-width: 100%; }
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs text-left border-collapse">
-                        <thead class="bg-slate-50 text-slate-700 font-bold text-center border-b">${trHeaders}</thead>
+                        <thead class="bg-slate-50 text-slate-700 font-bold text-center border-b"><tr>${trHeaders}</tr></thead>
                         <tbody class="divide-y divide-slate-100">${tbodyHtml}</tbody>
                     </table>
                 </div>
@@ -3452,6 +3789,19 @@ img, svg { display: block; max-width: 100%; }
 
             const adminMonthDuty = {};
             state.administrators.forEach(a => adminMonthDuty[a.id] = 0);
+            // "Aylık Maksimum Nöbet" sınırı takvim ayı bazında sayılır (dönem birden fazla ayı kapsayabilir).
+            const adminCalMonth = {}; // "adminId|YYYY-MM" -> sayı
+            const monthKeyOf = (ds) => ds.slice(0, 7);
+            const bumpAdminMonth = (id, ds) => { const k = id + '|' + monthKeyOf(ds); adminCalMonth[k] = (adminCalMonth[k] || 0) + 1; };
+            const adminMonthCount = (id, ds) => adminCalMonth[id + '|' + monthKeyOf(ds)] || 0;
+            // Dönem dışında kalan aynı aydaki günlerin idareci nöbetleri de aylık sınıra sayılır.
+            Object.keys(state.monthlySchedule).forEach(ds => {
+                if (periodSet.has(ds) || holidayMapAll[ds]) return;
+                const rec = state.monthlySchedule[ds];
+                if (rec && rec.adminId) bumpAdminMonth(rec.adminId, ds);
+            });
+            const adminActive = (a) => a.active !== false;
+            const adminDays = (a) => Array.isArray(a.days) ? a.days : [];
 
             const teacherMonthDuty = {};
             const teacherLocHistory = {};
@@ -3467,16 +3817,17 @@ img, svg { display: block; max-width: 100%; }
             // 1. İdareci Dağıtımı (Her Güne 1 İdareci; aylık sınır + aylar arası adalet gözetilerek eşit dağılım)
             workDays.forEach(dayObj => {
                 const lockedAdm = state.monthlySchedule[dayObj.dateStr].adminId;
-                if (lockedAdm) { if (adminMonthDuty[lockedAdm] !== undefined) adminMonthDuty[lockedAdm]++; }
+                if (lockedAdm) { if (adminMonthDuty[lockedAdm] !== undefined) adminMonthDuty[lockedAdm]++; bumpAdminMonth(lockedAdm, dayObj.dateStr); }
             });
             // 1a. İdarecinin SABİT nöbet günleri (kesin kural): elle kilitlenmemiş her gün önce bunlar yazılır
             workDays.forEach(dayObj => {
                 const rec = state.monthlySchedule[dayObj.dateStr];
                 if (rec.adminId) return;
-                const fx = state.administrators.filter(a => a.active !== false && (a.fixedDays || []).includes(dayObj.dayOfWeek));
+                const fx = state.administrators.filter(a => adminActive(a) && (a.fixedDays || []).includes(dayObj.dayOfWeek));
                 if (!fx.length) return;
                 rec.adminId = fx[0].id;
                 adminMonthDuty[fx[0].id]++;
+                bumpAdminMonth(fx[0].id, dayObj.dateStr);
                 if (fx.length > 1) warnings.push(`${fmtTR(dayObj.dateStr)} ${dayObj.dayName}: birden fazla idarecinin sabit günü (${fx.map(a => a.name).join(', ')}) — ${fx[0].name} yazıldı.`);
             });
             workDays.forEach(dayObj => {
@@ -3484,13 +3835,13 @@ img, svg { display: block; max-width: 100%; }
                 if (state.monthlySchedule[dayObj.dateStr].adminId) return; // 🔒 elle sabitlenmiş / 📌 sabit günlü idareci
 
                 let avAdmins = state.administrators.filter(a =>
-                    a.active && a.days.includes(dayObj.dayOfWeek) &&
-                    (!a.maxDuty || a.maxDuty <= 0 || adminMonthDuty[a.id] < a.maxDuty)
+                    adminActive(a) && adminDays(a).includes(dayObj.dayOfWeek) &&
+                    (!a.maxDuty || a.maxDuty <= 0 || adminMonthCount(a.id, dayObj.dateStr) < a.maxDuty)
                 );
                 // Sınır yüzünden hiç uygun idareci kalmadıysa, aylık sınırı bu gün için esnet ve uyar.
                 let limitRelaxed = false;
                 if (avAdmins.length === 0) {
-                    avAdmins = state.administrators.filter(a => a.active && a.days.includes(dayObj.dayOfWeek));
+                    avAdmins = state.administrators.filter(a => adminActive(a) && adminDays(a).includes(dayObj.dayOfWeek));
                     limitRelaxed = avAdmins.length > 0;
                 }
 
@@ -3501,8 +3852,9 @@ img, svg { display: block; max-width: 100%; }
                     const chosen = avAdmins[0];
                     state.monthlySchedule[dayObj.dateStr].adminId = chosen.id;
                     adminMonthDuty[chosen.id]++;
+                    bumpAdminMonth(chosen.id, dayObj.dateStr);
                     if (limitRelaxed) {
-                        warnings.push(`${dayObj.dayNum} ${dayObj.dayName}: ${chosen.name} aylık nöbet sınırını (${chosen.maxDuty}) aştığı halde atandı — o gün başka uygun idareci yoktu.`);
+                        warnings.push(`${fmtTR(dayObj.dateStr)} ${dayObj.dayName}: ${chosen.name} aylık nöbet sınırını (${chosen.maxDuty}) aştığı halde atandı — o gün başka uygun idareci yoktu.`);
                     }
                 }
             });
@@ -4184,7 +4536,7 @@ img, svg { display: block; max-width: 100%; }
                         }
                     }
                     res.emptySlots.forEach(es => {
-                        warnings.push(`${es.dayObj.dayNum} ${es.dayObj.dayName} - ${es.loc.name}: o gün okulda bu yere atanabilecek öğretmen yok — nöbet boş bırakıldı.`);
+                        warnings.push(`${fmtTR(es.dayObj.dateStr)} ${es.dayObj.dayName} - ${es.loc.name}: o gün okulda bu yere atanabilecek öğretmen yok — nöbet boş bırakıldı.`);
                     });
                     if (res.ok) {
                         genelSolved = true;
@@ -4240,7 +4592,7 @@ img, svg { display: block; max-width: 100%; }
                             weekTasimaTeachers.add(chosen.id);
                             if (relaxed) {
                                 relaxedDutyByTeacher[chosen.id] = (relaxedDutyByTeacher[chosen.id] || 0) + 1;
-                                warnings.push(`${dayObj.dayNum} ${dayObj.dayName} - ${loc.name} (Taşıma): ${chosen.name} bu hafta ikinci kez taşıma nöbetine yazıldı — o gün boşta uygun öğretmen kalmadı.`);
+                                warnings.push(`${fmtTR(dayObj.dateStr)} ${dayObj.dayName} - ${loc.name} (Taşıma): ${chosen.name} bu hafta ikinci kez taşıma nöbetine yazıldı — o gün boşta uygun öğretmen kalmadı.`);
                             }
                         });
                     });
@@ -4286,7 +4638,11 @@ img, svg { display: block; max-width: 100%; }
                         const tasimaRuleHere = tasimaActive && locGroup === 'genel';
 
                         // Haftalık üst sınır: taşımalı modda genel yerlerde "çift nöbet" ayarı, diğerlerinde öğretmenin kendi sınırı.
-                        const weeklyLimit = (tch) => tasimaRuleHere ? katLimitOf(tch) : (tch.maxDuty || 1);
+                        // Okul öncesi / özel eğitim yerleri öğretmenin KENDİ sınıfıdır: o sınıfta tek öğretmen varsa her gün
+                        // nöbeti o tutar (talimat Md. 5-6). Bu bir kural ihlali değildir; haftalık sınır bu yerlere uygulanmaz,
+                        // aynı grupta birden fazla öğretmen varsa "bu hafta az nöbet tutan öne" sıralamasıyla dönüşümlü yazılır.
+                        const fixedArea = locGroup !== 'genel';
+                        const weeklyLimit = (tch) => fixedArea ? Infinity : tasimaRuleHere ? katLimitOf(tch) : (tch.maxDuty || 1);
 
                         // level 0: tüm kurallar | level 1: haftalık sınır esnek | level 2: taşımacı da olabilir
                         const baseFilter = (tch, level) => {
@@ -4372,10 +4728,10 @@ img, svg { display: block; max-width: 100%; }
 
                             if (relaxLevel === 1) {
                                 relaxedDutyByTeacher[chosen.id] = (relaxedDutyByTeacher[chosen.id] || 0) + 1;
-                                warnings.push(`${dayObj.dayNum} ${dayObj.dayName} - ${loc.name}: ${chosen.name} haftalık nöbet sınırını (${weeklyLimit(chosen)}) aştığı halde atandı — o gün/yerde başka uygun öğretmen yoktu.`);
+                                warnings.push(`${fmtTR(dayObj.dateStr)} ${dayObj.dayName} - ${loc.name}: ${chosen.name} haftalık nöbet sınırını (${weeklyLimit(chosen)}) aştığı halde atandı — o gün/yerde başka uygun öğretmen yoktu.`);
                             } else if (relaxLevel === 2) {
                                 relaxedDutyByTeacher[chosen.id] = (relaxedDutyByTeacher[chosen.id] || 0) + 1;
-                                warnings.push(`${dayObj.dayNum} ${dayObj.dayName} - ${loc.name}: ${chosen.name} bu hafta taşıma nöbetçisi olduğu halde ek nöbete yazıldı — o gün başka uygun öğretmen yoktu.`);
+                                warnings.push(`${fmtTR(dayObj.dateStr)} ${dayObj.dayName} - ${loc.name}: ${chosen.name} bu hafta taşıma nöbetçisi olduğu halde ek nöbete yazıldı — o gün başka uygun öğretmen yoktu.`);
                             }
                         }
                     });
@@ -4763,7 +5119,9 @@ img, svg { display: block; max-width: 100%; }
                 d.setDate(d.getDate() + 1);
             }
             // Sütunlar: tanımlı yerler (sırasıyla) + silinmiş ama kayıtta geçen yerler
-            const cols = state.locations.filter(l => locSeen.has(l.id) || getLocationGroup(l) === 'genel').map(l => ({ id: l.id, name: l.name, isTasima: !!l.isTasima }));
+            const isIkiliS = state.settings.educationType === 'ikili';
+            const colName = (l) => { const dv = getLocationDevre(l); return l.name + (isIkiliS && dv !== 'tum' && !/(sabah|öğle)/i.test(l.name) ? (dv === 'sabah' ? ' (Sabah)' : ' (Öğle)') : ''); };
+            const cols = state.locations.filter(l => locSeen.has(l.id) || getLocationGroup(l) === 'genel').map(l => ({ id: l.id, name: colName(l), isTasima: !!l.isTasima }));
             locSeen.forEach(lid => { if (!cols.some(c => c.id === lid)) cols.push({ id: lid, name: '(silinmiş yer)', isTasima: false }); });
             // Hedef: mutlak → her hafta, o haftanın toplamı o hafta okulda olan grup öğretmenlerine EŞİT bölünür;
             //        oransal → grup toplamı × öğretmenin okulda olduğu gün payı
@@ -4836,7 +5194,7 @@ img, svg { display: block; max-width: 100%; }
                         const cls = Math.abs(fark) < 1.5 ? 'text-emerald-700' : Math.abs(fark) < 3 ? 'text-amber-700' : 'text-rose-700 font-bold';
                         return `<td class="p-2.5 text-center text-slate-600">${hedef.toFixed(1)}</td><td class="p-2.5 text-center ${cls}">${fark >= 0 ? '+' : ''}${fark.toFixed(1)}</td>`;
                     })() + `</tr>`;
-            }).join('') || '<tr><td class="p-3 text-slate-400" colspan="6">Öğretmen yok.</td></tr>';
+            }).join('') || `<tr><td class="p-3 text-slate-400" colspan="${st.cols.length + 10}">Öğretmen yok.</td></tr>`;
             document.getElementById('statsTeacherTableFoot').innerHTML = `<tr><td class="p-2.5" colspan="3">TOPLAM</td>` +
                 st.cols.map(c => `<td class="p-2.5 text-center">${colTotals[c.id] || 0}</td>`).join('') + `<td class="p-2.5 text-center">${st.totalDuties}</td><td colspan="5"></td></tr>`;
             const ca = document.getElementById('statsCapacity');
@@ -4876,16 +5234,32 @@ img, svg { display: block; max-width: 100%; }
                 const ts = st.teacherStats[t.id];
                 const g = getTeacherGroup(t);
                 const hedef = ts.hedef || 0;
-                data.push([t.name, t.branch || '', String((t.days || []).length), ...st.cols.map(c => String(ts.locations[c.id] || 0)), String(ts.total), ts.points.toFixed(1), String(ts.adjust || 0), ...[1, 2, 3, 4, 5].map(x => String(ts.days[x])), String(ts.leaveDays), ts.availDays ? (ts.points / ts.availDays).toFixed(2) : '-', hedef.toFixed(1), (ts.unit - hedef >= 0 ? '+' : '') + (ts.unit - hedef).toFixed(1)]);
+                const r1 = (x) => Math.round(x * 10) / 10;
+                data.push([t.name, t.branch || '', (t.days || []).length, ...st.cols.map(c => ts.locations[c.id] || 0), ts.total, r1(ts.points), ts.adjust || 0, ...[1, 2, 3, 4, 5].map(x => ts.days[x]), ts.leaveDays, ts.availDays ? Math.round(ts.points / ts.availDays * 100) / 100 : '-', r1(hedef), r1(ts.unit - hedef)]);
             });
             data.push([]);
             data.push(['İdareci', 'Unvan', 'Toplam Nöbet', 'Tarihler']);
             state.administrators.forEach(a => {
                 const as = st.adminStats[a.id];
-                data.push([a.name, a.title || '', String(as.total), as.dates.map(fmtTR).join(', ')]);
+                data.push([a.name, a.title || '', as.total, as.dates.map(fmtTR).join(', ')]);
             });
             downloadXlsx([{ name: 'Nobet_Istatistik', xml: buildSheetXml(data, headerRowIndex) }],
                 `Nobet_Istatistik_${fmtTR(st.start)}-${fmtTR(st.end)}.xlsx`);
+        }
+
+        // Düzenleme modu: formu görünür yapar, kartı vurgular ve "Düzenleniyor" etiketi gösterir.
+        function setFormEditing(inputId, name) {
+            const inp = document.getElementById(inputId);
+            if (!inp) return;
+            const card = inp.closest('.form-card');
+            if (!card) return;
+            card.classList.toggle('is-editing', !!name);
+            const tag = card.querySelector('.edit-tag');
+            if (tag) tag.textContent = name ? `Düzenleniyor: ${name}` : '';
+            if (name) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => { try { inp.focus({ preventScroll: true }); } catch (e) { } }, 250);
+            }
         }
 
         // --- İDARECİ CRUD ---
@@ -4922,8 +5296,8 @@ img, svg { display: block; max-width: 100%; }
                     <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 border rounded text-[11px]">${escapeHtml(daysText)}</span>${(adm.fixedDays || []).length ? ` <span class="ml-1 px-2 py-0.5 bg-sky-100 border border-sky-300 text-sky-800 rounded text-[11px]" title="Sabit nöbet günleri">📌 ${escapeHtml(adm.fixedDays.map(d => DAY_SHORT[d]).join(', '))}</span>` : ''}${adminAreasText(adm) ? `<div class="mt-1"><span class="px-2 py-0.5 bg-amber-50 border border-amber-300 text-amber-800 rounded text-[11px]" title="Sorumlu olduğu yerler">🏢 ${escapeHtml(adminAreasText(adm))}</span></div>` : ''}</td>
                     <td class="p-3 text-slate-600">${adm.maxDuty && adm.maxDuty > 0 ? adm.maxDuty : 'Sınırsız'}</td>
                     <td class="p-3 text-right space-x-1">
-                        <button onclick="editAdmin('${adm.id}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded"><span aria-hidden="true">✏️</span></button>
-                        <button onclick="deleteAdmin('${adm.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded"><span aria-hidden="true">🗑️</span></button>
+                        <button onclick="editAdmin('${adm.id}')" title="Düzenle" aria-label="Düzenle" class="icon-btn p-1.5 text-indigo-600 hover:bg-indigo-50 rounded"><span aria-hidden="true">✏️</span></button>
+                        <button onclick="deleteAdmin('${adm.id}')" title="Sil" aria-label="Sil" class="icon-btn p-1.5 text-rose-600 hover:bg-rose-50 rounded"><span aria-hidden="true">🗑️</span></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -4975,11 +5349,16 @@ img, svg { display: block; max-width: 100%; }
             for (let i = 1; i <= 5; i++) document.getElementById(`admDay${i}`).checked = adm.days.includes(i);
             for (let i = 1; i <= 5; i++) document.getElementById(`admFix${i}`).checked = (adm.fixedDays || []).includes(i);
             renderAdminLocCheckboxes(adm.locationIds || []);
+            setFormEditing('adminName', adm.name);
         }
 
         function deleteAdmin(id) {
-            if (!confirm('Silmek istediğinize emin misiniz?')) return;
+            const adm = state.administrators.find(a => a.id === id);
+            if (!adm) return;
+            if (!confirm(`"${adm.name}" silinsin mi? Geçmiş çizelgelerdeki nöbetleri boş görünecek.`)) return;
             state.administrators = state.administrators.filter(a => a.id !== id);
+            if (document.getElementById('adminFormId').value === id) resetAdminForm();
+            logEvent(`İdareci silindi: ${adm.name}`);
             refreshAll();
         }
 
@@ -4991,6 +5370,7 @@ img, svg { display: block; max-width: 100%; }
             for (let i = 1; i <= 5; i++) document.getElementById(`admDay${i}`).checked = true;
             for (let i = 1; i <= 5; i++) document.getElementById(`admFix${i}`).checked = false;
             renderAdminLocCheckboxes([]);
+            setFormEditing('adminName', null);
         }
 
         // --- ÖĞRETMEN CRUD ---
@@ -5091,8 +5471,8 @@ img, svg { display: block; max-width: 100%; }
                     <td class="p-3">${shiftBadge}${locRestrictBadge}${fixedBadge}${(tch.leaves || []).length ? `<span class="ml-1 px-2 py-0.5 bg-rose-50 border border-rose-200 text-rose-700 rounded text-[11px]" title="${escapeHtml((tch.leaves || []).map(l => fmtTR(l.start) + (l.end && l.end !== l.start ? '-' + fmtTR(l.end) : '') + (l.note ? ' ' + l.note : '')).join(' | '))}">🩺 ${(tch.leaves || []).length} izin/rapor</span>` : ''}${getAdjustPoints(tch) ? `<span class="ml-1 px-2 py-0.5 bg-violet-50 border border-violet-200 text-violet-700 rounded text-[11px]" title="Düzeltme / mazeret puanı">${getAdjustPoints(tch) > 0 ? '+' : ''}${getAdjustPoints(tch)} puan</span>` : ''}</td>
                     <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 border rounded text-[11px]">${escapeHtml(daysText)}</span></td>
                     <td class="p-3 text-right space-x-1">
-                        <button onclick="editTeacher('${tch.id}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded"><span aria-hidden="true">✏️</span></button>
-                        <button onclick="deleteTeacher('${tch.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded"><span aria-hidden="true">🗑️</span></button>
+                        <button onclick="editTeacher('${tch.id}')" title="Düzenle" aria-label="Düzenle" class="icon-btn p-1.5 text-indigo-600 hover:bg-indigo-50 rounded"><span aria-hidden="true">✏️</span></button>
+                        <button onclick="deleteTeacher('${tch.id}')" title="Sil" aria-label="Sil" class="icon-btn p-1.5 text-rose-600 hover:bg-rose-50 rounded"><span aria-hidden="true">🗑️</span></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -5172,6 +5552,7 @@ img, svg { display: block; max-width: 100%; }
             document.getElementById('teacherAdjust').value = String(getAdjustPoints(tch));
             window.__leavesDraft = (tch.leaves || []).map(l => ({ ...l }));
             renderLeaveDraft();
+            setFormEditing('teacherName', tch.name);
         }
 
         // İzin / rapor taslak listesi (Kaydet'e basılınca öğretmene yazılır)
@@ -5200,8 +5581,13 @@ img, svg { display: block; max-width: 100%; }
         }
 
         function deleteTeacher(id) {
-            if (!confirm('Silmek istediğinize emin misiniz?')) return;
+            const tch = state.teachers.find(t => t.id === id);
+            if (!tch) return;
+            if (!confirm(`"${tch.name}" silinsin mi? Geçmiş çizelgelerdeki nöbetleri boş görünecek; yeniden dağıtımda yerine başka öğretmen yazılır.`)) return;
             state.teachers = state.teachers.filter(t => t.id !== id);
+            if (state.rotationState) delete state.rotationState[id];
+            if (document.getElementById('teacherFormId').value === id) resetTeacherForm();
+            logEvent(`Öğretmen silindi: ${tch.name}`);
             refreshAll();
         }
 
@@ -5221,6 +5607,7 @@ img, svg { display: block; max-width: 100%; }
             document.getElementById('teacherFixedDay1').value = '0';
             document.getElementById('teacherFixedDay2').value = '0';
             renderFixedLocOptions('', '');
+            setFormEditing('teacherName', null);
         }
 
         // --- NÖBET YERİ CRUD ---
@@ -5253,8 +5640,8 @@ img, svg { display: block; max-width: 100%; }
                     <td class="p-3 text-right space-x-1 whitespace-nowrap">
                         <button onclick="moveLocation('${loc.id}', -1)" title="Yukarı taşı (rotasyonda önce gelir)" aria-label="Yukarı taşı" class="p-1.5 text-slate-600 hover:bg-slate-100 rounded">▲</button>
                         <button onclick="moveLocation('${loc.id}', 1)" title="Aşağı taşı (rotasyonda sonra gelir)" aria-label="Aşağı taşı" class="p-1.5 text-slate-600 hover:bg-slate-100 rounded">▼</button>
-                        <button onclick="editLocation('${loc.id}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded"><span aria-hidden="true">✏️</span></button>
-                        <button onclick="deleteLocation('${loc.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded"><span aria-hidden="true">🗑️</span></button>
+                        <button onclick="editLocation('${loc.id}')" title="Düzenle" aria-label="Düzenle" class="icon-btn p-1.5 text-indigo-600 hover:bg-indigo-50 rounded"><span aria-hidden="true">✏️</span></button>
+                        <button onclick="deleteLocation('${loc.id}')" title="Sil" aria-label="Sil" class="icon-btn p-1.5 text-rose-600 hover:bg-rose-50 rounded"><span aria-hidden="true">🗑️</span></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -5322,11 +5709,25 @@ img, svg { display: block; max-width: 100%; }
             const days = getLocationDays(loc);
             for (let i = 1; i <= 5; i++) document.getElementById(`locDay${i}`).checked = days.includes(i);
             setLocationLevelUI(getLocationWeight(loc));
+            setFormEditing('locationName', loc.name);
         }
 
         function deleteLocation(id) {
-            if (!confirm('Silmek istediğinize emin misiniz?')) return;
+            const loc = state.locations.find(l => l.id === id);
+            if (!loc) return;
+            if (!confirm(`"${loc.name}" nöbet yeri silinsin mi? Bu yere yapılmış sabitlemeler ve öğretmen/idareci yer seçimleri de kaldırılır.`)) return;
             state.locations = state.locations.filter(l => l.id !== id);
+            // Silinen yere yapılan bütün başvurular temizlenir. Aksi halde "müsait yerleri" yalnızca
+            // bu yer olan bir öğretmen hiçbir nöbete atanamaz, sabit gün de her hafta uyarı verirdi.
+            state.teachers.forEach(t => {
+                if (Array.isArray(t.allowedLocationIds)) t.allowedLocationIds = t.allowedLocationIds.filter(x => x !== id);
+                (t.fixedDuties || []).forEach(f => { if (f && f.locId === id) f.locId = ''; });
+                if (state.rotationState && state.rotationState[t.id] === id) delete state.rotationState[t.id];
+            });
+            state.administrators.forEach(a => { a.locationIds = (a.locationIds || []).filter(x => x !== id); });
+            Object.keys(state.lockedCells || {}).forEach(ds => { delete state.lockedCells[ds][id]; });
+            if (document.getElementById('locationFormId').value === id) resetLocationForm();
+            logEvent(`Nöbet yeri silindi: ${loc.name}`);
             refreshAll();
         }
 
@@ -5336,6 +5737,7 @@ img, svg { display: block; max-width: 100%; }
             document.getElementById('locationShift').value = 'sabah';
             for (let i = 1; i <= 5; i++) document.getElementById(`locDay${i}`).checked = true;
             setLocationLevelUI(1);
+            setFormEditing('locationName', null);
         }
 
         // --- ÇEVRİMDIŞI EXCEL ÇIKTISI (Harici kütüphane gerektirmez) ---
@@ -5443,11 +5845,27 @@ img, svg { display: block; max-width: 100%; }
                 row.forEach((val, cIdx) => {
                     const ref = colLetter(cIdx + 1) + rowNum;
                     const styleAttr = isHeader ? ' s="1"' : '';
-                    cells += `<c r="${ref}" t="inlineStr"${styleAttr}><is><t xml:space="preserve">${xmlEscape(val)}</t></is></c>`;
+                    // Sayılar Excel'de metin değil SAYI hücresi olarak yazılır (toplama/sıralama çalışsın).
+                    if (typeof val === 'number' && isFinite(val)) {
+                        cells += `<c r="${ref}"${styleAttr}><v>${val}</v></c>`;
+                    } else {
+                        cells += `<c r="${ref}" t="inlineStr"${styleAttr}><is><t xml:space="preserve">${xmlEscape(val)}</t></is></c>`;
+                    }
                 });
                 sheetData += `<row r="${rowNum}">${cells}</row>`;
             });
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${sheetData}</sheetData></worksheet>`;
+            // Sütun genişlikleri: başlık ve altındaki satırların en uzun metnine göre (başlık üstündeki
+            // tek hücreli resmî başlık satırları hesaba katılmaz).
+            const widths = [];
+            rows.forEach((row, rIdx) => {
+                if (rIdx < headerRowIndex) return;
+                row.forEach((val, cIdx) => {
+                    const len = Math.max(...String(val === null || val === undefined ? '' : val).split('\n').map(x => x.length));
+                    widths[cIdx] = Math.max(widths[cIdx] || 8, Math.min(60, len + 2));
+                });
+            });
+            const colsXml = widths.length ? `<cols>${widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('')}</cols>` : '';
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${colsXml}<sheetData>${sheetData}</sheetData></worksheet>`;
         }
 
         function downloadXlsx(sheetsXml, filename) {
@@ -5502,15 +5920,7 @@ ${sheetsXml.map((s, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.o
             ];
 
             const zipBytes = makeZip(files);
-            const blob = new Blob([zipBytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
+            downloadBlob(new Blob([zipBytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), filename);
         }
 
         function exportToExcel() {
@@ -5531,7 +5941,7 @@ ${sheetsXml.map((s, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.o
 
                 const headerRowIndex = data.length;
                 const header = ["Nöbet Yeri"];
-                workDays.forEach(d => header.push(`${fmtTR(d.dateStr)} ${d.dayName.slice(0, 3)}`));
+                workDays.forEach(d => header.push(`${fmtTR(d.dateStr)} ${DAY_SHORT[d.dayOfWeek]}`));
                 data.push(header);
 
                 const admRow = ["Nöbetçi İdareci"];
@@ -5587,7 +5997,7 @@ ${sheetsXml.map((s, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.o
                     []];
                 const hIdx = data.length;
                 data.push(["S.No", "Adı Soyadı", "Unvanı / Branşı", "Nöbet Tarihleri ve Yerleri", "Nöbet Sayısı", "Tebliğ Tarihi", "Tebellüğ Eden (İmza)"]);
-                tr.forEach((r, i) => data.push([String(i + 1), r.name, r.title, r.duties.join(', '), String(r.count), `..../..../${year}`, ""]));
+                tr.forEach((r, i) => data.push([i + 1, r.name, r.title, r.duties.join(', '), r.count, `..../..../${year}`, ""]));
                 data.push([]);
                 data.push(["", "Tebliğ Eden", "", "", "", "UYGUNDUR"]);
                 data.push(["", state.settings.vicePrincipalName || "", "", "", "", state.settings.principalName || ""]);
@@ -5596,12 +6006,14 @@ ${sheetsXml.map((s, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.o
             }
 
 
-            const filename = `Nobet_Cizelgesi_${(state.settings.schoolName || 'Okul').replace(/\s+/g, '_')}_${fmtTR(state.settings.periodStart)}-${fmtTR(state.settings.periodEnd)}.xlsx`;
+            const filename = `Nobet_Cizelgesi_${safeFileName(state.settings.schoolName || 'Okul')}_${fmtTR(state.settings.periodStart)}-${fmtTR(state.settings.periodEnd)}.xlsx`;
             downloadXlsx(sheets, filename);
         }
 
         // --- DEMO ÖRNEK VERİLER ---
-        function loadSampleData() {
+        function loadSampleData(silent) {
+            const hasData = state.teachers.length > 0 || state.administrators.length > 0 || state.locations.length > 0;
+            if (!silent && hasData && !confirm('Örnek veriler yüklenirse mevcut TÜM öğretmen, idareci, nöbet yeri ve çizelge kayıtlarınız silinecek. Devam etmeden önce "Verileri Dışa Aktar" ile yedek almanız önerilir.\n\nÖrnek veriler yüklensin mi?')) return;
             state = {
                 settings: {
                     districtName: "KOZLUK KAYMAKAMLIĞI",
@@ -5612,7 +6024,9 @@ ${sheetsXml.map((s, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.o
                     educationType: "ikili",
                     selectedYear: 2026,
                     selectedMonth: 8,
-                    lastBackupAt: null
+                    lastBackupAt: null,
+                    dutyInstructionsTitle: DEFAULT_DUTY_INSTRUCTIONS_TITLE,
+                    dutyInstructions: [...DEFAULT_DUTY_INSTRUCTIONS]
                 },
                 administrators: [
                     { id: "adm_1", name: "Hamit IŞIK", title: "Müdür Yrd.", maxDuty: 0, days: [1, 2, 3, 4, 5], active: true },
@@ -5656,7 +6070,7 @@ ${sheetsXml.map((s, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.o
             };
             ensureStateDefaults();
             refreshAll();
-            alert('Örnek veriler (Resmî Format ve Okul Öncesi Desteği Dahil) başarıyla yüklendi.');
+            if (!silent) alert('Örnek veriler (Resmî Format ve Okul Öncesi Desteği Dahil) başarıyla yüklendi.');
         }
     </script>
 </body>
