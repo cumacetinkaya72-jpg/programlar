@@ -279,7 +279,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             .app-container, .content-area, .scroll-area { display: block !important; height: auto !important; overflow: visible !important; padding: 0 !important; }
             body * { visibility: hidden; }
             .print-section, .print-section * { visibility: visible; }
-            body.toplu-print-modu .print-section { display: block !important; visibility: visible !important; position: relative !important; left: auto !important; top: auto !important; page-break-after: always !important; }
+            body.toplu-print-modu .print-section { visibility: visible !important; position: relative !important; left: auto !important; top: auto !important; break-before: page; page-break-before: always; }
+            body.toplu-print-modu .toplu-ilk-rapor { break-before: auto !important; page-break-before: auto !important; }
             .print-section {
                 position: absolute; left: 0; top: 0; width: 100%;
                 background: white !important; margin: 0 !important; padding: 0 !important;
@@ -613,6 +614,9 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
 
                 <!-- DASHBOARD / YÖNETİCİ ÖZETİ VIEW -->
                 <div v-show="currentView === 'dashboard'" class="space-y-6 animate-fade-in no-print">
+                    <div v-if="odenekUyarilari.length" class="flex items-start gap-2 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-medium rounded-xl p-3">
+                        <span>⚠️</span> <span><span v-for="(u, i) in odenekUyarilari" :key="'odenek_u_'+i" class="block">{{ u }}</span></span>
+                    </div>
                     
                     <!-- Top Summary Stats Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -799,7 +803,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Doğrudan Temin No</label><input v-model="idare.dtNo" type="text" class="data-input" placeholder="26DT0001"></div>
                             <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Yatırım Proje No</label><input v-model="idare.projeNo" type="text" class="data-input" placeholder="Varsa giriniz"></div>
-                            <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Ödenek Tutarı (KDV Dahil) (₺)</label><input v-model="idare.odenekTutari" type="text" class="data-input" placeholder="125.000,00"></div>
+                            <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Ödenek Tutarı (KDV Dahil) (₺)</label><input v-model="idare.odenekTutari" type="text" class="data-input" placeholder="125.000,00"><p v-if="idare.odenekTutari && isNaN(tutarOku(idare.odenekTutari))" class="text-[11px] text-amber-600 mt-1">Tutar okunamadı, ödenek kontrolü yapılamıyor (örnek: 125.000,00).</p></div>
                             <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Bütçe Tertibi</label><input v-model="idare.butceTertibi" type="text" class="data-input" placeholder="03.2.1.01"></div>
                             <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Avans Şartları</label><input v-model="idare.avans" type="text" class="data-input" placeholder="Verilmeyecektir."></div>
                             <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Fiyat Farkı Dayanağı</label><input v-model="idare.fiyatFarki" type="text" class="data-input" placeholder="Ödenmeyecektir"></div>
@@ -836,6 +840,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                             <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Gerçekleştirme Görevlisi Unvan</label><input v-model="yetkililer.gercek.unvan" type="text" class="data-input"></div>
                             <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Harcama Yetkilisi Ad Soyad</label><input v-model="yetkililer.harcama.ad" type="text" class="data-input"></div>
                             <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Harcama Yetkilisi Unvan</label><input v-model="yetkililer.harcama.unvan" type="text" class="data-input"></div>
+                            <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Taşınır Kayıt Yetkilisi Ad Soyad</label><input v-model="yetkililer.tasinir.ad" type="text" class="data-input" placeholder="Muayene kabul tutanağında teslim alan olarak yer alır"></div>
+                            <div><label class="font-bold text-xs text-slate-600 dark:text-slate-300 block mb-1">Taşınır Kayıt Yetkilisi Unvan</label><input v-model="yetkililer.tasinir.unvan" type="text" class="data-input"></div>
                         </div>
                     </div>
 
@@ -1036,8 +1042,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 <!-- VIEW: TEKNİK ŞARTNAME MADDELERİ -->
                 <div v-show="currentView === 'teknik_sartname'" class="panel-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-5 sm:p-6 no-print space-y-3 animate-fade-in">
                     <h3 class="font-bold text-slate-900 dark:text-white text-base">📜 Teknik Şartname Maddeleri (İsteğe Bağlı)</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Her satır belgede ayrı bir şartname maddesi olarak düzenlenir.</p>
-                    <textarea v-model="teknikSartname.maddeler" rows="10" class="data-input font-mono text-xs" style="min-height: 220px; resize: vertical;" placeholder="1. A4 fotokopi kağıdı 80 gr ve 1. hamur kalitede teslim edilecektir.&#10;2. Ambalajı bozuk ürünler kabul edilmeyecektir."></textarea>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Her satır belgede ayrı bir şartname maddesi olarak düzenlenir. Madde numaraları belgede otomatik verilir; satır başına yazdığınız "1." gibi numaralar kaldırılır.</p>
+                    <textarea v-model="teknikSartname.maddeler" rows="10" class="data-input font-mono text-xs" style="min-height: 220px; resize: vertical;" placeholder="A4 fotokopi kağıdı 80 gr ve 1. hamur kalitede teslim edilecektir.&#10;Ambalajı bozuk ürünler kabul edilmeyecektir."></textarea>
                 </div>
 
                 <!-- VIEW 4: FIRMALAR VE İLETİŞİM BİLGİLERİ -->
@@ -1128,6 +1134,9 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         <h3 class="font-bold text-slate-900 dark:text-white text-base">💰 Yaklaşık Maliyet Birim Fiyatları (KDV Hariç)</h3>
                         <p class="text-xs text-slate-500 dark:text-slate-400">Firmaların birim tekliflerini giriniz; ortalamalar otomatik hesaplanacaktır.</p>
                     </div>
+                    <div v-if="odenekUyarilari.length" class="flex items-start gap-2 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs font-medium rounded-xl p-3">
+                        <span>⚠️</span> <span><span v-for="(u, i) in odenekUyarilari" :key="'odenek_u_'+i" class="block">{{ u }}</span></span>
+                    </div>
 
                     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
                         <table class="input-table min-w-[650px]">
@@ -1181,6 +1190,15 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         <button @click="kopyalaYmFiyatlari" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-indigo-600/20">⚡ YM Fiyatlarını Aktar</button>
                     </div>
 
+                    <div v-if="eksikTeklifliFirmalar.length" class="flex items-start gap-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-medium rounded-xl p-3">
+                        <span>⚠️</span>
+                        <span>
+                            Şu firmalar bazı kalemlere fiyat vermemiştir ve en uygun teklif değerlendirmesine alınmaz:
+                            <b>{{ eksikTeklifliFirmalar.map(f => (f.ad || 'Firma') + ' (' + f.eksikKalem + ' kalem eksik)').join(', ') }}</b>.
+                            <template v-if="!tamTeklifVarMi"> Tüm kalemlere teklif veren firma olmadığı için kazanan belirlenemedi.</template>
+                        </span>
+                    </div>
+
                     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
                         <table class="input-table min-w-[600px]">
                             <thead>
@@ -1217,6 +1235,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                                         :class="['text-right px-3 py-3 whitespace-nowrap', kazananFirma.id === f.id ? 'bg-emerald-600 text-white font-black' : 'text-slate-300']">
                                         {{ formatCur(f.kdvDahil) }}
                                         <div v-if="kazananFirma.id === f.id" class="text-[10px] text-amber-300 uppercase font-extrabold mt-0.5">🏆 EN UYGUN TEKLİF</div>
+                                        <div v-else-if="f.toplam > 0 && f.eksikKalem > 0" class="text-[10px] text-amber-300 font-bold mt-0.5">⚠️ {{ f.eksikKalem }} kalem eksik</div>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -1330,7 +1349,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                                     </div>
                                     <div v-if="ekap.mod === 'sonuc'">
                                         <label class="font-bold text-[11px] text-slate-500 dark:text-slate-400 block mb-1">Toplam Fiyat <span class="font-normal">(boşsa otomatik)</span></label>
-                                        <input :value="ekapSatirDegeri(s.id, 'fiyat')" @input="ekapSatirGuncelle(s.id, 'fiyat', $event.target.value)" type="text" class="data-input" :placeholder="s.fiyat === '' ? 'Teklif girilmemiş' : String(s.fiyat)">
+                                        <input :value="ekapSatirDegeri(s.id, 'fiyat')" @input="ekapSatirGuncelle(s.id, 'fiyat', $event.target.value)" type="text" class="data-input" :style="s.fiyatGecersiz ? 'border-color:#ef4444;' : ''" :placeholder="s.fiyat === '' ? 'Teklif girilmemiş' : formatNum(s.fiyat)">
+                                        <p v-if="s.fiyatGecersiz" class="text-[11px] text-red-600 dark:text-red-400 mt-1">Tutar okunamadı. Örnek yazım: 1250,50 veya 1.250,50</p>
                                     </div>
                                     <div class="sm:col-span-2">
                                         <label class="font-bold text-[11px] text-slate-500 dark:text-slate-400 block mb-1">OKAS Bilgisi <span class="font-normal">(EKAP listesinden seçiniz)</span></label>
@@ -1835,7 +1855,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         <tbody>
                             <tr>
                                 <td style="width: 30%; font-weight: bold; border: 1px solid black;">İdarenin Adı</td>
-                                <td style="width: 70%; border: 1px solid black;">{{ idare.okulAdi }} Müdürlüğü</td>
+                                <td style="width: 70%; border: 1px solid black;">{{ idareAdi }}</td>
                             </tr>
                             <tr>
                                 <td style="font-weight: bold; border: 1px solid black;">Doğrudan Temin Numarası</td>
@@ -2080,7 +2100,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         
                         <table border="1" cellpadding="4" cellspacing="0" style="width: 100%; border-collapse: collapse; border: 1px solid black; margin-bottom: 20px; font-size: 10pt;">
                             <tbody>
-                                <tr><td style="width: 30%; font-weight: bold; border: 1px solid black; background-color: #f9f9f9;">İdarenin Adı</td><td style="border: 1px solid black;">{{ idare.okulAdi }} Müdürlüğü</td></tr>
+                                <tr><td style="width: 30%; font-weight: bold; border: 1px solid black; background-color: #f9f9f9;">İdarenin Adı</td><td style="border: 1px solid black;">{{ idareAdi }}</td></tr>
                                 <tr><td style="font-weight: bold; border: 1px solid black; background-color: #f9f9f9;">Doğrudan Temin Numarası</td><td style="border: 1px solid black;">{{ idare.dtNo || '-' }}</td></tr>
                                 <tr><td style="font-weight: bold; border: 1px solid black; background-color: #f9f9f9;">Malın Adı</td><td style="border: 1px solid black;">{{ idare.isinAdi }}</td></tr>
                             </tbody>
@@ -2140,7 +2160,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         <tbody>
                             <tr>
                                 <td style="width: 35%; font-weight: bold; border: 1px solid black; background-color: #f9f9f9;">İdarenin Adı</td>
-                                <td style="border: 1px solid black;">{{ idare.okulAdi }} Müdürlüğü</td>
+                                <td style="border: 1px solid black;">{{ idareAdi }}</td>
                             </tr>
                             <tr>
                                 <td style="font-weight: bold; border: 1px solid black; background-color: #f9f9f9;">Doğrudan Temin Numarası</td>
@@ -2242,7 +2262,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         <tbody>
                             <tr>
                                 <td style="width: 30%; font-weight: bold; border: 1px solid black; background-color: #f9f9f9;">İdarenin Adı</td>
-                                <td style="width: 70%; border: 1px solid black;">{{ idare.okulAdi }} Müdürlüğü</td>
+                                <td style="width: 70%; border: 1px solid black;">{{ idareAdi }}</td>
                             </tr>
                             <tr>
                                 <td style="font-weight: bold; border: 1px solid black; background-color: #f9f9f9;">İşin Adı/Niteliği</td>
@@ -2315,12 +2335,25 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                             </td>
                         </tr>
                     </table>
+
+                    <table v-if="yetkililer.tasinir.ad && yetkililer.tasinir.ad.trim()" style="width: 100%; border: none; margin-top: 20px; font-size: 9.5pt; font-family: 'Times New Roman', Times, serif; page-break-inside: avoid;">
+                        <tr>
+                            <td style="border: none; width: 67%;"></td>
+                            <td style="border: none; width: 33%; text-align: center; vertical-align: top;">
+                                <p style="font-weight: bold; margin: 0;">Teslim Alan</p>
+                                <p style="margin: 2px 0;">{{ trTarihFormat(evraklar.muayene.tarih) }}</p>
+                                <p style="font-weight: bold; margin: 0;">{{ yetkililer.tasinir.ad }}</p>
+                                <p style="margin: 0;">{{ yetkililer.tasinir.unvan }}</p>
+                                <p style="margin: 0;">Taşınır Kayıt Yetkilisi</p>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
                 <!-- REPORT 9: TEKNİK ŞARTNAME -->
                 <div v-show="(currentView === 'rpt_teknik_sartname') || (topluPrintMode && topluRaporlamSecimleri.teknikSartname)" class="print-section" id="rpt_teknik_sartname">
                     <div style="text-align: center; font-weight: bold; line-height: 1.3; margin-bottom: 4px; font-size: 12pt; font-family: 'Times New Roman', Times, serif; text-transform: uppercase;">
-                        {{ idare.okulAdi }} MÜDÜRLÜĞÜ
+                        {{ idareAdi.toLocaleUpperCase('tr-TR') }}
                     </div>
                     <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 22px; font-size: 13pt; font-family: 'Times New Roman', Times, serif;">
                         TEKNİK ŞARTNAME
@@ -2355,14 +2388,14 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                             </tbody>
                         </table>
 
-                        <template v-if="teknikSartname.maddeler && teknikSartname.maddeler.trim()">
+                        <template v-if="teknikSartnameMaddeListesi.length">
                             <p style="font-weight: bold; margin-bottom: 8px;">4. Teknik Şartname Maddeleri</p>
                             <ol style="margin: 0 0 16px 22px; padding: 0;">
-                                <li v-for="(madde, i) in teknikSartname.maddeler.split('\n').filter(m => m.trim())" :key="'ts_madde_' + i" style="margin-bottom: 4px; text-align: justify;">{{ madde.trim() }}</li>
+                                <li v-for="(madde, i) in teknikSartnameMaddeListesi" :key="'ts_madde_' + i" style="margin-bottom: 4px; text-align: justify;">{{ madde }}</li>
                             </ol>
                         </template>
 
-                        <p style="font-weight: bold; margin-bottom: 4px;">5. Teslimat Şartları</p>
+                        <p style="font-weight: bold; margin-bottom: 4px;">{{ teknikSartnameMaddeListesi.length ? 5 : 4 }}. Teslimat Şartları</p>
                         <p style="text-align: justify; margin-bottom: 40px;">Ürünler idarenin adresine teslim edilir; teslimat, Muayene ve Kabul Komisyonuna yapılır. Sorunların giderilme süresi 7 (yedi) takvim gününü aşamaz.</p>
                     </div>
 
@@ -2705,7 +2738,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                     <!-- İşlem Butonları -->
                     <div class="flex flex-col sm:flex-row gap-3">
                         <button @click="topluPDF" :disabled="seciliRaporSayisi === 0" class="flex-1 px-4 py-3 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2" :class="seciliRaporSayisi === 0 ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20'">
-                            <span>📥</span> <span>Toplu PDF İndir</span>
+                            <span>📥</span> <span>PDF Olarak Kaydet</span>
                         </button>
                         <button @click="topluYazdir" :disabled="seciliRaporSayisi === 0" class="flex-1 px-4 py-3 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2" :class="seciliRaporSayisi === 0 ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white shadow-md shadow-slate-900/20'">
                             <span>🖨️</span> <span>Toplu Yazdır</span>
@@ -2716,8 +2749,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                     <div class="bg-amber-50 dark:bg-slate-800 rounded-xl p-4 border border-amber-200 dark:border-slate-700 text-sm text-amber-900 dark:text-amber-300 space-y-1">
                         <p class="font-semibold">💡 Bilgi:</p>
                         <ul class="list-disc list-inside space-y-1 text-[13px]">
-                            <li>PDF İndir: Seçili raporları ayrı sayfalar halinde tek bir PDF dosyasına birleştirerek indirir.</li>
-                            <li>Toplu Yazdır: Seçili tüm raporları yazıcı ayarları ile yazdırır.</li>
+                            <li>PDF Olarak Kaydet: Yazdırma penceresi açılır; "Hedef" kısmından <b>PDF olarak kaydet</b> seçilirse seçili raporlar ayrı sayfalar hâlinde tek PDF dosyasına kaydedilir.</li>
+                            <li>Toplu Yazdır: Yalnızca seçili raporları yazıcı ayarları ile yazdırır.</li>
                             <li>Raporları seçip baskı öncesi tarayıcıda ön izleme yapabilirsiniz.</li>
                         </ul>
                     </div>
@@ -2768,6 +2801,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
         let kazanan = null;
         pfaFirmalar.forEach(f => {
             let top = 0, topKdv = 0;
+            if (malzemeler.some(m => !fiyatVarMi(pfaTeklifler[f.id + '_' + m.id]))) return;
             malzemeler.forEach(m => {
                 let price = parseFloat(pfaTeklifler[f.id + '_' + m.id]) || 0;
                 let miktar = parseFloat(m.miktar) || 0;
@@ -2787,7 +2821,29 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             kazananTutar: kazanan ? kazanan.kdvDahil : 0
         };
     }
-    let today = new Date().toISOString().split('T')[0];
+    // Tarayıcının yerel saatine göre YYYY-MM-DD (toISOString UTC verdiği için gece 00-03 arası bir gün geri kalıyordu)
+    function yerelTarih(d) {
+        d = d || new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    // "1.250,50", "1250,50", "1250.50", "1.250" gibi Türkçe/İngilizce yazılmış tutarları sayıya çevirir
+    function tutarOku(deger) {
+        if (typeof deger === 'number') return deger;
+        let s = String(deger === undefined || deger === null ? '' : deger).replace(/[\s₺]/g, '').replace(/TL$/i, '');
+        if (!s) return NaN;
+        if (s.indexOf(',') !== -1) s = s.replace(/\./g, '').replace(',', '.');
+        else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+        return /^-?\d+(\.\d+)?$/.test(s) ? parseFloat(s) : NaN;
+    }
+
+    // Bir kalem için geçerli (0'dan büyük) fiyat girilmiş mi
+    function fiyatVarMi(deger) {
+        let v = parseFloat(deger);
+        return !isNaN(v) && v > 0;
+    }
+
+    let today = yerelTarih();
     let chartInstance = null;
 
     let OMK_MADDELERI = [
@@ -4159,13 +4215,40 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             printStyle() {
                 return `<style>@media print { @page { margin: 10mm; } }</style>`;
             },
+            idareAdi() {
+                let ad = (this.idare.okulAdi || '').trim();
+                if (!ad) return '';
+                let buyuk = ad.toLocaleUpperCase('tr-TR');
+                if (buyuk.endsWith('MÜDÜRLÜĞÜ') || buyuk.endsWith('BAŞKANLIĞI') || buyuk.endsWith('VALİLİĞİ') || buyuk.endsWith('KAYMAKAMLIĞI')) return ad;
+                return ad + ' Müdürlüğü';
+            },
+            teknikSartnameMaddeListesi() {
+                return (this.teknikSartname.maddeler || '').split('\n')
+                    .map(m => m.trim().replace(/^\d+\s*[.)\-–]\s*/, '').trim())
+                    .filter(m => m);
+            },
+            odenekSayisal() {
+                let v = tutarOku(this.idare.odenekTutari);
+                return isNaN(v) ? 0 : v;
+            },
+            odenekUyarilari() {
+                let uyarilar = [];
+                if (this.odenekSayisal <= 0) return uyarilar;
+                if (this.genelYaklasikMaliyetKdvDahil > this.odenekSayisal) {
+                    uyarilar.push('Yaklaşık maliyet (KDV dahil ' + this.formatCur(this.genelYaklasikMaliyetKdvDahil) + ') ödenek tutarını (' + this.formatCur(this.odenekSayisal) + ') aşıyor.');
+                }
+                if (this.kazananFirma.id && this.kazananFirma.kdvDahil > this.odenekSayisal) {
+                    uyarilar.push('En uygun teklif (KDV dahil ' + this.formatCur(this.kazananFirma.kdvDahil) + ') ödenek tutarını (' + this.formatCur(this.odenekSayisal) + ') aşıyor.');
+                }
+                return uyarilar;
+            },
             aktifArsivKaydi() {
                 if (!this.aktifArsivId) return null;
                 return this.gecmisIhaleler.find(k => k.id === this.aktifArsivId) || null;
             },
             varsayilanArsivAdi() {
                 let parcalar = [this.idare.dtNo, this.idare.isinAdi].map(x => (x || '').trim()).filter(x => x);
-                return parcalar.length ? parcalar.join(' - ') : ('İhale ' + this.trTarihFormat(new Date().toISOString().split('T')[0]));
+                return parcalar.length ? parcalar.join(' - ') : ('İhale ' + this.trTarihFormat(yerelTarih()));
             },
             filtrelenmisArsiv() {
                 let q = (this.arsivArama || '').toLocaleLowerCase('tr-TR').trim();
@@ -4241,18 +4324,29 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 return this.pfaFirmalar.map(f => {
                     let top = 0;
                     let topKdv = 0;
+                    let eksik = 0;
                     this.malzemeler.forEach(m => {
-                        let price = parseFloat(this.pfaTeklifler[f.id + '_' + m.id]) || 0;
+                        let ham = this.pfaTeklifler[f.id + '_' + m.id];
+                        if (!fiyatVarMi(ham)) eksik++;
+                        let price = parseFloat(ham) || 0;
                         let kdv = parseFloat(m.kdv) || 0;
                         top += price * m.miktar;
                         topKdv += (price * m.miktar) * (1 + (kdv / 100));
                     });
-                    return { ...f, toplam: top, kdvDahil: topKdv };
+                    return { ...f, toplam: top, kdvDahil: topKdv, eksikKalem: eksik };
                 });
+            },
+            eksikTeklifliFirmalar() {
+                // Teklif vermiş ama bazı kalemleri boş bırakmış firmalar
+                return this.pfaToplamlar.filter(f => f.toplam > 0 && f.eksikKalem > 0);
+            },
+            tamTeklifVarMi() {
+                return this.pfaToplamlar.some(f => f.toplam > 0 && f.eksikKalem === 0);
             },
             kazananFirma() {
                 if(!this.pfaToplamlar || this.pfaToplamlar.length === 0) return { id: null, ad: 'Bilinmiyor', adres: '', vkn: '', toplam: 0, kdvDahil: 0 };
-                let gecerliTeklifler = this.pfaToplamlar.filter(f => f.toplam > 0);
+                // Yalnızca tüm kalemlere fiyat veren firmalar değerlendirilir; eksik kalem 0 ₺ sayılıp haksız yere kazanmasın
+                let gecerliTeklifler = this.pfaToplamlar.filter(f => f.toplam > 0 && f.eksikKalem === 0);
                 if(gecerliTeklifler.length === 0) return { id: null, ad: 'Bilinmiyor', adres: '', vkn: '', toplam: 0, kdvDahil: 0 };
                 let min = gecerliTeklifler[0];
                 gecerliTeklifler.forEach(f => { if(f.toplam < min.toplam) min = f; });
@@ -4405,7 +4499,12 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                     let birim = ozel.birim || this.ekapBirimEsle(m.birim);
                     let miktar = parseFloat(m.miktar) || 0;
                     let fiyat = ozel.fiyat;
-                    if (fiyat === undefined || fiyat === null || fiyat === '') {
+                    let fiyatGecersiz = false;
+                    if (fiyat !== undefined && fiyat !== null && String(fiyat).trim() !== '') {
+                        let okunan = tutarOku(fiyat);
+                        if (isNaN(okunan)) { fiyatGecersiz = true; fiyat = ''; }
+                        else fiyat = okunan;
+                    } else {
                         let bf = firmaId ? (parseFloat(this.pfaTeklifler[firmaId + '_' + m.id]) || 0) : 0;
                         let tutar = bf * miktar;
                         if (tutar > 0 && this.ekap.fiyatDahil) fiyat = tutar;
@@ -4420,7 +4519,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         okas: ozel.okas || '',
                         fiyat: fiyat,
                         paraBirimi: (fiyat === '' ? '' : (this.ekap.paraBirimi || 'TRY (Türk Lirası)')),
-                        istekli: (fiyat === '' ? '' : istekli)
+                        istekli: (fiyat === '' ? '' : istekli),
+                        fiyatGecersiz: fiyatGecersiz
                     };
                 });
             },
@@ -4508,6 +4608,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 if (isNaN(d.getTime())) return iso;
                 return d.toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             },
+            tutarOku(deger) { return tutarOku(deger); },
             uyar(mesaj) {
                 this.alertMessage = mesaj;
                 this.showAlertModal = true;
@@ -4624,7 +4725,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             },
             tumArsiviDisaAktar() {
                 if (!this.gecmisIhaleler.length) return;
-                let bugun = new Date().toISOString().split('T')[0];
+                let bugun = yerelTarih();
                 this.jsonIndir({ tur: ARSIV_DOSYA_TURU, surum: 1, disaAktarimTarihi: new Date().toISOString(), ihaleler: this.gecmisIhaleler }, 'Gecmis_Ihaleler_' + bugun + '.json');
             },
             arsivKayitlariniBirlestir(liste) {
@@ -4763,8 +4864,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         datasets: [{
                             label: 'Teklif Tutarı (₺ KDV Dahil)',
                             data: data.length ? data : [0],
-                            backgroundColor: labels.map((_, idx) => idx === 0 ? 'rgba(16, 185, 129, 0.7)' : primaryColor + 'b3'),
-                            borderColor: labels.map((_, idx) => idx === 0 ? '#10b981' : primaryColor),
+                            backgroundColor: this.pfaToplamlar.map(f => f.id === this.kazananFirma.id ? 'rgba(16, 185, 129, 0.7)' : primaryColor + 'b3'),
+                            borderColor: this.pfaToplamlar.map(f => f.id === this.kazananFirma.id ? '#10b981' : primaryColor),
                             borderWidth: 2,
                             borderRadius: 8
                         }]
@@ -4787,8 +4888,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                     let labels = this.pfaToplamlar.map(f => f.ad || 'Firma');
                     chartInstance.data.labels = labels.length ? labels : ['Firma Yok'];
                     chartInstance.data.datasets[0].data = this.pfaToplamlar.map(f => f.kdvDahil || 0);
-                    chartInstance.data.datasets[0].backgroundColor = labels.map((_, idx) => idx === 0 ? 'rgba(16, 185, 129, 0.7)' : primaryColor + 'b3');
-                    chartInstance.data.datasets[0].borderColor = labels.map((_, idx) => idx === 0 ? '#10b981' : primaryColor);
+                    chartInstance.data.datasets[0].backgroundColor = this.pfaToplamlar.map(f => f.id === this.kazananFirma.id ? 'rgba(16, 185, 129, 0.7)' : primaryColor + 'b3');
+                    chartInstance.data.datasets[0].borderColor = this.pfaToplamlar.map(f => f.id === this.kazananFirma.id ? '#10b981' : primaryColor);
                     chartInstance.update();
                 }
             },
@@ -4797,10 +4898,27 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 if (!gercekAd) return false;
                 return (ad || '').trim().toLocaleUpperCase('tr-TR') === gercekAd;
             },
+            yeniId(liste, sonraki) {
+                // Listede kullanılan en büyük kimlikten küçük bir sayı verilmesin (çakışmayı önler)
+                let enBuyuk = liste.reduce((max, x) => Math.max(max, x.id || 0), 0);
+                return Math.max(sonraki || 1, enBuyuk + 1);
+            },
             ekle(tur) {
-                if(tur === 'malzeme') this.malzemeler.push({ id: this.nextMalzemeId++, ad: '', ozellik: '', miktar: 1, birim: 'ADET', kdv: 20 });
-                if(tur === 'ymFirma') this.ymFirmalar.push({ id: this.nextYmFirmaId++, ad: '', adres: '', vkn: '' });
-                if(tur === 'pfaFirma') this.pfaFirmalar.push({ id: this.nextPfaFirmaId++, ad: '', adres: '', vkn: '' });
+                if(tur === 'malzeme') {
+                    let id = this.yeniId(this.malzemeler, this.nextMalzemeId);
+                    this.nextMalzemeId = id + 1;
+                    this.malzemeler.push({ id: id, ad: '', ozellik: '', miktar: 1, birim: 'ADET', kdv: 20 });
+                }
+                if(tur === 'ymFirma') {
+                    let id = this.yeniId(this.ymFirmalar, this.nextYmFirmaId);
+                    this.nextYmFirmaId = id + 1;
+                    this.ymFirmalar.push({ id: id, ad: '', adres: '', vkn: '' });
+                }
+                if(tur === 'pfaFirma') {
+                    let id = this.yeniId(this.pfaFirmalar, this.nextPfaFirmaId);
+                    this.nextPfaFirmaId = id + 1;
+                    this.pfaFirmalar.push({ id: id, ad: '', adres: '', vkn: '' });
+                }
             },
             sil(tur, index) {
                 if(tur === 'malzeme') {
@@ -4827,7 +4945,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 }
             },
             kopyalaYmToPfa() {
-                this.confirmMessage = "Yaklaşık Maliyet için eklenen tüm firmalar 'Piyasa Fiyatı / Teklif Firmaları' alanına aktarılacaktır. Mevcut teklif firmalarınız güncellenecek. Emin misiniz?";
+                this.confirmMessage = "Yaklaşık Maliyet için eklenen tüm firmalar 'Piyasa Fiyatı / Teklif Firmaları' alanına aktarılacaktır. Mevcut teklif firmaları ve bu firmalara girilmiş teklif fiyatları silinecektir. Emin misiniz?";
                 this.pendingAction = 'ymToPfa';
                 this.showConfirmModal = true;
             },
@@ -4844,6 +4962,12 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             executePendingAction() {
                 if(this.pendingAction === 'ymToPfa') {
                     this.pfaFirmalar = JSON.parse(JSON.stringify(this.ymFirmalar));
+                    let enBuyukId = this.pfaFirmalar.reduce((max, f) => Math.max(max, f.id || 0), 0);
+                    this.nextPfaFirmaId = enBuyukId + 1;
+                    // Eski firmalara ait teklifler yeni firmalara geçmesin
+                    this.pfaTeklifler = {};
+                    this.seciliTeklifFirmasi = 'bos';
+                    if (!['kazanan', 'manuel', 'bos'].includes(this.ekap.istekliKaynagi)) this.ekap.istekliKaynagi = 'kazanan';
                     this.alertMessage = "YM Firmaları başarıyla kopyalandı!";
                     this.showAlertModal = true;
                 } else if(this.pendingAction === 'ymPricesToPfa') {
@@ -4927,26 +5051,8 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 });
             },
             topluPDF() {
-                if (this.seciliRaporSayisi === 0) {
-                    this.alertMessage = "Lütfen en az bir rapor seçiniz!";
-                    this.showAlertModal = true;
-                    return;
-                }
-
-                // Toplu print modunu aç
-                this.topluPrintMode = true;
-                document.body.classList.add('toplu-print-modu');
-
-                // Print dialog aç
-                setTimeout(() => {
-                    window.print();
-                    
-                    // Print tamamlandıktan sonra kapat
-                    setTimeout(() => {
-                        this.topluPrintMode = false;
-                        document.body.classList.remove('toplu-print-modu');
-                    }, 500);
-                }, 100);
+                // Tarayıcılar PDF'i doğrudan oluşturamaz; yazdırma penceresinde "PDF olarak kaydet" seçilir
+                this.topluYazdir();
             },
             topluYazdir() {
                 if (this.seciliRaporSayisi === 0) {
@@ -4959,8 +5065,11 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                 this.topluPrintMode = true;
                 document.body.classList.add('toplu-print-modu');
 
-                // Print dialog aç (Kullanıcı PDF olarak kaydedebilir)
+                // Sayfa sonu yalnızca raporlar arasına konsun: görünen ilk rapor işaretlenir
                 setTimeout(() => {
+                    let gorunen = [...document.querySelectorAll('.print-section')].filter(el => el.getClientRects().length > 0);
+                    document.querySelectorAll('.toplu-ilk-rapor').forEach(el => el.classList.remove('toplu-ilk-rapor'));
+                    if (gorunen[0]) gorunen[0].classList.add('toplu-ilk-rapor');
                     window.print();
                     
                     // Print tamamlandıktan sonra kapat
@@ -4993,9 +5102,16 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                             this.arsivVerisiniIceAl(parsed, file.name);
                             return;
                         }
+                        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || (!parsed.idare && !Array.isArray(parsed.malzemeler))) {
+                            this.alertMessage = "Seçilen dosya bu programın yedek dosyası değil. Lütfen \"Verileri Dışa Aktar\" ile alınmış bir .json dosyası seçiniz.";
+                            this.showAlertModal = true;
+                            return;
+                        }
                         let arsivListesi = Array.isArray(parsed.gecmisIhaleler) ? parsed.gecmisIhaleler : null;
-                        delete parsed.gecmisIhaleler;
-                        Object.assign(this.$data, parsed);
+                        // Yalnızca ihale verileri yüklenir; ekran/pencere durumları dosyadan alınmaz
+                        this.durumuUygula(parsed);
+                        this.aktifArsivId = parsed.aktifArsivId || null;
+                        document.documentElement.classList.toggle('dark', !!this.isDarkMode);
                         let mesaj = "Veriler başarıyla yüklendi!";
                         if (arsivListesi && arsivListesi.length) {
                             let sonuc = this.arsivKayitlariniBirlestir(arsivListesi);
@@ -5003,7 +5119,11 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         }
                         this.alertMessage = mesaj;
                         this.showAlertModal = true;
-                    } catch(err) {}
+                    } catch(err) {
+                        e.target.value = '';
+                        this.alertMessage = "Dosya okunamadı: geçerli bir JSON yedek dosyası değil.";
+                        this.showAlertModal = true;
+                    }
                 };
                 reader.readAsText(file);
             },
@@ -5057,7 +5177,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                         this.ekapListeBilgi = {
                             okas: EKAP_OKAS.length,
                             birim: EKAP_BIRIMLER.length,
-                            tarih: this.trTarihFormat(new Date().toISOString().split('T')[0]),
+                            tarih: this.trTarihFormat(yerelTarih()),
                             dosya: dosya.name
                         };
                         this.ekapListeVersiyon++;
@@ -5130,6 +5250,11 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
             ekapExcelIndir() {
                 try {
                     let satirlar = this.ekapSatirlar;
+                    if (this.ekap.mod !== 'duyuru' && satirlar.some(s => s.fiyatGecersiz)) {
+                        this.alertMessage = "Bazı kalemlerde Toplam Fiyat okunamadı (kırmızı işaretli alanlar). Lütfen tutarı 1250,50 veya 1.250,50 biçiminde yazınız.";
+                        this.showAlertModal = true;
+                        return;
+                    }
                     if (!satirlar || satirlar.length === 0) {
                         this.alertMessage = "Lütfen önce İhtiyaç Listesi'ne kalem ekleyiniz.";
                         this.showAlertModal = true;
@@ -5189,7 +5314,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
                     let icerik = '\ufeff' + xml.join('');
                     let blob = new Blob([icerik], { type: 'application/vnd.ms-excel;charset=utf-8' });
                     let dtNo = (this.idare.dtNo || 'EKAP').replace(/[^A-Za-z0-9]/g, '');
-                    let bugun = this.trTarihFormat(new Date().toISOString().split('T')[0]).replace(/\./g, '_');
+                    let bugun = this.trTarihFormat(yerelTarih()).replace(/\./g, '_');
                     let link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
                     link.download = dtNo + '_KalemGirisleri_' + (duyuruModu ? 'Duyuru_' : 'Sonuc_') + bugun + '.xls';
