@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Z2Panel · zapret2</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Giriş / ilk kurulum -->
+  <div id="auth" class="auth hidden">
+    <form id="authForm" class="card auth-card">
+      <h1>Z2Panel</h1>
+      <p id="authHint" class="muted">Keenetic zapret2 yönetim paneli</p>
+      <input id="authPw" type="password" autocomplete="current-password" placeholder="Parola" required minlength="6">
+      <input id="authPw2" type="password" autocomplete="new-password" placeholder="Parola (tekrar)" class="hidden">
+      <button class="btn primary" type="submit" id="authBtn">Giriş</button>
+      <p id="authErr" class="err"></p>
+    </form>
+  </div>
+
+  <div id="app" class="hidden">
+    <header class="top">
+      <div class="brand">Z2Panel <span id="hdrModel" class="muted"></span></div>
+      <div class="svc"><span id="svcDot" class="dot"></span><span id="svcText">…</span></div>
+    </header>
+
+    <nav class="tabs" id="tabs">
+      <button data-tab="overview" class="active">Genel Bakış</button>
+      <button data-tab="update">Kurulum &amp; Güncelleme</button>
+      <button data-tab="quick">Hızlı Ayarlar</button>
+      <button data-tab="files">Dosyalar</button>
+      <button data-tab="logs">Günlükler</button>
+      <button data-tab="backups">Yedekler</button>
+      <button data-tab="panel">Panel</button>
+    </nav>
+
+    <main>
+      <!-- GENEL BAKIŞ -->
+      <section id="tab-overview" class="tab">
+        <div id="alerts"></div>
+        <div class="grid">
+          <div class="card">
+            <h2>Cihaz</h2>
+            <dl class="kv" id="devInfo"></dl>
+          </div>
+          <div class="card">
+            <h2>Servis</h2>
+            <p class="big"><span id="svcDot2" class="dot"></span> <span id="svcText2">…</span></p>
+            <dl class="kv" id="svcInfo"></dl>
+            <div class="row">
+              <button class="btn" data-svc="start">Başlat</button>
+              <button class="btn" data-svc="restart">Yeniden başlat</button>
+              <button class="btn danger" data-svc="stop">Durdur</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h2>Sürümler</h2>
+            <button class="btn small" id="btnCheck">Güncellemeleri denetle</button>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>Bileşen</th><th>Kurulu</th><th>En güncel</th><th></th></tr></thead>
+            <tbody id="verRows"></tbody>
+          </table>
+          <p class="muted small" id="checkedAt"></p>
+        </div>
+      </section>
+
+      <!-- KURULUM & GÜNCELLEME -->
+      <section id="tab-update" class="tab hidden">
+        <div class="grid">
+          <div class="card">
+            <h2>Paket ile (önerilen)</h2>
+            <p class="muted">Keenetic için hazırlanmış <b>nfqws2-keenetic</b> paketi opkg ile kurulur/güncellenir. Init betikleri, iptables kuralları ve Keenetic'e özel yamalar (ör. <code>--fastpath-workaround</code>) pakete dahildir.</p>
+            <div class="row">
+              <button class="btn primary" data-job="install">Kur</button>
+              <button class="btn primary" data-job="upgrade">Paketi güncelle</button>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Doğrudan zapret2 (gelişmiş)</h2>
+            <p class="muted">Paket henüz güncellenmediyse nfqws2 ikilisini ve lua betiklerini doğrudan <b>bol-van/zapret2</b> sürümünden yükler. SHA-256 doğrulanır, önce yedek/geri alma noktası alınır; servis başlamazsa otomatik geri alınır.</p>
+            <div class="row">
+              <input id="directTag" placeholder="Etiket (boş = en son, ör. v1.0.5.2)">
+              <button class="btn" id="btnDirect">Doğrudan güncelle</button>
+              <button class="btn" data-job="rollback" id="btnRollback">Geri al</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Kaldırma</h2>
+          <p class="muted">nfqws2-keenetic paketini kaldırır. Önce yapılandırma yedeği alınır.</p>
+          <button class="btn danger" data-job="uninstall">nfqws2'yi kaldır</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Son işlem günlüğü</h2><button class="btn small" id="btnJobLog">Göster</button></div>
+        </div>
+      </section>
+
+      <!-- HIZLI AYARLAR -->
+      <section id="tab-quick" class="tab hidden">
+        <div class="card">
+          <h2>Hızlı ayarlar</h2>
+          <form id="quickForm" class="form">
+            <label>Çalışma modu
+              <select id="qMode">
+                <option value="auto">Otomatik — engellenenleri algılayıp auto.list'e ekler (önerilen)</option>
+                <option value="list">Liste — yalnızca user.list'teki alan adları</option>
+                <option value="all">Tümü — exclude.list hariç tüm trafik</option>
+                <option value="custom" disabled>Özel (dosyadan düzenlenmiş)</option>
+              </select>
+            </label>
+            <label>İnternet (ISP) arayüzü
+              <input id="qIface" placeholder="ör. eth3 veya ppp0">
+              <span class="muted small" id="qIfaceHint"></span>
+            </label>
+            <label class="check"><input type="checkbox" id="qV6"> IPv6 trafiğini de işle</label>
+            <div class="row"><button class="btn primary" type="submit">Kaydet ve uygula</button></div>
+          </form>
+        </div>
+        <div class="card">
+          <h2>İpuçları</h2>
+          <ul class="tips">
+            <li>Keenetic arayüzünde <b>“Sağlayıcı DNS'ini yok say”</b> seçeneğini açın ve DoH/DoT kullanın; DNS tabanlı engeller zapret ile aşılmaz.</li>
+            <li>Erişilemeyen alan adlarını <b>Dosyalar → user.list</b> içine ekleyin (ör. <code>discord.com</code>, <code>discord.gg</code>, <code>discordapp.com</code>, <code>discord.media</code>).</li>
+            <li>Keenetic'te <b>nfqws</b> adlı bir erişim politikası oluşturursanız yalnızca o politikadaki cihazların trafiği işlenir.</li>
+            <li>Strateji ayarları <code>nfqws2.conf</code> içindeki <code>NFQWS_ARGS</code> değişkenindedir. Belgeler: <a href="https://github.com/bol-van/zapret2/blob/master/docs/manual.md" target="_blank" rel="noopener">zapret2 manual</a>.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- DOSYALAR -->
+      <section id="tab-files" class="tab hidden">
+        <div class="files">
+          <aside class="card filelist">
+            <div class="card-head"><h2>Dosyalar</h2><button class="btn small" id="btnNewList">+ Liste</button></div>
+            <ul id="fileList"></ul>
+          </aside>
+          <div class="card editor">
+            <div class="card-head">
+              <h2 id="edName">—</h2>
+              <div class="row">
+                <button class="btn small" id="btnSave">Kaydet</button>
+                <button class="btn small primary" id="btnSaveRestart">Kaydet ve yeniden başlat</button>
+                <button class="btn small danger hidden" id="btnDelete">Sil</button>
+              </div>
+            </div>
+            <textarea id="edText" spellcheck="false" placeholder="Soldan bir dosya seçin"></textarea>
+            <p class="muted small" id="edHint"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- GÜNLÜKLER -->
+      <section id="tab-logs" class="tab hidden">
+        <div class="card">
+          <div class="card-head">
+            <div class="row">
+              <select id="logSel">
+                <option value="nfqws2.log">nfqws2.log (otomatik liste)</option>
+                <option value="nfqws2-debug.log">nfqws2-debug.log</option>
+                <option value="syslog">Keenetic sistem günlüğü (nfqws)</option>
+                <option value="job.log">Son işlem günlüğü</option>
+              </select>
+              <label class="check"><input type="checkbox" id="logAuto"> Otomatik yenile</label>
+            </div>
+            <div class="row">
+              <button class="btn small" id="btnLogRefresh">Yenile</button>
+              <button class="btn small danger" id="btnLogClear">Temizle</button>
+            </div>
+          </div>
+          <pre id="logText" class="log"></pre>
+        </div>
+      </section>
+
+      <!-- YEDEKLER -->
+      <section id="tab-backups" class="tab hidden">
+        <div class="card">
+          <div class="card-head">
+            <h2>Yapılandırma yedekleri</h2>
+            <button class="btn small primary" id="btnBackup">Yedek al</button>
+          </div>
+          <p class="muted small">Yedekler <code>nfqws2.conf</code> ve <code>lists/</code> dizinini içerir. Güncelleme, geri yükleme ve kaldırma işlemlerinden önce otomatik yedek alınır (en fazla 20 saklanır).</p>
+          <table class="tbl">
+            <thead><tr><th>Yedek</th><th>Boyut</th><th></th></tr></thead>
+            <tbody id="bkRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PANEL -->
+      <section id="tab-panel" class="tab hidden">
+        <div class="grid">
+          <div class="card">
+            <h2>Otomatik denetim</h2>
+            <form id="setForm" class="form">
+              <label class="check"><input type="checkbox" id="sCheck"> Her gün güncellemeleri denetle</label>
+              <label class="check"><input type="checkbox" id="sUpgrade"> Paket güncellemesi varsa otomatik kur</label>
+              <label>Saat (0-23) <input id="sHour" type="number" min="0" max="23"></label>
+              <div class="row"><button class="btn primary" type="submit">Kaydet</button></div>
+              <p class="muted small" id="cronHint"></p>
+            </form>
+          </div>
+          <div class="card">
+            <h2>Parola</h2>
+            <form id="pwForm" class="form">
+              <input id="pwOld" type="password" placeholder="Mevcut parola" autocomplete="current-password" required>
+              <input id="pwNew" type="password" placeholder="Yeni parola (en az 6)" autocomplete="new-password" required minlength="6">
+              <div class="row"><button class="btn primary" type="submit">Değiştir</button></div>
+            </form>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Panel</h2>
+          <p>Sürüm: <b id="pVer"></b> <span id="pLatest" class="muted"></span></p>
+          <div class="row">
+            <button class="btn" data-job="panel_update">Paneli güncelle</button>
+            <button class="btn danger" id="btnLogout">Çıkış</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- İşlem penceresi -->
+  <div id="jobModal" class="modal hidden">
+    <div class="card modal-card">
+      <div class="card-head">
+        <h2 id="jobTitle">İşlem</h2>
+        <span id="jobState" class="badge"></span>
+      </div>
+      <pre id="jobLog" class="log"></pre>
+      <div class="row end"><button class="btn" id="jobClose">Kapat</button></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>
