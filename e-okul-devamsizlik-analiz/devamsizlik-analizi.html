@@ -460,13 +460,14 @@ function sampleData() {
   const recs = [];
   const add = (cls, no, name, dates, type = "D", days = 1) => dates.forEach(d => recs.push({ cls, no: String(no), name, date: d, type, days, source: "örnek" }));
   const run = (start, n) => { const a = []; let d = start; for (let i = 0; i < n; i++) { a.push(d); d = nextSchoolDay(d); } return a; };
-  add("1. Sınıf-A", 12, "ÖRNEK AYŞE YILMAZ", run("2026-09-14", 12));
-  add("1. Sınıf-A", 15, "ÖRNEK MEHMET KAYA", ["2026-09-16", "2026-09-17", "2026-10-08", "2026-10-09"]);
-  add("1. Sınıf-A", 21, "ÖRNEK ZEYNEP DEMİR", ["2026-10-08", "2026-10-09"]);
-  add("2. Sınıf-A", 4, "ÖRNEK ALİ ŞAHİN", ["2026-09-16"]);
-  add("2. Sınıf-A", 9, "ÖRNEK ELİF ÇELİK", ["2026-09-16", "2026-09-29", "2026-09-30"], "R");
-  add("4. Sınıf-A", 7, "ÖRNEK YUSUF ARSLAN", ["2026-09-24", "2026-09-25", "2026-09-28", "2026-09-29", "2026-10-05", "2026-10-06"]);
-  add("4. Sınıf-A", 18, "ÖRNEK MERVE AYDIN", ["2026-09-24", "2026-09-25", "2026-09-28", "2026-09-29"]);
+  add("3. Sınıf-A", 3, "ÖRNEK ÖĞRENCİ 1", run("2026-09-21", 11));
+  add("3. Sınıf-A", 8, "ÖRNEK ÖĞRENCİ 2", ["2026-09-15", "2026-09-22", "2026-10-01", "2026-10-02", "2026-10-07"]);
+  add("3. Sınıf-A", 14, "ÖRNEK ÖĞRENCİ 3", ["2026-10-05"]);
+  add("3. Sınıf-B", 5, "ÖRNEK ÖĞRENCİ 4", ["2026-09-18", "2026-09-30"]);
+  add("3. Sınıf-B", 11, "ÖRNEK ÖĞRENCİ 5", ["2026-09-23", "2026-09-24", "2026-09-25"], "R");
+  add("3. Sınıf-B", 19, "ÖRNEK ÖĞRENCİ 6", ["2026-09-17", "2026-10-06"]);
+  add("5. Sınıf-A", 2, "ÖRNEK ÖĞRENCİ 7", ["2026-09-14", "2026-09-28", "2026-09-29", "2026-10-01", "2026-10-02", "2026-10-08", "2026-10-09"]);
+  add("5. Sınıf-A", 16, "ÖRNEK ÖĞRENCİ 8", ["2026-09-21", "2026-10-08"]);
   return recs;
 }
 
@@ -534,7 +535,7 @@ function render() {
 
   const m = state.meta;
   $("#schoolLine").textContent = state.sample
-    ? "Örnek veri gösteriliyor (kurgusal öğrenciler). Kendi raporunuzu yükleyin."
+    ? "Örnek veri gösteriliyor (gerçek kişi değildir). Kendi raporunuzu yükleyin."
     : [m.school, m.year && `${m.year} ${m.term} Dönem`, m.stamp && `rapor tarihi ${fmtDate(m.stamp)}`].filter(Boolean).join(" · ");
   $("#files").innerHTML = state.sample
     ? `<span class="chip sample">Örnek veri</span>`
