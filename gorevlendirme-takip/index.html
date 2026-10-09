@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Görevlendirme Takip</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6f9; --panel: #ffffff; --text: #1f2933; --muted: #6b7280; --border: #d9dee5;
+    --accent: #1d4ed8; --accent-text: #ffffff;
+    --red: #dc2626; --red-bg: #fde8e8; --red-dark: #7f1d1d; --red-dark-bg: #f8d4d4;
+    --amber: #b45309; --amber-bg: #fef3c7; --green: #15803d; --green-bg: #dcfce7;
+    --gray-bg: #eef0f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111418; --panel: #1b2027; --text: #e5e7eb; --muted: #9aa3ae; --border: #2e3540;
+      --accent: #3b82f6; --red: #f87171; --red-bg: #3b1416; --red-dark: #fecaca; --red-dark-bg: #5b1a1d;
+      --amber: #fbbf24; --amber-bg: #3a2c0c; --green: #4ade80; --green-bg: #0f2e1a; --gray-bg: #262c35;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+  header { padding: 16px; background: var(--panel); border-bottom: 1px solid var(--border); }
+  header h1 { margin: 0 0 4px; font-size: 20px; }
+  header p { margin: 0; color: var(--muted); }
+  main { padding: 16px; max-width: 1400px; margin: 0 auto; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  button, .btn { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel); color: var(--text); cursor: pointer; }
+  button.primary, .btn.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  input[type=text], input[type=number], select { font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel); color: var(--text); }
+  input[type=file] { display: none; }
+  #drop { display: block; border: 2px dashed var(--border); border-radius: 10px; padding: 22px; text-align: center; color: var(--muted); cursor: pointer; }
+  #drop.over { border-color: var(--accent); color: var(--accent); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .card { border-radius: 10px; padding: 12px; border: 1px solid var(--border); background: var(--panel); cursor: pointer; }
+  .card b { display: block; font-size: 26px; }
+  .card.active { outline: 2px solid var(--accent); }
+  .card.expired { background: var(--red-dark-bg); color: var(--red-dark); }
+  .card.critical { background: var(--red-bg); color: var(--red); }
+  .card.soon { background: var(--amber-bg); color: var(--amber); }
+  .card.ok { background: var(--green-bg); color: var(--green); }
+  .card.none { background: var(--gray-bg); }
+  #alert { display: none; background: var(--red); color: #fff; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; animation: pulse 1.6s ease-in-out infinite; }
+  #alert h2 { margin: 0 0 6px; font-size: 17px; }
+  #alert ul { margin: 6px 0 0; padding-left: 20px; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,.6); } 50% { box-shadow: 0 0 0 8px rgba(220,38,38,0); } }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+  th { position: sticky; top: 0; background: var(--panel); cursor: pointer; user-select: none; font-size: 13px; }
+  th .arrow { color: var(--muted); font-size: 11px; }
+  tr.expired td { background: var(--red-dark-bg); }
+  tr.critical td { background: var(--red-bg); }
+  tr.critical td.kalan, tr.expired td.kalan { color: var(--red); font-weight: 700; }
+  tr.soon td.kalan { color: var(--amber); font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .badge.expired { background: var(--red-dark); color: #fff; }
+  .badge.critical { background: var(--red); color: #fff; }
+  .badge.soon { background: var(--amber-bg); color: var(--amber); }
+  .badge.ok { background: var(--green-bg); color: var(--green); }
+  .badge.none { background: var(--gray-bg); color: var(--muted); }
+  details summary { cursor: pointer; font-weight: 600; }
+  .rules td, .rules th { white-space: normal; position: static; cursor: default; }
+  .muted { color: var(--muted); }
+  .empty { padding: 30px; text-align: center; color: var(--muted); }
+  @media print {
+    header, #drop, .no-print, details { display: none !important; }
+    #alert { animation: none; }
+    body { background: #fff; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Görevlendirme Süresi Takip</h1>
+  <p>Excel listesini yükleyin; görevlendirme bitiş tarihleri hesaplanır, süresi bitmek üzere olanlar kırmızı ile uyarılır.</p>
+</header>
+<main>
+  <div class="panel no-print">
+    <label id="drop" for="file">
+      <strong>Excel dosyasını buraya sürükleyin</strong> veya tıklayıp seçin (.xlsx, .xls)<br>
+      <span class="muted">Dosya bilgisayarınızda işlenir, hiçbir yere gönderilmez. Tüm sayfalar okunur, aynı kayıtlar bir kez gösterilir.</span>
+    </label>
+    <input type="file" id="file" accept=".xlsx,.xls,.xlsm,.ods,.csv">
+    <div class="row" style="margin-top:10px">
+      <span id="fileInfo" class="muted">Henüz dosya yüklenmedi.</span>
+    </div>
+  </div>
+
+  <div id="alert"></div>
+
+  <div class="panel">
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <div class="panel no-print">
+    <div class="row">
+      <input type="text" id="search" placeholder="Ad, soyad, T.C., kurum ara…" style="flex:1;min-width:200px">
+      <select id="roleFilter"><option value="">Tüm görevler</option></select>
+      <button id="exportBtn" disabled>Excel'e aktar</button>
+      <button id="printBtn" disabled>Yazdır</button>
+      <button id="clearBtn" disabled>Listeyi temizle</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="table-wrap">
+      <table>
+        <thead><tr id="thead"></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="empty" class="empty">Listeyi görmek için Excel dosyasını yükleyin.</div>
+  </div>
+
+  <details class="panel no-print">
+    <summary>Ayarlar (görev süreleri ve uyarı gün sayısı)</summary>
+    <div style="margin-top:12px">
+      <div class="row" style="margin-bottom:12px">
+        <label>Kırmızı uyarı: bitime <input type="number" id="warnDays" min="1" max="365" style="width:70px"> gün veya daha az kalanlar</label>
+        <label>Sarı uyarı: bitime <input type="number" id="soonDays" min="1" max="365" style="width:70px"> gün veya daha az kalanlar</label>
+      </div>
+      <p class="muted" style="margin:0 0 8px">Görev adı aşağıdaki anahtar kelimeyi içeriyorsa o süre uygulanır (yukarıdan aşağıya ilk eşleşen). Süre 0 ise o görev takip edilmez.</p>
+      <table class="rules">
+        <thead><tr><th>Görev adında geçen ifade</th><th>Süre (ay)</th><th></th></tr></thead>
+        <tbody id="rulesBody"></tbody>
+      </table>
+      <div class="row" style="margin-top:10px">
+        <button id="addRule">Kural ekle</button>
+        <label>Kurallara uymayan diğer görevler: <input type="number" id="defaultMonths" min="0" max="120" style="width:70px"> ay <span class="muted">(0 = takip etme)</span></label>
+        <button id="resetRules">Varsayılana dön</button>
+      </div>
+      <p class="muted" style="margin:12px 0 0">Bitiş tarihi = Başlama tarihi + süre − 1 gün (örn. 14.09.2026 başlayan 6 aylık görevin son günü 13.03.2027).</p>
+    </div>
+  </details>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var DEFAULT_RULES = [
+    { key: "müdür yardımcısı", months: 6 },
+    { key: "şube müdür", months: 6 },
+    { key: "mebbis", months: 6 },
+    { key: "koordinatör", months: 6 },
+    { key: "müdür", months: 6 }
+  ];
+  var DEFAULT_SETTINGS = { warnDays: 10, soonDays: 30, defaultMonths: 0, rules: DEFAULT_RULES };
+  var SETTINGS_KEY = "gorevTakip.settings";
+  var DATA_KEY = "gorevTakip.data";
+
+  var COLUMNS = [
+    { id: "ad", label: "Adı" },
+    { id: "soyad", label: "Soyadı" },
+    { id: "gorev", label: "Görev" },
+    { id: "baslama", label: "Başlama" },
+    { id: "bitis", label: "Bitiş (son gün)" },
+    { id: "kalan", label: "Kalan Gün" },
+    { id: "durum", label: "Durum" },
+    { id: "kurum", label: "Görevlendirildiği Kurum" },
+    { id: "brans", label: "Branş" },
+    { id: "tc", label: "T.C. Kimlik No" }
+  ];
+
+  var STATUS = {
+    expired: { label: "Süresi doldu", order: 0 },
+    critical: { label: "Bitiyor!", order: 1 },
+    soon: { label: "Yaklaşıyor", order: 2 },
+    ok: { label: "Devam ediyor", order: 3 },
+    none: { label: "Süre tanımsız", order: 4 }
+  };
+
+  var settings = loadSettings();
+  var records = [];
+  var fileName = "";
+  var sortCol = "kalan", sortDir = 1;
+  var statusFilter = "";
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- storage ----------
+  function storageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function storageSet(key, val) { try { localStorage.setItem(key, val); } catch (e) { /* yoksay */ } }
+  function storageDel(key) { try { localStorage.removeItem(key); } catch (e) { /* yoksay */ } }
+
+  function loadSettings() {
+    var s = null;
+    try { s = JSON.parse(storageGet(SETTINGS_KEY)); } catch (e) { s = null; }
+    var d = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    if (!s || typeof s !== "object") return d;
+    return {
+      warnDays: num(s.warnDays, d.warnDays),
+      soonDays: num(s.soonDays, d.soonDays),
+      defaultMonths: num(s.defaultMonths, d.defaultMonths),
+      rules: Array.isArray(s.rules) ? s.rules : d.rules
+    };
+  }
+  function saveSettings() { storageSet(SETTINGS_KEY, JSON.stringify(settings)); }
+  function num(v, d) { var n = parseInt(v, 10); return isNaN(n) ? d : n; }
+
+  // ---------- helpers ----------
+  function trLower(s) { return String(s == null ? "" : s).toLocaleLowerCase("tr-TR"); }
+  function clean(s) { return String(s == null ? "" : s).replace(/ /g, " ").replace(/\s+/g, " ").trim(); }
+  function today() { var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function fmt(d) {
+    if (!d) return "";
+    return String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0") + "." + d.getFullYear();
+  }
+  function addMonths(d, m) {
+    var y = d.getFullYear(), mo = d.getMonth() + m, day = d.getDate();
+    var last = new Date(y, mo + 1, 0).getDate();
+    return new Date(y, mo, Math.min(day, last));
+  }
+  function dayDiff(a, b) { return Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 86400000); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  function parseDate(v) {
+    if (v == null || v === "") return null;
+    if (v instanceof Date && !isNaN(v)) return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+    if (typeof v === "number" && window.XLSX) {
+      var p = XLSX.SSF.parse_date_code(v);
+      if (p) return new Date(p.y, p.m - 1, p.d);
+    }
+    var s = clean(v), m;
+    if ((m = s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})/))) return new Date(+m[3], +m[2] - 1, +m[1]);
+    if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return new Date(+m[1], +m[2] - 1, +m[3]);
+    return null;
+  }
+
+  function monthsFor(gorev) {
+    var g = trLower(gorev);
+    for (var i = 0; i < settings.rules.length; i++) {
+      var r = settings.rules[i];
+      var k = trLower(clean(r.key));
+      if (k && g.indexOf(k) !== -1) return num(r.months, 0);
+    }
+    return settings.defaultMonths;
+  }
+
+  function compute(rec) {
+    var months = monthsFor(rec.gorev);
+    var out = { months: months, bitis: null, kalan: null, status: "none" };
+    if (!rec.baslama || !months) return out;
+    out.bitis = new Date(addMonths(rec.baslama, months).getTime());
+    out.bitis.setDate(out.bitis.getDate() - 1);
+    out.kalan = dayDiff(today(), out.bitis);
+    if (out.kalan < 0) out.status = "expired";
+    else if (out.kalan <= settings.warnDays) out.status = "critical";
+    else if (out.kalan <= settings.soonDays) out.status = "soon";
+    else out.status = "ok";
+    return out;
+  }
+
+  // ---------- Excel okuma ----------
+  var HEADER_MATCH = {
+    tc: function (h) { return h.indexOf("kimlik") !== -1 || h === "tc" || h === "t.c."; },
+    ad: function (h) { return h === "adı" || h === "ad" || h === "adi"; },
+    soyad: function (h) { return h.indexOf("soyad") === 0; },
+    adsoyad: function (h) { return h.indexOf("adı soyadı") !== -1 || h.indexOf("ad soyad") !== -1; },
+    baslama: function (h) { return h.indexOf("başla") !== -1 || h.indexOf("basla") !== -1 || h.indexOf("görevlendirme tarih") !== -1; },
+    gorev: function (h) { return h === "görev" || h === "görevi" || h === "unvan" || h === "görev unvanı"; },
+    brans: function (h) { return h.indexOf("branş") !== -1 || h.indexOf("brans") !== -1; },
+    kurum: function (h) { return h.indexOf("kurum") !== -1 || h.indexOf("okul") !== -1; }
+  };
+
+  function findHeader(rows) {
+    for (var r = 0; r < Math.min(rows.length, 30); r++) {
+      var map = {}, row = rows[r] || [];
+      for (var c = 0; c < row.length; c++) {
+        var h = trLower(clean(row[c]));
+        if (!h) continue;
+        for (var key in HEADER_MATCH) {
+          if (map[key] == null && HEADER_MATCH[key](h)) { map[key] = c; break; }
+        }
+      }
+      if (map.baslama != null && map.gorev != null && (map.ad != null || map.adsoyad != null || map.tc != null)) {
+        return { row: r, map: map };
+      }
+    }
+    return null;
+  }
+
+  function readWorkbook(wb) {
+    var out = [], seen = {}, sheetsUsed = [];
+    wb.SheetNames.forEach(function (name) {
+      var rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, raw: true, defval: "" });
+      var hdr = findHeader(rows);
+      if (!hdr) return;
+      var m = hdr.map, count = 0;
+      for (var r = hdr.row + 1; r < rows.length; r++) {
+        var row = rows[r];
+        var get = function (k) { return m[k] != null ? row[m[k]] : ""; };
+        var ad = clean(get("ad")), soyad = clean(get("soyad"));
+        if (!ad && m.adsoyad != null) ad = clean(get("adsoyad"));
+        var tc = clean(get("tc"));
+        var gorev = clean(get("gorev"));
+        if (!ad && !soyad && !tc) continue;
+        if (trLower(gorev) === "görev" && trLower(ad).indexOf("ad") === 0) continue; // tekrar eden başlık satırı
+        var baslama = parseDate(get("baslama"));
+        var rec = { tc: tc, ad: ad, soyad: soyad, gorev: gorev, brans: clean(get("brans")), kurum: clean(get("kurum")), baslama: baslama };
+        var key = [tc || (ad + " " + soyad), trLower(gorev), trLower(rec.kurum), baslama ? baslama.getTime() : ""].join("|");
+        if (seen[key]) continue;
+        seen[key] = true;
+        out.push(rec);
+        count++;
+      }
+      sheetsUsed.push(name + " (" + count + " yeni)");
+    });
+    return { records: out, sheets: sheetsUsed };
+  }
+
+  function handleFile(file) {
+    if (!file) return;
+    if (!window.XLSX) {
+      alert("Excel okuma kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol edip sayfayı yenileyin.");
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        var wb = XLSX.read(new Uint8Array(e.target.result), { type: "array", cellDates: true });
+        var res = readWorkbook(wb);
+        if (!res.records.length) {
+          alert("Dosyada uygun bir liste bulunamadı. Başlık satırında 'Adı', 'Başlama Tarih' ve 'Görev' sütunları olmalı.");
+          return;
+        }
+        records = res.records;
+        fileName = file.name;
+        persistData(res.sheets);
+        render();
+      } catch (err) {
+        alert("Dosya okunamadı: " + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function persistData(sheets) {
+    var info = "Yüklenen dosya: " + fileName + " — " + records.length + " kişi (" + sheets.join(", ") + ") — " + new Date().toLocaleString("tr-TR");
+    $("fileInfo").textContent = info;
+    storageSet(DATA_KEY, JSON.stringify({
+      info: info,
+      records: records.map(function (r) { return Object.assign({}, r, { baslama: r.baslama ? fmt(r.baslama) : "" }); })
+    }));
+  }
+
+  function restoreData() {
+    var raw = storageGet(DATA_KEY);
+    if (!raw) return;
+    try {
+      var d = JSON.parse(raw);
+      records = (d.records || []).map(function (r) { return Object.assign({}, r, { baslama: parseDate(r.baslama) }); });
+      $("fileInfo").textContent = (d.info || "") + " (kayıtlı liste)";
+    } catch (e) { records = []; }
+  }
+
+  // ---------- görüntüleme ----------
+  function enriched() {
+    return records.map(function (r) { return Object.assign({}, r, compute(r)); });
+  }
+
+  function render() {
+    var list = enriched();
+    var has = records.length > 0;
+    ["exportBtn", "printBtn", "clearBtn"].forEach(function (id) { $(id).disabled = !has; });
+
+    // görev filtresi seçenekleri
+    var roles = {};
+    list.forEach(function (r) { if (r.gorev) roles[r.gorev] = (roles[r.gorev] || 0) + 1; });
+    var sel = $("roleFilter"), cur = sel.value;
+    sel.innerHTML = '<option value="">Tüm görevler</option>' + Object.keys(roles).sort(function (a, b) { return a.localeCompare(b, "tr"); })
+      .map(function (g) { return '<option value="' + esc(g) + '">' + esc(g) + " (" + roles[g] + ")</option>"; }).join("");
+    if (roles[cur]) sel.value = cur;
+
+    renderCards(list);
+    renderAlert(list);
+
+    var q = trLower($("search").value.trim());
+    var role = sel.value;
+    var rows = list.filter(function (r) {
+      if (statusFilter && r.status !== statusFilter) return false;
+      if (role && r.gorev !== role) return false;
+      if (q) {
+        var hay = trLower([r.tc, r.ad, r.soyad, r.gorev, r.brans, r.kurum].join(" "));
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+    rows.sort(compare);
+    renderTable(rows);
+  }
+
+  function sortValue(r, col) {
+    switch (col) {
+      case "kalan": return r.kalan == null ? Infinity : r.kalan;
+      case "durum": return STATUS[r.status].order * 100000 + (r.kalan == null ? 0 : r.kalan);
+      case "baslama": return r.baslama ? r.baslama.getTime() : Infinity;
+      case "bitis": return r.bitis ? r.bitis.getTime() : Infinity;
+      default: return trLower(r[col]);
+    }
+  }
+  function compare(a, b) {
+    var x = sortValue(a, sortCol), y = sortValue(b, sortCol);
+    if (typeof x === "string") return x.localeCompare(y, "tr") * sortDir;
+    if (x === y) return 0;
+    return (x < y ? -1 : 1) * sortDir;
+  }
+
+  function renderCards(list) {
+    var counts = { expired: 0, critical: 0, soon: 0, ok: 0, none: 0 };
+    list.forEach(function (r) { counts[r.status]++; });
+    var html = '<div class="card' + (statusFilter === "" ? " active" : "") + '" data-s=""><span>Toplam</span><b>' + list.length + "</b></div>";
+    var desc = {
+      expired: "Süresi dolmuş",
+      critical: "Son " + settings.warnDays + " gün",
+      soon: settings.warnDays + 1 + "–" + settings.soonDays + " gün kaldı",
+      ok: "Devam ediyor",
+      none: "Süre tanımsız"
+    };
+    Object.keys(counts).forEach(function (s) {
+      html += '<div class="card ' + s + (statusFilter === s ? " active" : "") + '" data-s="' + s + '"><span>' + desc[s] + "</span><b>" + counts[s] + "</b></div>";
+    });
+    $("cards").innerHTML = html;
+  }
+
+  function renderAlert(list) {
+    var urgent = list.filter(function (r) { return r.status === "critical" || r.status === "expired"; })
+      .sort(function (a, b) { return a.kalan - b.kalan; });
+    var box = $("alert");
+    if (!urgent.length) { box.style.display = "none"; box.innerHTML = ""; return; }
+    var crit = urgent.filter(function (r) { return r.status === "critical"; }).length;
+    var exp = urgent.length - crit;
+    var title = "⚠ DİKKAT: ";
+    var parts = [];
+    if (crit) parts.push(crit + " kişinin görevlendirme süresinin bitmesine " + settings.warnDays + " gün veya daha az kaldı");
+    if (exp) parts.push(exp + " kişinin görevlendirme süresi doldu");
+    box.innerHTML = "<h2>" + title + esc(parts.join(", ")) + "!</h2><ul>" + urgent.slice(0, 15).map(function (r) {
+      var t = r.kalan < 0 ? (-r.kalan) + " gün önce doldu" : (r.kalan === 0 ? "BUGÜN son gün" : r.kalan + " gün kaldı");
+      return "<li><strong>" + esc(r.ad + " " + r.soyad) + "</strong> — " + esc(r.gorev) + ", " + esc(r.kurum) + " — bitiş " + fmt(r.bitis) + " (<strong>" + t + "</strong>)</li>";
+    }).join("") + (urgent.length > 15 ? "<li>… ve " + (urgent.length - 15) + " kişi daha (tabloda kırmızı satırlar)</li>" : "") + "</ul>";
+    box.style.display = "block";
+  }
+
+  function renderTable(rows) {
+    $("thead").innerHTML = COLUMNS.map(function (c) {
+      var arrow = sortCol === c.id ? (sortDir === 1 ? "▲" : "▼") : "";
+      return '<th data-col="' + c.id + '">' + esc(c.label) + ' <span class="arrow">' + arrow + "</span></th>";
+    }).join("");
+    $("empty").style.display = rows.length ? "none" : "block";
+    $("empty").textContent = records.length ? "Filtreye uyan kayıt yok." : "Listeyi görmek için Excel dosyasını yükleyin.";
+    $("tbody").innerHTML = rows.map(function (r) {
+      var kalan = r.kalan == null ? "—" : (r.kalan < 0 ? r.kalan + " (doldu)" : (r.kalan === 0 ? "0 (bugün)" : r.kalan));
+      var dur = r.status === "none" && r.baslama ? "Süre tanımsız" : (r.baslama ? STATUS[r.status].label : "Tarih yok");
+      return '<tr class="' + r.status + '">' +
+        "<td>" + esc(r.ad) + "</td><td>" + esc(r.soyad) + "</td><td>" + esc(r.gorev) +
+        (r.months ? ' <span class="muted">(' + r.months + " ay)</span>" : "") +
+        "</td><td>" + fmt(r.baslama) + "</td><td>" + fmt(r.bitis) + '</td><td class="kalan">' + kalan +
+        '</td><td><span class="badge ' + r.status + '">' + dur + "</span></td><td>" + esc(r.kurum) +
+        "</td><td>" + esc(r.brans) + "</td><td>" + esc(r.tc) + "</td></tr>";
+    }).join("");
+  }
+
+  // ---------- ayarlar ----------
+  function renderSettings() {
+    $("warnDays").value = settings.warnDays;
+    $("soonDays").value = settings.soonDays;
+    $("defaultMonths").value = settings.defaultMonths;
+    $("rulesBody").innerHTML = settings.rules.map(function (r, i) {
+      return '<tr><td><input type="text" data-i="' + i + '" data-f="key" value="' + esc(r.key) + '" style="width:100%"></td>' +
+        '<td><input type="number" min="0" max="120" data-i="' + i + '" data-f="months" value="' + esc(r.months) + '" style="width:80px"></td>' +
+        '<td><button data-del="' + i + '">Sil</button></td></tr>';
+    }).join("");
+  }
+
+  function settingsChanged() { saveSettings(); render(); }
+
+  // ---------- dışa aktarma ----------
+  function exportExcel() {
+    var list = enriched().sort(function (a, b) { return sortValue(a, "durum") - sortValue(b, "durum"); });
+    var data = [["T.C. Kimlik No", "Adı", "Soyadı", "Görev", "Branş", "Görevlendirildiği Kurum", "Başlama Tarihi", "Süre (ay)", "Bitiş Tarihi", "Kalan Gün", "Durum"]];
+    list.forEach(function (r) {
+      data.push([r.tc, r.ad, r.soyad, r.gorev, r.brans, r.kurum, fmt(r.baslama), r.months || "", fmt(r.bitis), r.kalan == null ? "" : r.kalan, STATUS[r.status].label]);
+    });
+    var ws = XLSX.utils.aoa_to_sheet(data);
+    ws["!cols"] = [14, 14, 16, 30, 20, 40, 12, 9, 12, 10, 14].map(function (w) { return { wch: w }; });
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Görevlendirme Takip");
+    XLSX.writeFile(wb, "gorevlendirme_takip_" + fmt(today()).replace(/\./g, "-") + ".xlsx");
+  }
+
+  // ---------- olaylar ----------
+  $("file").addEventListener("change", function (e) { handleFile(e.target.files[0]); e.target.value = ""; });
+  var drop = $("drop");
+  ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("over"); }); });
+  ["dragleave", "drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); }); });
+  drop.addEventListener("drop", function (e) { handleFile(e.dataTransfer.files[0]); });
+
+  $("search").addEventListener("input", render);
+  $("roleFilter").addEventListener("change", render);
+  $("cards").addEventListener("click", function (e) {
+    var card = e.target.closest(".card");
+    if (!card) return;
+    statusFilter = card.getAttribute("data-s");
+    render();
+  });
+  $("thead").addEventListener("click", function (e) {
+    var th = e.target.closest("th");
+    if (!th) return;
+    var col = th.getAttribute("data-col");
+    if (sortCol === col) sortDir = -sortDir; else { sortCol = col; sortDir = 1; }
+    render();
+  });
+  $("exportBtn").addEventListener("click", exportExcel);
+  $("printBtn").addEventListener("click", function () { window.print(); });
+  $("clearBtn").addEventListener("click", function () {
+    if (!confirm("Yüklenen liste bu tarayıcıdan silinsin mi?")) return;
+    records = []; fileName = ""; storageDel(DATA_KEY);
+    $("fileInfo").textContent = "Henüz dosya yüklenmedi.";
+    render();
+  });
+
+  $("warnDays").addEventListener("change", function () { settings.warnDays = Math.max(1, num(this.value, 10)); settingsChanged(); });
+  $("soonDays").addEventListener("change", function () { settings.soonDays = Math.max(1, num(this.value, 30)); settingsChanged(); });
+  $("defaultMonths").addEventListener("change", function () { settings.defaultMonths = Math.max(0, num(this.value, 0)); settingsChanged(); });
+  $("rulesBody").addEventListener("change", function (e) {
+    var i = e.target.getAttribute("data-i"), f = e.target.getAttribute("data-f");
+    if (i == null) return;
+    settings.rules[i][f] = f === "months" ? Math.max(0, num(e.target.value, 0)) : e.target.value;
+    settingsChanged();
+  });
+  $("rulesBody").addEventListener("click", function (e) {
+    var i = e.target.getAttribute("data-del");
+    if (i == null) return;
+    settings.rules.splice(+i, 1);
+    renderSettings(); settingsChanged();
+  });
+  $("addRule").addEventListener("click", function () {
+    settings.rules.push({ key: "", months: 6 });
+    renderSettings(); saveSettings();
+  });
+  $("resetRules").addEventListener("click", function () {
+    settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    renderSettings(); settingsChanged();
+  });
+
+  renderSettings();
+  restoreData();
+  render();
+  // gün değişince (sayfa açık kalırsa) kalan günleri güncelle
+  setInterval(render, 60 * 60 * 1000);
+})();
+</script>
+</body>
+</html>
