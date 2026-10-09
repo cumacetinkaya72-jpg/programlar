@@ -1280,6 +1280,28 @@
             .kp-kart { max-height: calc(100vh - 16px); }
         }
     </style>
+    <style id="secenekStil">
+        /* ==================================================================== */
+        /* ================= HAZIR SEÇENEKLER VE MEVZUAT NOTLARI =============== */
+        /* ==================================================================== */
+        .ms-ust { display: flex; justify-content: flex-end; margin-bottom: -4px; }
+        .ms-tum-btn { font-size: 11.5px; font-weight: 700; color: #3730a3; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 999px; padding: 5px 12px; cursor: pointer; transition: background .15s; }
+        .ms-tum-btn:hover, .ms-tum-btn.acik { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+        .ms-etiket { display: flex !important; align-items: center; gap: 6px; }
+        .ms-bilgi { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1px solid #4f46e5; background: #fff; color: #4f46e5; font-size: 11px; font-weight: 700; line-height: 1; padding: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background .15s, color .15s; }
+        .ms-bilgi:hover, .ms-bilgi.acik { background: #4f46e5; color: #fff; }
+        .ms-mevzuat { margin-top: 6px; font-size: 11.5px; line-height: 1.5; color: #334155; background: #eef2ff; border-left: 3px solid #4f46e5; border-radius: 6px; padding: 7px 10px; }
+        .ms-mevzuat b { color: #3730a3; font-weight: 700; }
+        .ms-panel { display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; }
+        .ms-panel .hidden { display: none !important; }
+        .ms-panel select, .ms-panel input { width: 100%; font-size: 13px; padding: 9px 10px; border: 1px solid #c7d2fe; border-radius: 10px; background: #f8faff; color: #0f172a; outline: none; }
+        .ms-panel select:focus, .ms-panel input:focus { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, .15); background: #fff; }
+        .ms-panel .ms-ana { font-weight: 600; color: #312e81; cursor: pointer; }
+        .ms-detay { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 6px; }
+        .ms-detay .ms-genis { grid-column: 1 / -1; }
+        .ms-ipucu { font-size: 11.5px; line-height: 1.45; padding: 6px 9px; border-radius: 6px; background: #fffbeb; color: #92400e; border-left: 3px solid #f59e0b; }
+        .ms-sonuc { border-style: dashed !important; }
+    </style>
 </head>
 <body class="bg-slate-100">
 
@@ -1394,6 +1416,9 @@
 
             <!-- Form Alanı -->
             <form id="nakilForm" class="p-4 sm:p-5 space-y-4" onsubmit="event.preventDefault()">
+                <div class="ms-ust">
+                    <button type="button" class="ms-tum-btn" onclick="mevzuatTumu()" title="Tüm alanların mevzuat dayanaklarını göster / gizle">📘 Mevzuat Notları</button>
+                </div>
 
                 <!-- TAB 1: Kimlik & Sicil -->
                 <div id="tab-content-1" class="tab-content space-y-3">
@@ -2118,6 +2143,7 @@
                 in_harcamaAd: 'Hasan ŞAHİN'
             };
 
+            if (typeof msSecimleriSifirla === 'function') msSecimleriSifirla();
             Object.keys(sampleData).forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = sampleData[id];
@@ -2173,6 +2199,7 @@
             okuyucu.onload = function(e) {
                 try {
                     const veri = JSON.parse(e.target.result);
+                    if (typeof msSecimleriSifirla === 'function') msSecimleriSifirla();
                     fields.forEach(f => {
                         const el = document.getElementById('in_' + f);
                         if (el && veri[f] !== undefined) el.value = veri[f];
@@ -4273,6 +4300,397 @@
             if (typeof initAileApp === 'function') initAileApp();
             showView('nakil');
         };
+    </script>
+
+    <script>
+
+        // ================= HAZIR SEÇENEKLER VE MEVZUAT NOTLARI =================
+        // Alanların üstüne açılır seçenek listesi, yanına mevzuat (ⓘ) düğmesi ekler.
+        // Seçime göre oluşan metin mevcut kutuya yazılır; kutu elle düzeltilebilir kalır.
+
+        const MS_AYLAR = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+        const MS_SENDIKALAR = ['Eğitim-Bir-Sen', 'Türk Eğitim-Sen', 'Eğitim-İş', 'Eğitim-Sen', 'Hürriyetçi Eğitim-Sen', 'Eğitim Gücü Sen'];
+        const MS_RAPOR_ESIK = 7;
+
+        function msParaBicimle(girdi) {
+            const s = (girdi || '').trim();
+            if (!s || !/^[\d.,\s]+$/.test(s)) return s;
+            const temiz = s.replace(/\s/g, '');
+            const n = parseFloat(temiz.replace(/\./g, '').replace(',', '.'));
+            if (isNaN(n)) return s;
+            const ondalikli = /,\d{1,2}$/.test(temiz);
+            return n.toLocaleString('tr-TR', { minimumFractionDigits: ondalikli ? 2 : 0, maximumFractionDigits: ondalikli ? 2 : 0 }) + ' TL';
+        }
+
+        // d: detay alanlarının değerleri, s: ana seçim
+        const MS_ALANLAR = {
+            personelNo: {
+                not: '<b>Saymanlık No:</b> Kurumun bağlı bulunduğu Malmüdürlüğü / Muhasebe biriminin 5 haneli kodudur <b>(Örn: 44109)</b>. Personel (KBS) numarası veya Kurumsal Bütçe Kodu (13.1...) ile karıştırılmamalıdır.'
+            },
+            ayrilisTarihi: {
+                not: '<b>657 md. 62:</b> Aynı yerdeki göreve atananlar tebliğ gününü, <b>başka yerdeki göreve atananlar tebliğden itibaren 15 gün içinde</b> hareket ederek görevine başlar.'
+            },
+            kariyerDurumu: {
+                not: '<b>1739 sayılı Kanun md. 43:</b> Öğretmenlik mesleği; <b>öğretmen, uzman öğretmen ve başöğretmen</b> kariyer basamaklarına ayrılır. Unvan nakil bildiriminde açıkça belirtilir.'
+            },
+            kidemSuresi: {
+                secenekler: ['MEBBİS Kayıtlarında Mevcuttur', 'Yıl / Ay / Gün Olarak Gir'],
+                detay: [
+                    { k: 'yil', ph: 'yıl', tip: 'number', goster: s => s === 'Yıl / Ay / Gün Olarak Gir' },
+                    { k: 'ay', ph: 'ay', tip: 'number', goster: s => s === 'Yıl / Ay / Gün Olarak Gir' },
+                    { k: 'gun', ph: 'gün', tip: 'number', goster: s => s === 'Yıl / Ay / Gün Olarak Gir' }
+                ],
+                metin(s, d) {
+                    if (s === 'MEBBİS Kayıtlarında Mevcuttur') return 'MEBBİS kayıtlarında mevcuttur.';
+                    return [[d.yil, 'Yıl'], [d.ay, 'Ay'], [d.gun, 'Gün']].filter(p => p[0] !== '').map(p => `${Number(p[0])} ${p[1]}`).join(' ');
+                }
+            },
+            ogrenim: {
+                secenekler: ['Lisans', 'Yüksek Lisans', 'Doktora', 'Ön Lisans', 'Lise'],
+                detay: [{ k: 'okul', ph: 'okul / bölüm (isteğe bağlı)', tip: 'text', genis: true }],
+                hazirla(d) {
+                    // Kararnameden gelen okul adını detay kutusuna taşı
+                    const mevcut = (document.getElementById('in_ogrenim').value || '').replace(/^(Lisans|Yüksek Lisans|Doktora|Ön Lisans|Lise)\s*(\((.*)\))?$/, '$3');
+                    if (!d.okul && mevcut) return { okul: mevcut };
+                    return null;
+                },
+                metin: (s, d) => d.okul ? `${s} (${d.okul})` : s
+            },
+            aileDurumu: {
+                not: '<b>657 md. 202-206:</b> Aile yardımı ödeneği, menfaat karşılığı çalışmayan eş için ödenir. Çocuk yardımında <b>0-6 yaş grubu bir kat artırımlı</b> hesaplanır.',
+                secenekler: ['Bekâr', 'Evli', 'Boşanmış', 'Dul'],
+                detay: [
+                    { k: 'es', tip: 'select', secenekler: ['Eşi Çalışmıyor', 'Eşi Çalışıyor', 'Eşi Emekli'], goster: s => s === 'Evli' },
+                    { k: 'c06', ph: '0-6 yaş çocuk', tip: 'number' },
+                    { k: 'c6u', ph: '6 yaş üstü çocuk', tip: 'number' }
+                ],
+                metin(s, d) {
+                    const c06 = parseInt(d.c06 || '0', 10) || 0, c6u = parseInt(d.c6u || '0', 10) || 0;
+                    const parcalar = [s];
+                    if (s === 'Evli') parcalar.push(d.es || 'Eşi Çalışmıyor');
+                    if (c06 + c6u > 0) parcalar.push(`${c06 + c6u} Çocuklu` + (c06 > 0 ? ` (${c06} çocuk 0-6 yaş)` : ''));
+                    return parcalar.join(', ');
+                }
+            },
+            aileYardimi: {
+                not: '<b>657 md. 202-206:</b> Aile yardımı ödeneği, menfaat karşılığı çalışmayan eş için ödenir. Çocuk yardımında <b>0-6 yaş grubu bir kat artırımlı</b> hesaplanır.',
+                secenekler: ['Aile ve Çocuk Yardımı Alıyor', 'Yalnızca Aile Yardımı Alıyor', 'Yalnızca Çocuk Yardımı Alıyor', 'Almıyor'],
+                metin: s => ({
+                    'Aile ve Çocuk Yardımı Alıyor': 'Aile ve çocuk yardımı almaktadır.',
+                    'Yalnızca Aile Yardımı Alıyor': 'Aile yardımı almaktadır.',
+                    'Yalnızca Çocuk Yardımı Alıyor': 'Çocuk yardımı almaktadır.',
+                    'Almıyor': 'Almamaktadır.'
+                }[s])
+            },
+            yillikIzin: {
+                not: '<b>657 md. 102-103:</b> Yıllık izin süresi hizmet süresine göre belirlenir. <b>Cari yıl ile bir önceki yıl izni birlikte</b> kullanılabilir.',
+                secenekler: ['MEBBİS Kayıtlarında Mevcuttur', 'Öğretmen (Uygulanmaz)', 'Kullanmadı', 'Gün Belirt'],
+                detay: [
+                    { k: 'gun', ph: 'gün', tip: 'number', goster: s => s === 'Gün Belirt' },
+                    { k: 'yil', ph: 'yıl', tip: 'number', goster: s => s === 'Gün Belirt', varsayilan: () => String(new Date().getFullYear()) }
+                ],
+                metin(s, d) {
+                    if (s === 'MEBBİS Kayıtlarında Mevcuttur') return 'MEBBİS kayıtlarında';
+                    if (s === 'Öğretmen (Uygulanmaz)') return 'Uygulanmaz (Öğretmen)';
+                    if (s === 'Kullanmadı') return 'Kullanmadı';
+                    if (!d.gun) return '';
+                    return (d.yil ? `${d.yil}: ` : '') + `${Number(d.gun)} Gün`;
+                }
+            },
+            mazeretIzni: {
+                secenekler: ['Kullanmadı', 'Gün Belirt'],
+                detay: [{ k: 'gun', ph: 'gün', tip: 'number', goster: s => s === 'Gün Belirt' }],
+                metin: (s, d) => s === 'Kullanmadı' ? 'Kullanmadı' : (d.gun ? `${Number(d.gun)} Gün` : '')
+            },
+            gecikmeNedeni: {
+                not: '<b>657 md. 62:</b> Aynı yerdeki göreve atananlar tebliğ gününü, <b>başka yerdeki göreve atananlar tebliğden itibaren 15 gün içinde</b> hareket ederek görevine başlar.',
+                secenekler: ['Süresi İçinde Göreve Başladı', 'Yıllık İzinli', 'Hastalık İzni (Raporlu)', 'Mazeret İzni', 'Diğer'],
+                detay: [{ k: 'aciklama', ph: 'gecikme açıklaması', tip: 'text', genis: true, goster: s => s && s !== 'Süresi İçinde Göreve Başladı' }],
+                metin(s, d) {
+                    if (s === 'Süresi İçinde Göreve Başladı') return 'Etmiştir';
+                    const neden = { 'Yıllık İzinli': 'yıllık izinli olması', 'Hastalık İzni (Raporlu)': 'hastalık izni (raporlu) olması', 'Mazeret İzni': 'mazeret izni' }[s];
+                    if (s === 'Diğer') return d.aciklama ? `Etmemiştir; ${d.aciklama} nedeniyle gecikmiştir.` : 'Etmemiştir.';
+                    return `Etmemiştir; ${neden} nedeniyle gecikmiştir.` + (d.aciklama ? ` (${d.aciklama})` : '');
+                }
+            },
+            yollukMetni: {
+                not: '<b>6245 sayılı Harcırah Kanunu:</b> Mükerrer ödemeyi önlemek için eski kurumca ödenip ödenmediği belirtilmelidir.'
+            },
+            vergiMatrahi: {
+                secenekler: ['Say 2000 Sisteminde Kayıtlıdır', 'KBS Sisteminde Mevcuttur', 'Tutar Belirt'],
+                detay: [{ k: 'tutar', ph: 'matrah — ör. 45000', tip: 'text', genis: true, goster: s => s === 'Tutar Belirt' }],
+                metin(s, d) {
+                    if (s === 'Say 2000 Sisteminde Kayıtlıdır') return 'Say 2000 sisteminde kayıtlıdır.';
+                    if (s === 'KBS Sisteminde Mevcuttur') return 'KBS sisteminde mevcuttur.';
+                    return d.tutar ? `${msParaBicimle(d.tutar)} tutarında matrah bulunmaktadır.` : '';
+                }
+            },
+            giyecekYardimi: {
+                not: '<b>Giyecek Yardımı Yönetmeliği md. 3:</b> Öğretmenler cetvellerde bulunmadığından "Yararlanmayan Personel" seçilir.',
+                secenekler: ['Yararlanmayan Personel', 'Yararlanan Personel — Aldı', 'Yararlanan Personel — Almadı'],
+                detay: [{ k: 'yil', ph: 'yıl', tip: 'number', goster: s => s && s !== 'Yararlanmayan Personel', varsayilan: () => String(new Date().getFullYear()) }],
+                metin(s, d) {
+                    if (s === 'Yararlanmayan Personel') return 'Giyecek yardımından yararlanan personel değildir.';
+                    const yil = d.yil || new Date().getFullYear();
+                    return s === 'Yararlanan Personel — Aldı' ? `${yil} yılı giyecek yardımı almıştır.` : `${yil} yılı giyecek yardımı almamıştır.`;
+                }
+            },
+            hazirlikOdenegi: {
+                not: '<b>657 Ek Md. 32:</b> Fiilen öğretmenlik yapanlara her öğretim yılında bir defaya mahsus ödenir.',
+                secenekler: ['Aldı', 'Almadı'],
+                detay: [
+                    { k: 'ay', tip: 'select', bos: 'Ay —', secenekler: MS_AYLAR, goster: s => s === 'Aldı' },
+                    { k: 'yil', ph: 'yıl — ör. 2025', tip: 'number', goster: s => s === 'Aldı' }
+                ],
+                metin(s, d) {
+                    if (s !== 'Aldı') return 'Almamıştır.';
+                    const donem = [d.ay, d.yil].filter(Boolean).join(' ');
+                    return donem ? `${donem} döneminde almıştır.` : 'Almıştır.';
+                }
+            },
+            borcBilgi: {
+                not: '<b>Kişi borcu / icra kesintisi:</b> Borcun <b>türü, tutarı ve kalan taksit sayısı</b> açıkça yazılmalıdır.',
+                secenekler: ['Borcu Yok', 'Borcu Var'],
+                detay: [{ k: 'aciklama', ph: 'tür, tutar, kalan taksit', tip: 'text', genis: true, goster: s => s === 'Borcu Var' }],
+                metin: (s, d) => s === 'Borcu Yok' ? 'Yoktur' : (d.aciklama ? `Vardır (${d.aciklama})` : 'Vardır')
+            },
+            saglikRaporu: {
+                not: `<b>657 md. 152:</b> Bir takvim yılında <b>tek hekim</b> raporları toplamı <b>${MS_RAPOR_ESIK} günü aşarsa</b>, aşan günlere isabet eden zam ve tazminatlar %25 eksik ödenir.`,
+                secenekler: ['Rapor Almadı', 'Rapor Aldı'],
+                detay: [
+                    { k: 'gun', ph: 'toplam gün', tip: 'number', goster: s => s === 'Rapor Aldı' },
+                    { k: 'kesinti', tip: 'select', bos: 'Kesinti —', secenekler: ['Yapıldı', 'Yapılmadı'], goster: (s, d) => s === 'Rapor Aldı' && (parseInt(d.gun || '0', 10) > MS_RAPOR_ESIK) }
+                ],
+                ipucu(s, d) {
+                    const gun = parseInt(d.gun || '0', 10) || 0;
+                    if (s !== 'Rapor Aldı' || !gun) return '';
+                    const asan = gun - MS_RAPOR_ESIK;
+                    return asan > 0 ? `${MS_RAPOR_ESIK} günü aşan ${asan} gün → zam ve tazminatlarda %25 eksik ödeme.` : `${MS_RAPOR_ESIK} gün sınırı aşılmadı, kesinti söz konusu değil.`;
+                },
+                metin(s, d) {
+                    if (s === 'Rapor Almadı') return 'Rapor almamıştır.';
+                    const gun = parseInt(d.gun || '0', 10) || 0;
+                    if (!gun) return 'Rapor almıştır.';
+                    const asan = gun - MS_RAPOR_ESIK;
+                    if (asan <= 0 || !d.kesinti) return `${gun} Gün`;
+                    return `${gun} Gün (aşan ${asan} gün için kesinti ${d.kesinti === 'Yapıldı' ? 'yapılmıştır' : 'yapılmamıştır'})`;
+                }
+            },
+            yabanciDil: {
+                not: '<b>375 sayılı KHK md. 2:</b> Yabancı dil tazminatı, sınavla belirlenen düzeyler esas alınarak ödenir. Sınav sonuçları <b>beş yıl</b> geçerlidir.',
+                secenekler: ['Yararlanmıyor', 'Yararlanıyor'],
+                detay: [{ k: 'duzey', tip: 'select', bos: 'Düzey —', secenekler: ['A Düzeyi', 'B Düzeyi', 'C Düzeyi'], goster: s => s === 'Yararlanıyor' }],
+                metin: (s, d) => s === 'Yararlanmıyor' ? 'Yararlanmamaktadır.' : (d.duzey ? `Yararlanmaktadır (${d.duzey})` : 'Yararlanmaktadır.')
+            },
+            sendika: {
+                not: '<b>4688 sayılı Kanun md. 25:</b> Kesintinin yeni görev yerinde sürdürülebilmesi için sendika adı ve numarası yazılır.',
+                secenekler: MS_SENDIKALAR.concat(['Diğer Sendika', 'Sendika Üyesi Değildir']),
+                detay: [
+                    { k: 'ad', ph: 'sendika adı', tip: 'text', goster: s => s === 'Diğer Sendika' },
+                    { k: 'no', ph: 'üye numarası', tip: 'text', goster: s => s && s !== 'Sendika Üyesi Değildir' }
+                ],
+                metin(s, d) {
+                    if (s === 'Sendika Üyesi Değildir') return 'Sendika üyesi değildir.';
+                    const ad = s === 'Diğer Sendika' ? d.ad : s;
+                    return [ad, d.no].filter(Boolean).join(' / ');
+                }
+            },
+            promosyon: {
+                not: '<b>Banka promosyonu:</b> Sözleşme süresi dolmadan kurum değiştirenlerden iade talep edilebildiğinden tutar, dönem ve süre birlikte yazılmalıdır.',
+                secenekler: ['Almadı', 'Aldı'],
+                detay: [
+                    { k: 'tutar', ph: 'tutar — ör. 60250', tip: 'text', goster: s => s === 'Aldı' },
+                    { k: 'sure', ph: 'süre (yıl) — ör. 3', tip: 'number', goster: s => s === 'Aldı' },
+                    { k: 'ay', tip: 'select', bos: 'Ay —', secenekler: MS_AYLAR, goster: s => s === 'Aldı' },
+                    { k: 'yil', ph: 'yıl — ör. 2024', tip: 'number', goster: s => s === 'Aldı' }
+                ],
+                metin(s, d) {
+                    if (s !== 'Aldı') return 'Almamıştır.';
+                    const ek = [];
+                    if (d.sure) ek.push(`${d.sure} yıllık sözleşme`);
+                    const donem = [d.ay, d.yil].filter(Boolean).join(' ');
+                    if (donem) ek.push(donem);
+                    const parantez = ek.length ? ` (${ek.join(', ')})` : '';
+                    return d.tutar ? `${msParaBicimle(d.tutar)} tutarında alınmıştır${parantez}.` : `Alınmıştır${parantez}.`;
+                }
+            }
+        };
+
+        const MS_KAYIT_ANAHTARI = 'meb_nakil_secimler';
+
+        function msDurumOku(alan) {
+            const kap = document.getElementById('ms_' + alan);
+            if (!kap) return { s: '', d: {} };
+            const d = {};
+            kap.querySelectorAll('[data-detay]').forEach(el => { d[el.dataset.detay] = el.value.trim(); });
+            return { s: kap.querySelector('.ms-ana').value, d };
+        }
+
+        function msGorunurlukGuncelle(alan) {
+            const cfg = MS_ALANLAR[alan];
+            const kap = document.getElementById('ms_' + alan);
+            if (!cfg || !kap) return;
+            const { s, d } = msDurumOku(alan);
+            let gorunenVar = false;
+            kap.querySelectorAll('[data-detay]').forEach(el => {
+                const tanim = cfg.detay.find(x => x.k === el.dataset.detay);
+                const gorunur = !!s && (!tanim.goster || tanim.goster(s, d));
+                el.classList.toggle('hidden', !gorunur);
+                if (gorunur) {
+                    gorunenVar = true;
+                    if (tanim.varsayilan && !el.value) el.value = tanim.varsayilan();
+                }
+            });
+            const detayKap = kap.querySelector('.ms-detay');
+            if (detayKap) detayKap.classList.toggle('hidden', !gorunenVar);
+            const ipucu = kap.querySelector('.ms-ipucu');
+            if (ipucu) {
+                const yeni = cfg.ipucu ? cfg.ipucu(s, msDurumOku(alan).d) : '';
+                ipucu.textContent = yeni;
+                ipucu.classList.toggle('hidden', !yeni);
+            }
+        }
+
+        function msMetniUygula(alan) {
+            const cfg = MS_ALANLAR[alan];
+            msGorunurlukGuncelle(alan);
+            const { s, d } = msDurumOku(alan);
+            const hedef = document.getElementById('in_' + alan);
+            if (!s || !hedef) { msKaydet(); return; }
+            hedef.value = cfg.metin(s, d) || '';
+            updateReport();
+            msKaydet();
+        }
+
+        function msKaydet() {
+            const veri = {};
+            Object.keys(MS_ALANLAR).forEach(alan => {
+                if (!MS_ALANLAR[alan].secenekler) return;
+                const durum = msDurumOku(alan);
+                if (durum.s) veri[alan] = durum;
+            });
+            try { localStorage.setItem(MS_KAYIT_ANAHTARI, JSON.stringify(veri)); } catch (e) {}
+        }
+
+        function msYukle() {
+            let veri = {};
+            try { veri = JSON.parse(localStorage.getItem(MS_KAYIT_ANAHTARI) || '{}') || {}; } catch (e) {}
+            Object.keys(veri).forEach(alan => {
+                const kap = document.getElementById('ms_' + alan);
+                if (!kap) return;
+                kap.querySelector('.ms-ana').value = veri[alan].s || '';
+                kap.querySelectorAll('[data-detay]').forEach(el => {
+                    const v = (veri[alan].d || {})[el.dataset.detay];
+                    if (v !== undefined) el.value = v;
+                });
+            });
+            Object.keys(MS_ALANLAR).forEach(msGorunurlukGuncelle);
+        }
+
+        // Tüm seçimleri sıfırlar (form temizlenince veya başka kişinin verisi yüklenince)
+        function msSecimleriSifirla() {
+            document.querySelectorAll('.ms-panel').forEach(kap => {
+                kap.querySelector('.ms-ana').value = '';
+                kap.querySelectorAll('[data-detay]').forEach(el => { el.value = ''; });
+            });
+            Object.keys(MS_ALANLAR).forEach(msGorunurlukGuncelle);
+            msKaydet();
+        }
+
+        function mevzuatAc(alan) {
+            const kutu = document.getElementById('mev_' + alan);
+            const btn = document.getElementById('mevBtn_' + alan);
+            if (!kutu) return;
+            const acik = kutu.classList.toggle('hidden') === false;
+            if (btn) {
+                btn.classList.toggle('acik', acik);
+                btn.setAttribute('aria-expanded', acik ? 'true' : 'false');
+            }
+        }
+
+        function mevzuatTumu() {
+            const kutular = [...document.querySelectorAll('.ms-mevzuat')];
+            const hepsiAcik = kutular.every(k => !k.classList.contains('hidden'));
+            kutular.forEach(k => k.classList.toggle('hidden', hepsiAcik));
+            document.querySelectorAll('.ms-bilgi').forEach(b => {
+                b.classList.toggle('acik', !hepsiAcik);
+                b.setAttribute('aria-expanded', hepsiAcik ? 'false' : 'true');
+            });
+            document.querySelectorAll('.ms-tum-btn').forEach(b => {
+                b.textContent = hepsiAcik ? '📘 Mevzuat Notları' : '📘 Notları Gizle';
+                b.classList.toggle('acik', !hepsiAcik);
+            });
+        }
+
+        function msSecimArayuzunuKur() {
+            Object.keys(MS_ALANLAR).forEach(alan => {
+                const cfg = MS_ALANLAR[alan];
+                const girdi = document.getElementById('in_' + alan);
+                if (!girdi) return;
+                const sarmal = girdi.parentElement;
+                const etiket = sarmal.querySelector('label');
+
+                if (cfg.not && etiket) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.id = 'mevBtn_' + alan;
+                    btn.className = 'ms-bilgi';
+                    btn.title = 'Mevzuat dayanağı';
+                    btn.setAttribute('aria-label', 'Mevzuat dayanağını göster');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.textContent = 'ⓘ';
+                    btn.onclick = () => mevzuatAc(alan);
+                    etiket.classList.add('ms-etiket');
+                    etiket.appendChild(btn);
+
+                    const not = document.createElement('div');
+                    not.id = 'mev_' + alan;
+                    not.className = 'ms-mevzuat hidden';
+                    not.innerHTML = cfg.not;
+                    girdi.insertAdjacentElement('afterend', not);
+                }
+
+                if (!cfg.secenekler) return;
+                const panel = document.createElement('div');
+                panel.id = 'ms_' + alan;
+                panel.className = 'ms-panel';
+                const detaylar = (cfg.detay || []).map(t => {
+                    const sinif = 'ms-detay-oge hidden' + (t.genis ? ' ms-genis' : '');
+                    if (t.tip === 'select') {
+                        return `<select data-detay="${t.k}" class="${sinif}" aria-label="${t.bos || t.k}">${t.bos ? `<option value="">${t.bos}</option>` : ''}${t.secenekler.map(o => `<option>${o}</option>`).join('')}</select>`;
+                    }
+                    return `<input data-detay="${t.k}" class="${sinif}" type="${t.tip === 'number' ? 'number' : 'text'}"${t.tip === 'number' ? ' min="0" inputmode="numeric"' : ''} placeholder="${t.ph || ''}" aria-label="${t.ph || t.k}">`;
+                }).join('');
+                panel.innerHTML = `
+                    <select class="ms-ana" aria-label="${etiket ? etiket.textContent.trim() : alan} seçeneği">
+                        <option value="">— Hazır seçenek seçin —</option>
+                        ${cfg.secenekler.map(o => `<option>${o}</option>`).join('')}
+                    </select>
+                    ${detaylar ? `<div class="ms-detay hidden">${detaylar}</div>` : ''}
+                    <div class="ms-ipucu hidden"></div>`;
+                sarmal.insertBefore(panel, girdi);
+
+                panel.querySelector('.ms-ana').addEventListener('change', () => {
+                    if (cfg.hazirla) {
+                        const ek = cfg.hazirla(msDurumOku(alan).d);
+                        if (ek) Object.keys(ek).forEach(k => { const el = panel.querySelector(`[data-detay="${k}"]`); if (el) el.value = ek[k]; });
+                    }
+                    msMetniUygula(alan);
+                });
+                panel.querySelectorAll('[data-detay]').forEach(el => {
+                    el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => msMetniUygula(alan));
+                });
+                girdi.classList.add('ms-sonuc');
+                girdi.title = 'Seçime göre otomatik oluşur; isterseniz elle düzeltebilirsiniz.';
+            });
+
+            msYukle();
+
+            // Form temizlenince seçimleri de sıfırla
+            const form = document.getElementById('nakilForm');
+            if (form) form.addEventListener('reset', () => setTimeout(msSecimleriSifirla, 0));
+        }
+        document.addEventListener('DOMContentLoaded', msSecimArayuzunuKur);
     </script>
 
     <!-- ============================================================ -->
