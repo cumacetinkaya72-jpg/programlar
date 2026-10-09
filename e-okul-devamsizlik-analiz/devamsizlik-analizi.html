@@ -151,6 +151,19 @@ details.settings summary { cursor: pointer; font-weight: 700; font-family: var(-
 .setgrid { display: flex; flex-wrap: wrap; gap: 12px 20px; padding-top: 12px; align-items: end; }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 8px 16px; border-radius: 6px; font-weight: 700; z-index: 50; }
 .note { font-size: .82rem; color: var(--muted); max-width: 75ch; }
+/* günlük liste */
+.dayctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dayctl .today { background: var(--crit); border-color: var(--crit); color: var(--sheet); }
+.daysum { font-size: 1.05rem; }
+.daysum b { font-family: var(--font-display); }
+.classcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 14px; }
+.ccard { border: 1px solid var(--line); border-radius: var(--r); display: grid; grid-template-rows: auto 1fr auto; min-width: 0; overflow: hidden; }
+.ccard header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 10px 12px; background: var(--accent-soft); }
+.ccard header h3 { color: var(--accent); }
+.ccard table th { position: static; }
+.ccard .acts { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--line); }
+.ccard .acts button { padding: 5px 10px; font-size: .85rem; }
+button.day { border: none; background: none; padding: 0; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 @media (max-width: 560px) {
   .alert { grid-template-columns: 1fr; }
   h1 { font-size: 1.45rem; }
@@ -216,6 +229,23 @@ details.settings summary { cursor: pointer; font-weight: 700; font-family: var(-
   </section>
 
   <section class="kpis" id="kpis" aria-label="Özet"></section>
+
+  <section class="panel" id="daySection">
+    <div class="panel-head">
+      <h2>Günlük devamsız listesi</h2>
+      <div class="dayctl">
+        <button type="button" class="today" id="dToday">Bugün</button>
+        <button type="button" id="dPrev" aria-label="Önceki gün">◀</button>
+        <input type="date" id="dDate" aria-label="Gün seç">
+        <button type="button" id="dNext" aria-label="Sonraki gün">▶</button>
+        <button type="button" id="dLast">Rapordaki son gün</button>
+      </div>
+    </div>
+    <p class="daysum" id="daySum"></p>
+    <div class="dayctl" id="dayAll"></div>
+    <div class="classcards" id="dayCards"></div>
+    <p class="note">Her sınıfın listesini JPEG resim ya da PDF olarak indirip sınıf öğretmenine gönderebilirsiniz. "Paylaş" düğmesi telefonda ve destekleyen tarayıcılarda WhatsApp, e-posta gibi uygulamalarla doğrudan gönderir. Özürsüz / toplam sütunları seçilen güne kadarki kayıtlardır.</p>
+  </section>
 
   <section class="panel">
     <div class="panel-head">
@@ -431,7 +461,7 @@ async function parsePdf(file) {
 /* ---------- durum ---------- */
 const state = {
   records: [], files: [], sample: true, meta: { school: "", year: "", term: "", stamp: "" },
-  period: "week", cls: "", from: "", to: "", type: "", q: "",
+  period: "week", cls: "", from: "", to: "", type: "", q: "", day: "",
   sort: { top: "total" }
 };
 const settings = loadSettings();
@@ -556,6 +586,7 @@ function render() {
   renderMatrix(recs, studentsF, statusByKey);
   renderClasses(recs, studentsAll);
   renderTop(studentsF, statusByKey);
+  renderDay();
 }
 
 function fillSelect(sel, opts, val) {
@@ -608,7 +639,7 @@ function renderPeriods(recs, classes) {
   if (!keys.length) { $("#periodTable").innerHTML = `<tbody><tr><td class="empty">Seçilen aralıkta kayıt yok.</td></tr></tbody>`; $("#chart").innerHTML = ""; return; }
   $("#periodTable").innerHTML = `
     <thead><tr><th>${p === "day" ? "Tarih" : p === "week" ? "Hafta" : "Ay"}</th>${cols.map(c => `<th class="r">${esc(c)}</th>`).join("")}<th class="r">Toplam gün</th><th class="r">Öğrenci</th></tr></thead>
-    <tbody>${[...keys].reverse().map(k => `<tr><td>${esc(periodLabel(k, p, true))}</td>${cols.map(c => `<td class="r">${cell.get(`${k}|${c}`) ? fmtN(cell.get(`${k}|${c}`)) : "<span class='muted'>–</span>"}</td>`).join("")}<td class="r"><b>${fmtN(tot(k))}</b></td><td class="r">${stud.get(k)?.size || 0}</td></tr>`).join("")}</tbody>
+    <tbody>${[...keys].reverse().map(k => `<tr><td>${p === "day" ? `<button class="day" data-day="${k}">${esc(periodLabel(k, p, true))}</button>` : esc(periodLabel(k, p, true))}</td>${cols.map(c => `<td class="r">${cell.get(`${k}|${c}`) ? fmtN(cell.get(`${k}|${c}`)) : "<span class='muted'>–</span>"}</td>`).join("")}<td class="r"><b>${fmtN(tot(k))}</b></td><td class="r">${stud.get(k)?.size || 0}</td></tr>`).join("")}</tbody>
     <tfoot><tr><td>Toplam</td>${cols.map(c => `<td class="r">${fmtN(recs.filter(r => r.cls === c).reduce((a, r) => a + r.days, 0))}</td>`).join("")}<td class="r">${fmtN(recs.reduce((a, r) => a + r.days, 0))}</td><td class="r">${new Set(recs.map(studentKey)).size}</td></tr></tfoot>`;
   renderChart(keys.map(k => ({ k, v: tot(k), label: periodLabel(k, p, false) })));
 }
@@ -738,6 +769,191 @@ function openStudent(key) {
   $("#dlg").showModal();
 }
 
+/* ---------- günlük devamsız listesi ---------- */
+const TR_DAYS_L = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+const localToday = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+const prevSchoolDay = iso => { let d = addDays(iso, -1); while (isWeekend(d)) d = addDays(d, -1); return d; };
+const lastDay = () => state.records.reduce((a, r) => r.date > a ? r.date : a, "");
+const fmtLong = iso => { const d = toDate(iso); return `${d.getUTCDate()} ${TR_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()} ${TR_DAYS_L[d.getUTCDay()]}`; };
+
+// seçilen günün devamsızları, sınıf sınıf; her öğrenci için o güne kadarki toplamlar
+function dayData(day) {
+  const codes = unexcusedCodes();
+  const todays = state.records.filter(r => r.date === day && (!state.cls || r.cls === state.cls));
+  const byClass = new Map();
+  for (const r of todays) {
+    const k = studentKey(r);
+    if (!byClass.has(r.cls)) byClass.set(r.cls, new Map());
+    const m = byClass.get(r.cls);
+    if (!m.has(k)) {
+      const upto = state.records.filter(x => studentKey(x) === k && x.date <= day);
+      const dates = new Set(upto.map(x => x.date));
+      let run = 0, d = day; while (dates.has(d)) { run++; d = prevSchoolDay(d); }
+      const cumU = upto.filter(x => codes.has(x.type)).reduce((a, x) => a + x.days, 0);
+      const cumT = upto.reduce((a, x) => a + x.days, 0);
+      const level = cumU > settings.limitU || cumT > settings.limitT ? 2 : cumU >= settings.warn || run >= settings.streak ? 1 : 0;
+      m.set(k, { no: r.no, name: r.name, types: new Set(), days: 0, run, cumU, cumT, level });
+    }
+    const st = m.get(k); st.types.add(r.type); st.days += r.days;
+  }
+  return [...byClass.entries()].sort((a, b) => trCmp(a[0], b[0]))
+    .map(([cls, m]) => ({ cls, rows: [...m.values()].sort((a, b) => +a.no - +b.no) }));
+}
+const typeText = st => [...st.types].map(t => `${t} · ${TYPE_NAMES[t] || "Diğer"}`).join(", ") + (st.days !== 1 ? ` (${fmtN(st.days)})` : "");
+const levelText = lv => lv === 2 ? "Sınır" : lv === 1 ? "Uyarı" : "";
+
+function renderDay() {
+  if (!state.day) { const t = localToday(); state.day = state.records.some(r => r.date === t) ? t : (lastDay() || t); }
+  const day = state.day;
+  $("#dDate").value = day;
+  const data = dayData(day);
+  const n = data.reduce((a, c) => a + c.rows.length, 0);
+  const isToday = day === localToday();
+  const last = lastDay();
+  let sum = `<b>${esc(fmtLong(day))}</b>${isToday ? " (bugün)" : ""} · `;
+  if (n) sum += `${data.length} sınıfta <b>${n}</b> öğrenci devamsız${state.cls ? ` (yalnız ${esc(state.cls)})` : ""}.`;
+  else if (last && day > last) sum += `bu gün için kayıt yok. Yüklenen rapordaki son devamsızlık günü ${fmtDate(last)}; güncel listeyi görmek için e-Okul'dan bugünkü IOK08002 raporunu yükleyin.`;
+  else sum += isWeekend(day) ? "hafta sonu." : "bu gün devamsız öğrenci yok.";
+  $("#daySum").innerHTML = sum;
+  const canShare = shareSupported();
+  $("#dayAll").innerHTML = n ? `<span class="muted small">Tüm sınıflar:</span>
+    <button type="button" data-export="pdf-all">PDF indir (her sınıf ayrı sayfa)</button>
+    <button type="button" data-export="jpg-all">JPEG indir (her sınıf ayrı resim)</button>
+    ${canShare ? `<button type="button" data-export="share-all">Paylaş</button>` : ""}` : "";
+  $("#dayCards").innerHTML = data.map(c => `
+    <article class="ccard">
+      <header><h3>${esc(c.cls)}</h3><span class="muted small">${c.rows.length} öğrenci</span></header>
+      <div class="tscroll" style="border:none;border-radius:0"><table>
+        <thead><tr><th class="r">No</th><th>Adı soyadı</th><th>Türü</th><th class="r" title="Bu güne kadar özürsüz / toplam gün">Öz. / Top.</th></tr></thead>
+        <tbody>${c.rows.map(r => `<tr><td class="r">${esc(r.no)}</td><td><button class="link" data-student="${esc(c.cls + "|" + r.no)}">${esc(r.name)}</button>${r.level ? ` <span class="pill ${r.level === 2 ? "crit" : "warn"}">${levelText(r.level)}</span>` : ""}${r.run > 1 ? ` <span class="pill info">${r.run}. gün</span>` : ""}</td><td>${esc([...r.types].join(", "))}</td><td class="r">${fmtN(r.cumU)} / ${fmtN(r.cumT)}</td></tr>`).join("")}</tbody>
+      </table></div>
+      <div class="acts">
+        <button type="button" data-export="jpg" data-cls="${esc(c.cls)}">JPEG indir</button>
+        <button type="button" data-export="pdf" data-cls="${esc(c.cls)}">PDF indir</button>
+        ${canShare ? `<button type="button" data-export="share" data-cls="${esc(c.cls)}">Paylaş</button>` : ""}
+      </div>
+    </article>`).join("");
+}
+
+/* ---------- sınıf listesini resim olarak çiz (yazdırmaya uygun, açık renk) ---------- */
+function drawClassSheet(cls, day, rows) {
+  const W = 1240, M = 60, RH = 54, top = 300;
+  const H = top + Math.max(rows.length, 1) * RH + 190;
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const g = cv.getContext("2d");
+  const body = '"Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif', disp = '"Bitter", Georgia, serif';
+  const ink = "#18233a", muted = "#5b6579", line = "#d9dfe8", accent = "#1f4fa3", crit = "#c0262d", warn = "#a35f00";
+  g.fillStyle = "#ffffff"; g.fillRect(0, 0, W, H);
+  g.fillStyle = accent; g.fillRect(0, 0, W, 12);
+  g.textBaseline = "alphabetic";
+  const text = (t, x, y, font, color, align = "left", maxW) => {
+    g.font = font; g.fillStyle = color; g.textAlign = align;
+    let s = String(t);
+    if (maxW) while (s.length > 1 && g.measureText(s).width > maxW) s = s.slice(0, -2) + "…";
+    g.fillText(s, x, y);
+  };
+  text(state.meta.school || "", M, 66, `400 24px ${body}`, muted, "left", W - 2 * M);
+  text("Günlük Devamsızlık Listesi", M, 122, `700 44px ${disp}`, ink);
+  text(cls, M, 186, `700 38px ${disp}`, accent);
+  text(fmtLong(day), W - M, 186, `700 30px ${body}`, ink, "right");
+  text(`${rows.length} öğrenci devamsız`, W - M, 122, `400 26px ${body}`, muted, "right");
+  g.fillStyle = line; g.fillRect(M, 214, W - 2 * M, 2);
+  const cols = [
+    { t: "Sıra", x: M + 50, a: "right" }, { t: "No", x: M + 150, a: "right" }, { t: "Adı Soyadı", x: M + 190, a: "left", w: 470 },
+    { t: "Türü", x: M + 680, a: "left", w: 160 }, { t: "Art arda", x: M + 920, a: "right" }, { t: "Özürsüz / Toplam", x: M + 1120, a: "right" }
+  ];
+  cols.forEach(c => text(c.t.toLocaleUpperCase("tr"), c.x, 262, `700 19px ${body}`, muted, c.a));
+  g.fillStyle = line; g.fillRect(M, 280, W - 2 * M, 1);
+  rows.forEach((r, i) => {
+    const y = top + i * RH;
+    if (i % 2) { g.fillStyle = "#f3f6fb"; g.fillRect(M, y, W - 2 * M, RH); }
+    const by = y + 36;
+    text(i + 1, cols[0].x, by, `400 24px ${body}`, muted, "right");
+    text(r.no, cols[1].x, by, `700 24px ${body}`, ink, "right");
+    let nameW = 470;
+    if (r.level) {
+      const lab = levelText(r.level); g.font = `700 18px ${body}`;
+      const pw = g.measureText(lab).width + 20, px = cols[2].x + 470 - pw;
+      g.fillStyle = r.level === 2 ? crit : warn; g.beginPath(); g.roundRect(px, y + 14, pw, 28, 14); g.fill();
+      text(lab, px + pw / 2, y + 34, `700 18px ${body}`, "#ffffff", "center"); nameW = 470 - pw - 12;
+    }
+    text(r.name, cols[2].x, by, `700 24px ${body}`, ink, "left", nameW);
+    text(typeText(r), cols[3].x, by, `400 22px ${body}`, ink, "left", 220);
+    text(r.run > 1 ? `${r.run}. gün` : "–", cols[4].x, by, `400 24px ${body}`, r.run >= settings.streak ? crit : ink, "right");
+    text(`${fmtN(r.cumU)} / ${fmtN(r.cumT)} gün`, cols[5].x, by, `400 24px ${body}`, r.level === 2 ? crit : ink, "right");
+  });
+  if (!rows.length) text("Bu gün devamsız öğrenci yok.", M, top + 36, `400 24px ${body}`, muted);
+  const fy = top + Math.max(rows.length, 1) * RH + 40;
+  g.fillStyle = line; g.fillRect(M, fy, W - 2 * M, 1);
+  text(`Özürsüz / Toplam: seçilen güne kadarki devamsızlık günü. Sınırlar: özürsüz ${fmtN(settings.limitU)}, toplam ${fmtN(settings.limitT)} gün; ${fmtN(settings.warn)} gün özürsüzde uyarı.`, M, fy + 44, `400 20px ${body}`, muted, "left", W - 2 * M);
+  text(`Kaynak: e-Okul IOK08002 Öğrenci Devamsızlıkları (Detaylı)${state.meta.stamp ? ` · rapor tarihi ${fmtDate(state.meta.stamp)}` : ""}`, M, fy + 78, `400 20px ${body}`, muted, "left", W - 2 * M);
+  return cv;
+}
+
+const canvasJpeg = cv => new Promise(res => cv.toBlob(res, "image/jpeg", 0.92));
+
+// JPEG resimlerden (her biri bir A4 sayfa) basit PDF üretir
+function makePdf(images) {
+  const enc = new TextEncoder(), parts = [], off = [];
+  let pos = 0;
+  const push = d => { const b = typeof d === "string" ? enc.encode(d) : d; parts.push(b); pos += b.length; };
+  const obj = (n, fn) => { off[n] = pos; push(`${n} 0 obj\n`); fn(); push("\nendobj\n"); };
+  push("%PDF-1.4\n"); push(new Uint8Array([37, 226, 227, 207, 211, 10]));
+  obj(1, () => push("<< /Type /Catalog /Pages 2 0 R >>"));
+  obj(2, () => push(`<< /Type /Pages /Kids [${images.map((_, i) => `${3 + 3 * i} 0 R`).join(" ")}] /Count ${images.length} >>`));
+  images.forEach((im, i) => {
+    const PW = 595.28, PH = 841.89, m = 28;
+    const sc = Math.min((PW - 2 * m) / im.w, (PH - 2 * m) / im.h);
+    const dw = im.w * sc, dh = im.h * sc, x = (PW - dw) / 2, y = PH - m - dh;
+    obj(3 + 3 * i, () => push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /XObject << /Im${i} ${5 + 3 * i} 0 R >> >> /Contents ${4 + 3 * i} 0 R >>`));
+    const cs = `q ${dw.toFixed(2)} 0 0 ${dh.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)} cm /Im${i} Do Q`;
+    obj(4 + 3 * i, () => push(`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`));
+    obj(5 + 3 * i, () => { push(`<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${im.bytes.length} >>\nstream\n`); push(im.bytes); push("\nendstream"); });
+  });
+  const total = 3 + 3 * images.length, xref = pos;
+  let x = `xref\n0 ${total}\n0000000000 65535 f \n`;
+  for (let k = 1; k < total; k++) x += `${String(off[k]).padStart(10, "0")} 00000 n \n`;
+  push(`${x}trailer\n<< /Size ${total} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(parts, { type: "application/pdf" });
+}
+
+const safeName = s => s.replace(/[çğıöşüÇĞİÖŞÜ]/g, c => ({ ç: "c", ğ: "g", ı: "i", ö: "o", ş: "s", ü: "u", Ç: "C", Ğ: "G", İ: "I", Ö: "O", Ş: "S", Ü: "U" }[c]))
+  .replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
+function downloadBlob(blob, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+}
+function shareSupported() {
+  try { return !!(navigator.canShare && navigator.canShare({ files: [new File([""], "a.jpg", { type: "image/jpeg" })] })); } catch (e) { return false; }
+}
+
+async function exportDay(kind, cls) {
+  const day = state.day;
+  const data = dayData(day).filter(c => !cls || c.cls === cls);
+  if (!data.length) { toast("Bu gün için devamsız öğrenci yok"); return; }
+  try { await document.fonts.ready; } catch (e) {}
+  const sheets = await Promise.all(data.map(async c => {
+    const cv = drawClassSheet(c.cls, day, c.rows);
+    const blob = await canvasJpeg(cv);
+    return { cls: c.cls, blob, w: cv.width, h: cv.height };
+  }));
+  const base = `${day}_devamsiz`;
+  if (kind.startsWith("jpg")) {
+    sheets.forEach((s, i) => setTimeout(() => downloadBlob(s.blob, `${base}_${safeName(s.cls)}.jpg`), i * 400));
+    toast(sheets.length > 1 ? `${sheets.length} resim indiriliyor` : "Resim indiriliyor");
+  } else if (kind.startsWith("pdf")) {
+    const imgs = await Promise.all(sheets.map(async s => ({ w: s.w, h: s.h, bytes: new Uint8Array(await s.blob.arrayBuffer()) })));
+    downloadBlob(makePdf(imgs), `${base}_${cls ? safeName(cls) : "tum-siniflar"}.pdf`);
+    toast("PDF indiriliyor");
+  } else if (kind.startsWith("share")) {
+    const files = sheets.map(s => new File([s.blob], `${base}_${safeName(s.cls)}.jpg`, { type: "image/jpeg" }));
+    try { await navigator.share({ files, title: `Devamsız öğrenciler · ${fmtDate(day)}`, text: `${fmtLong(day)} devamsız öğrenci listesi${cls ? ` · ${cls}` : ""}` }); }
+    catch (e) { if (e.name !== "AbortError") toast("Paylaşılamadı; JPEG indirip gönderin"); }
+  }
+}
+
 /* ---------- tabloyu Excel için kopyala ---------- */
 function tableToTsv(t) {
   return [...t.querySelectorAll("tr")].map(tr => [...tr.children].map(c => c.innerText.replace(/\s+/g, " ").replace(/▼/g, "").trim()).join("\t")).join("\n");
@@ -758,6 +974,7 @@ async function handleFiles(fileList) {
   const files = [...fileList].filter(f => /\.pdf$/i.test(f.name) || f.type === "application/pdf");
   if (!files.length) { toast("Lütfen PDF dosyası seçin"); return; }
   if (state.sample) { state.records = []; state.files = []; state.sample = false; state.meta = { school: "", year: "", term: "", stamp: "" }; state.from = state.to = state.cls = ""; }
+  state.day = "";
   for (const f of files) {
     try {
       const res = await parsePdf(f);
@@ -802,18 +1019,26 @@ document.addEventListener("click", e => {
   const s = e.target.closest("[data-student]"); if (s) { openStudent(s.dataset.student); return; }
   const c = e.target.closest("[data-class]"); if (c) { state.cls = c.dataset.class; render(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
   const t = e.target.closest("th[data-sort]"); if (t) { state.sort.top = t.dataset.sort; render(); return; }
+  const dy = e.target.closest("[data-day]"); if (dy) { state.day = dy.dataset.day; renderDay(); $("#daySection").scrollIntoView({ behavior: "smooth" }); return; }
+  const ex = e.target.closest("[data-export]"); if (ex) { exportDay(ex.dataset.export, ex.dataset.cls || ""); return; }
   const cp = e.target.closest("[data-copy]"); if (cp) copyTable(cp.dataset.copy);
 });
 $("#dlg").addEventListener("click", e => { if (e.target.id === "dlg") e.target.close(); });
 $("#fileInput").addEventListener("change", e => { handleFiles(e.target.files); e.target.value = ""; });
 $("#clearBtn").addEventListener("click", () => {
-  Object.assign(state, { records: sampleData(), files: [], sample: true, meta: { school: "", year: "", term: "", stamp: "2026-10-09" }, cls: "", from: "", to: "", type: "", q: "" });
+  Object.assign(state, { records: sampleData(), files: [], sample: true, meta: { school: "", year: "", term: "", stamp: "2026-10-09" }, cls: "", from: "", to: "", type: "", q: "", day: "" });
   render();
 });
 const drop = $("#drop");
 ["dragenter", "dragover"].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave", "drop"].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); if (ev === "drop" || !e.relatedTarget) drop.classList.remove("over"); }));
 document.addEventListener("drop", e => { if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
+
+$("#dToday").addEventListener("click", () => { state.day = localToday(); renderDay(); });
+$("#dLast").addEventListener("click", () => { state.day = lastDay(); renderDay(); });
+$("#dPrev").addEventListener("click", () => { state.day = prevSchoolDay(state.day || localToday()); renderDay(); });
+$("#dNext").addEventListener("click", () => { state.day = nextSchoolDay(state.day || localToday()); renderDay(); });
+$("#dDate").addEventListener("change", e => { if (e.target.value) { state.day = e.target.value; renderDay(); } });
 
 try { const p = localStorage.getItem("devamsizlik.period"); if (p) state.period = p; } catch (e) {}
 state.records = sampleData(); state.meta.stamp = "2026-10-09";

@@ -31,6 +31,10 @@ python3 build.py package/build
 - **Günlük / Haftalık / Aylık** tablo ve grafik; sınıf sütunlarıyla.
 - **Öğrenci listesi:** öğrenci × gün/hafta/ay tablosu. İsme tıklayınca takvim ve tüm kayıtlar açılır.
 - **Sınıf karşılaştırması** ve **en çok devamsız olanlar** sıralaması.
+- **Günlük devamsız listesi:** **Bugün** düğmesi (veya tarih seçimi / ◀ ▶) ile o gün devamsız
+  olan öğrenciler sınıf sınıf listelenir. Her sınıfın listesi **JPEG** ya da **PDF** olarak indirilip
+  sınıf öğretmenine gönderilebilir; tüm sınıflar tek PDF'te (her sınıf ayrı sayfa) de alınabilir.
+  Telefonda **Paylaş** düğmesi WhatsApp vb. uygulamalarla doğrudan gönderir.
 - Filtreler: sınıf/şube, tarih aralığı, devamsızlık türü, öğrenci adı/numarası.
 - Her tablo **Tabloyu kopyala** ile Excel'e yapıştırılabilir.
 
