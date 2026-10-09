@@ -30,23 +30,21 @@ npm pack pdfjs-dist@3.11.174 && tar xzf pdfjs-dist-3.11.174.tgz
 python3 build.py package/build
 ```
 
-## Neler gösterir
+## Bölümler
 
-Arayüz beş bölümden oluşur: **1. Günlük liste**, **2. Uyarılar**, **3. Raporlar**, **4. Sınıflar**,
-**5. Rapor yükle ve ayarlar**.
+- **Bugün:** o gün devamsız olan öğrenciler sınıf sınıf. Her sınıfın listesi JPEG / PDF olarak
+  indirilip sınıf öğretmenine gönderilebilir (telefonda **Paylaş** ile WhatsApp vb.).
+- **Rapor oluştur:** sırayla seçin:
+  1. **Tarih aralığı:** Bugün, Bu hafta, Geçen hafta, Bu ay, Geçen ay, Tüm kayıtlar ya da istediğiniz iki tarih.
+  2. **Sınıflar:** bir veya birden çok sınıf.
+  3. **Öğrenciler** (isteğe bağlı): ad ya da numara yazıp listeden seçin.
+  4. **Rapor türü:** Öğrenci listesi, Gün gün, Hafta hafta, Ay ay, Sınıf özeti; devamsızlık türü (özürsüz/özürlü).
+  5. **PDF indir / JPEG indir / Excel'e kopyala.** "Her sınıf ayrı sayfa / ayrı resim" seçiliyken her sınıf
+     ayrı sayfada ve ayrı JPEG dosyasında olur; öğretmenlere ayrı ayrı gönderilebilir.
+- **Uyarılar:** sınırı aşan, sınıra yaklaşan ve art arda gelmeyen öğrenciler.
+- **Rapor yükle ve ayarlar:** PDF yükleme, kayıtlı veriler, devamsızlık sınırları.
 
-- **Özet:** devamsız öğrenci sayısı, toplam devamsızlık günü, sınırı aşan ve uyarı düzeyindeki öğrenciler.
-- **Sınırı aşan / dikkat gereken öğrenciler:** özürsüz ve toplam devamsızlık sınırını aşanlar,
-  veli bildirimi eşiğine gelenler ve art arda uzun süre gelmeyenler (sürüyorsa ayrıca belirtilir).
-- **Günlük / Haftalık / Aylık** tablo ve grafik; sınıf sütunlarıyla.
-- **Öğrenci listesi:** öğrenci × gün/hafta/ay tablosu. İsme tıklayınca takvim ve tüm kayıtlar açılır.
-- **Sınıf karşılaştırması** ve **en çok devamsız olanlar** sıralaması.
-- **Günlük devamsız listesi:** **Bugün** düğmesi (veya tarih seçimi / ◀ ▶) ile o gün devamsız
-  olan öğrenciler sınıf sınıf listelenir. Her sınıfın listesi **JPEG** ya da **PDF** olarak indirilip
-  sınıf öğretmenine gönderilebilir; tüm sınıflar tek PDF'te (her sınıf ayrı sayfa) de alınabilir.
-  Telefonda **Paylaş** düğmesi WhatsApp vb. uygulamalarla doğrudan gönderir.
-- Filtreler: sınıf/şube, tarih aralığı, devamsızlık türü, öğrenci adı/numarası.
-- Her tablo **Tabloyu kopyala** ile Excel'e yapıştırılabilir.
+Öğrencinin adına tıklayınca takvimi açılır; **Bu öğrencinin raporu** ile yalnız o öğrencinin raporu hazırlanır.
 
 ## Sınırlar
 

@@ -157,6 +157,30 @@ dialog .dbody { padding: 18px; display: grid; gap: 14px; overflow: auto; max-hei
 .tabs button { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 6px 6px 0 0; background: none; padding: 10px 14px; color: var(--muted); font-size: .95rem; margin-bottom: -2px; border-bottom: 3px solid transparent; }
 .tabs button:hover { color: var(--ink); background: var(--accent-soft); }
 .tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); background: var(--sheet); }
+.rlayout { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.fpanel { gap: 18px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 60px); }
+.fstep { display: grid; gap: 8px; }
+.fstep h3 { display: flex; align-items: center; gap: 8px; }
+.sn { display: inline-grid; place-items: center; width: 24px; height: 24px; flex: none; border-radius: 50%; background: var(--accent); color: var(--sheet); font: 700 .8rem var(--font-body); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { padding: 5px 11px; border-radius: 999px; font-size: .88rem; }
+.chips button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--sheet); }
+.chip .x { border: none; background: none; color: inherit; padding: 0 0 0 4px; font-size: 1rem; line-height: 1; cursor: pointer; }
+.daterow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.fstep input[type=search] { width: 100%; }
+.rhead { display: grid; gap: 4px; }
+.rsum { font-weight: 700; color: var(--accent); }
+.exportbar { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; padding: 12px; border-radius: 6px; background: var(--accent-soft); }
+.check { display: inline-flex; gap: 6px; align-items: center; font-size: .9rem; }
+.rsec { display: grid; gap: 6px; }
+.rsec-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; justify-content: space-between; }
+.rsec-head h3 { color: var(--accent); font-size: 1.1rem; }
+#rBody { display: grid; gap: 22px; }
+td.c, th.c { text-align: center; }
+td.hl { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+td.wr { white-space: normal; min-width: 14em; }
+tr.tot td { font-weight: 700; background: var(--paper); }
+@media (max-width: 860px) { .rlayout { grid-template-columns: 1fr; } .fpanel { position: static; } }
 .tabs .tn { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--line); color: var(--ink); font-size: .75rem; }
 .tabs button[aria-selected="true"] .tn { background: var(--accent); color: var(--sheet); }
 .badge { display: inline-block; min-width: 1.6em; padding: 0 6px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .78rem; text-align: center; font-variant-numeric: tabular-nums; }
@@ -208,17 +232,16 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
   </div>
 
   <nav class="tabs" role="tablist" aria-label="Bölümler">
-    <button type="button" role="tab" data-tab="gunluk"><span class="tn">1</span>Günlük liste <span class="badge" id="bGunluk"></span></button>
-    <button type="button" role="tab" data-tab="uyarilar"><span class="tn">2</span>Uyarılar <span class="badge crit" id="bUyari"></span></button>
-    <button type="button" role="tab" data-tab="raporlar"><span class="tn">3</span>Raporlar</button>
-    <button type="button" role="tab" data-tab="siniflar"><span class="tn">4</span>Sınıflar</button>
-    <button type="button" role="tab" data-tab="veri"><span class="tn">5</span>Rapor yükle ve ayarlar</button>
+    <button type="button" role="tab" data-tab="gunluk">Bugün <span class="badge" id="bGunluk"></span></button>
+    <button type="button" role="tab" data-tab="rapor">Rapor oluştur</button>
+    <button type="button" role="tab" data-tab="uyarilar">Uyarılar <span class="badge crit" id="bUyari"></span></button>
+    <button type="button" role="tab" data-tab="veri">Rapor yükle ve ayarlar</button>
   </nav>
 
   <!-- 1. Günlük liste -->
   <section class="tabpanel" data-tab="gunluk" id="daySection">
     <div class="intro">
-      <h2>Günlük devamsız listesi</h2>
+      <h2>Bugün kimler gelmedi?</h2>
       <p class="muted">Seçilen gün devamsız olan öğrenciler, sınıf sınıf. Her sınıfın listesini resim (JPEG) ya da PDF olarak indirip sınıf öğretmenine gönderebilirsiniz.</p>
     </div>
     <div class="panel">
@@ -236,7 +259,74 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
     <p class="note">"Öz. / Top." sütunu, seçilen güne kadarki özürsüz ve toplam devamsızlık günüdür. "Paylaş" düğmesi telefonda WhatsApp, e-posta gibi uygulamalarla doğrudan gönderir.</p>
   </section>
 
-  <!-- 2. Uyarılar -->
+  <!-- 2. Rapor oluştur -->
+  <section class="tabpanel" data-tab="rapor" hidden>
+    <div class="intro">
+      <h2>Rapor oluştur</h2>
+      <p class="muted">Soldan sırayla seçin; rapor seçimlerinize göre hemen hazırlanır. Hazır raporu PDF veya JPEG olarak indirip öğretmenlerle paylaşabilirsiniz.</p>
+    </div>
+    <div class="rlayout">
+      <aside class="panel fpanel" aria-label="Rapor seçimleri">
+        <div class="fstep">
+          <h3><span class="sn">1</span>Tarih aralığı</h3>
+          <div class="chips" id="qRange">
+            <button type="button" data-range="today">Bugün</button>
+            <button type="button" data-range="week">Bu hafta</button>
+            <button type="button" data-range="lastweek">Geçen hafta</button>
+            <button type="button" data-range="month">Bu ay</button>
+            <button type="button" data-range="lastmonth">Geçen ay</button>
+            <button type="button" data-range="all">Tüm kayıtlar</button>
+          </div>
+          <div class="daterow">
+            <div class="field"><label for="rFrom">Başlangıç</label><input type="date" id="rFrom"></div>
+            <div class="field"><label for="rTo">Bitiş</label><input type="date" id="rTo"></div>
+          </div>
+        </div>
+        <div class="fstep">
+          <h3><span class="sn">2</span>Sınıflar</h3>
+          <div class="chips" id="rClasses"></div>
+          <p class="muted small">Birden çok sınıf seçebilirsiniz.</p>
+        </div>
+        <div class="fstep">
+          <h3><span class="sn">3</span>Öğrenciler <span class="muted small">(isteğe bağlı)</span></h3>
+          <input type="search" id="rStudent" list="rStudentList" placeholder="Ad veya numara yazıp listeden seçin" autocomplete="off">
+          <datalist id="rStudentList"></datalist>
+          <div class="chips" id="rStudents"></div>
+        </div>
+        <div class="fstep">
+          <h3><span class="sn">4</span>Rapor türü</h3>
+          <div class="chips" id="rView">
+            <button type="button" data-view="list">Öğrenci listesi</button>
+            <button type="button" data-view="day">Gün gün</button>
+            <button type="button" data-view="week">Hafta hafta</button>
+            <button type="button" data-view="month">Ay ay</button>
+            <button type="button" data-view="classes">Sınıf özeti</button>
+          </div>
+          <div class="field"><label for="rType">Devamsızlık türü</label>
+            <select id="rType"><option value="">Tümü</option><option value="U">Yalnız özürsüz</option><option value="E">Yalnız özürlü / diğer</option></select></div>
+        </div>
+        <button type="button" id="rReset">Seçimleri temizle</button>
+      </aside>
+      <div class="panel rresult">
+        <div class="rhead">
+          <h2 id="rTitle"></h2>
+          <p class="small" id="rDesc"></p>
+          <p class="rsum" id="rSum"></p>
+        </div>
+        <div class="exportbar">
+          <span class="sn">5</span>
+          <button type="button" class="primary" data-rexport="pdf">PDF indir</button>
+          <button type="button" class="primary" data-rexport="jpg">JPEG indir</button>
+          <span id="rShareWrap"></span>
+          <button type="button" data-rexport="copy">Excel'e kopyala</button>
+          <label class="check"><input type="checkbox" id="rSplit"> Her sınıf ayrı sayfa / ayrı resim</label>
+        </div>
+        <div id="rBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Uyarılar -->
   <section class="tabpanel" data-tab="uyarilar" hidden>
     <div class="intro">
       <h2>Sınırı aşan ve dikkat gereken öğrenciler</h2>
@@ -246,73 +336,7 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
     <div class="alerts" id="alerts"></div>
   </section>
 
-  <!-- 3–4 için ortak filtreler -->
-  <section class="panel" id="filterBar" hidden>
-    <div class="filters">
-      <div class="field"><label for="fClass">Sınıf / Şube</label><select id="fClass"></select></div>
-      <div class="field"><label for="fFrom">Başlangıç</label><input type="date" id="fFrom"></div>
-      <div class="field"><label for="fTo">Bitiş</label><input type="date" id="fTo"></div>
-      <div class="field"><label for="fType">Türü</label><select id="fType"></select></div>
-      <div class="field" style="flex:1 1 180px"><label for="fSearch">Öğrenci ara</label><input type="search" id="fSearch" placeholder="Ad veya numara"></div>
-      <button type="button" id="resetFilters">Filtreleri sıfırla</button>
-    </div>
-  </section>
-
-  <!-- 3. Raporlar -->
-  <section class="tabpanel" data-tab="raporlar" hidden>
-    <div class="intro">
-      <h2>Günlük, haftalık ve aylık raporlar</h2>
-      <p class="muted">Devamsızlıkların zamana göre dökümü. Aşağıdaki filtrelerle sınıf, tarih aralığı veya öğrenci seçebilirsiniz.</p>
-    </div>
-    <section class="kpis" id="kpis" aria-label="Özet"></section>
-    <div class="panel">
-      <div class="panel-head">
-        <div class="seg" role="group" aria-label="Zaman görünümü">
-          <button type="button" data-p="day">Günlük</button>
-          <button type="button" data-p="week">Haftalık</button>
-          <button type="button" data-p="month">Aylık</button>
-        </div>
-        <button type="button" data-copy="periodTable">Tabloyu kopyala</button>
-      </div>
-      <h2 id="periodTitle">Dönemlere göre devamsızlık</h2>
-      <div class="chart" id="chart"></div>
-      <div class="tscroll"><table id="periodTable"></table></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <h2 id="matrixTitle">Öğrenci listesi</h2>
-        <button type="button" data-copy="matrixTable">Tabloyu kopyala</button>
-      </div>
-      <p class="muted small">Hücreler o gün / hafta / ayda devamsız olunan gün sayısıdır. Ayrıntı için öğrencinin adına tıklayın.</p>
-      <div class="tscroll" style="max-height:560px"><table id="matrixTable" class="matrix"></table></div>
-    </div>
-  </section>
-
-  <!-- 4. Sınıflar -->
-  <section class="tabpanel" data-tab="siniflar" hidden>
-    <div class="intro">
-      <h2>Sınıflar ve en çok devamsız olanlar</h2>
-      <p class="muted">Sınıfların devamsızlık karşılaştırması. Bir sınıfın adına tıklayınca o sınıfın raporu açılır.</p>
-    </div>
-    <div class="two">
-      <div class="panel">
-        <div class="panel-head">
-          <h2>Sınıf karşılaştırması</h2>
-          <button type="button" data-copy="classTable">Kopyala</button>
-        </div>
-        <div class="tscroll"><table id="classTable"></table></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <h2>En çok devamsız olanlar</h2>
-          <button type="button" data-copy="topTable">Kopyala</button>
-        </div>
-        <div class="tscroll"><table id="topTable"></table></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. Rapor yükle ve ayarlar -->
+  <!-- 4. Rapor yükle ve ayarlar -->
   <section class="tabpanel" data-tab="veri" hidden>
     <div class="intro">
       <h2>Rapor yükle</h2>
@@ -525,7 +549,8 @@ async function parsePdf(file) {
 /* ---------- durum ---------- */
 const state = {
   records: [], files: [], sample: true, meta: { school: "", year: "", term: "", stamp: "" },
-  period: "week", cls: "", from: "", to: "", type: "", q: "", day: "",
+  day: "", status: new Map(), studentOpts: new Map(),
+  f: { from: "", to: "", classes: [], students: [], type: "", view: "list", split: true },
   sort: { top: "total" }
 };
 const settings = loadSettings();
@@ -660,25 +685,8 @@ function classify(s, reportEnd) {
   return { level, flags };
 }
 
-function filtered() {
-  const q = state.q.trim().toLocaleLowerCase("tr");
-  return state.records.filter(r =>
-    (!state.cls || r.cls === state.cls) &&
-    (!state.from || r.date >= state.from) &&
-    (!state.to || r.date <= state.to) &&
-    (!state.type || r.type === state.type) &&
-    (!q || r.name.toLocaleLowerCase("tr").includes(q) || r.no === q));
-}
-
 /* ---------- çizim ---------- */
 function render() {
-  const all = state.records;
-  const classes = [...new Set(all.map(r => r.cls))].sort(trCmp);
-  const types = [...new Set(all.map(r => r.type))].sort(trCmp);
-  fillSelect($("#fClass"), [["", "Tüm sınıflar"], ...classes.map(c => [c, c])], state.cls);
-  fillSelect($("#fType"), [["", "Tümü"], ...types.map(t => [t, `${t} · ${TYPE_NAMES[t] || "Diğer"}`])], state.type);
-  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === state.period));
-
   const m = state.meta;
   $("#schoolLine").textContent = state.sample
     ? "Örnek veri gösteriliyor (gerçek kişi değildir). Kendi raporunuzu yükleyin."
@@ -686,45 +694,16 @@ function render() {
   $("#files").innerHTML = state.sample
     ? `<span class="chip sample">Örnek veri</span>`
     : state.files.map(f => `<span class="chip${f.err ? " err" : ""}" title="${esc(f.msg)}">${esc(f.name)} · ${esc(f.msg)}</span>`).join("");
-
-  const recs = filtered();
-  const reportEnd = m.stamp || (all.length ? all.reduce((a, r) => r.date > a ? r.date : a, "") : "");
-
+  const reportEnd = m.stamp || lastDay();
   // sınır uyarıları: filtrelerden bağımsız, yüklenen tüm kayıtlar üzerinden
   const studentsAll = buildStudents(state.records).map(s => Object.assign(s, classify(s, reportEnd)));
-  const studentsF = buildStudents(recs);
-  const statusByKey = new Map(studentsAll.map(s => [s.key, s]));
-
-  renderKpis(recs, studentsF, studentsAll);
+  state.status = new Map(studentsAll.map(s => [s.key, s]));
   renderAlerts(studentsAll);
-  renderPeriods(recs, classes);
-  renderMatrix(recs, studentsF, statusByKey);
-  renderClasses(recs, studentsAll);
-  renderTop(studentsF, statusByKey);
+  renderReport();
   renderDay();
   renderStoreInfo();
   $("#sampleBanner").hidden = !state.sample;
-  const nAlert = studentsAll.filter(s => s.level === 2).length;
-  $("#bUyari").textContent = nAlert || "";
-}
-
-function fillSelect(sel, opts, val) {
-  sel.innerHTML = opts.map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`).join("");
-  sel.value = opts.some(o => o[0] === val) ? val : "";
-}
-
-function renderKpis(recs, studentsF, studentsAll) {
-  const days = recs.reduce((a, r) => a + r.days, 0);
-  const inCls = studentsAll.filter(s => !state.cls || s.cls === state.cls);
-  const crit = inCls.filter(s => s.level === 2).length;
-  const warn = inCls.filter(s => s.level === 1).length;
-  const dates = recs.map(r => r.date).sort();
-  const range = dates.length ? `${fmtDate(dates[0])} – ${fmtDate(dates[dates.length - 1])}` : "kayıt yok";
-  $("#kpis").innerHTML = `
-    <div class="kpi"><span class="eyebrow">Devamsız öğrenci</span><span class="v">${studentsF.length}</span><span class="muted small">${range}</span></div>
-    <div class="kpi"><span class="eyebrow">Toplam devamsızlık</span><span class="v">${fmtN(days)}</span><span class="muted small">gün · ${recs.length} kayıt</span></div>
-    <div class="kpi crit"><span class="eyebrow">Sınırı aşan / sınırda</span><span class="v">${crit}</span><span class="muted small">öğrenci</span></div>
-    <div class="kpi warn"><span class="eyebrow">Uyarı düzeyinde</span><span class="v">${warn}</span><span class="muted small">öğrenci</span></div>`;
+  $("#bUyari").textContent = studentsAll.filter(s => s.level === 2).length || "";
 }
 
 function renderAlerts(studentsAll) {
@@ -740,115 +719,6 @@ function renderAlerts(studentsAll) {
       </div>
       <span class="num small"><b>${fmtN(s.unexcused)}</b> özürsüz / <b>${fmtN(s.total)}</b> toplam</span>
     </div>`).join("") : `<div class="empty">Uyarı gerektiren öğrenci yok.</div>`;
-}
-
-function renderPeriods(recs, classes) {
-  const p = state.period;
-  const names = { day: "Günlük", week: "Haftalık", month: "Aylık" };
-  $("#periodTitle").textContent = `${names[p]} devamsızlık`;
-  const cols = state.cls ? [state.cls] : classes.filter(c => recs.some(r => r.cls === c));
-  const keys = periodRange([...new Set(recs.map(r => periodKey(r.date, p)))], p);
-  const cell = new Map(), stud = new Map();
-  for (const r of recs) {
-    const k = periodKey(r.date, p);
-    cell.set(`${k}|${r.cls}`, (cell.get(`${k}|${r.cls}`) || 0) + r.days);
-    if (!stud.has(k)) stud.set(k, new Set());
-    stud.get(k).add(studentKey(r));
-  }
-  const tot = k => cols.reduce((a, c) => a + (cell.get(`${k}|${c}`) || 0), 0);
-  if (!keys.length) { $("#periodTable").innerHTML = `<tbody><tr><td class="empty">Seçilen aralıkta kayıt yok.</td></tr></tbody>`; $("#chart").innerHTML = ""; return; }
-  $("#periodTable").innerHTML = `
-    <thead><tr><th>${p === "day" ? "Tarih" : p === "week" ? "Hafta" : "Ay"}</th>${cols.map(c => `<th class="r">${esc(c)}</th>`).join("")}<th class="r">Toplam gün</th><th class="r">Öğrenci</th></tr></thead>
-    <tbody>${[...keys].reverse().map(k => `<tr><td>${p === "day" ? `<button class="day" data-day="${k}">${esc(periodLabel(k, p, true))}</button>` : esc(periodLabel(k, p, true))}</td>${cols.map(c => `<td class="r">${cell.get(`${k}|${c}`) ? fmtN(cell.get(`${k}|${c}`)) : "<span class='muted'>–</span>"}</td>`).join("")}<td class="r"><b>${fmtN(tot(k))}</b></td><td class="r">${stud.get(k)?.size || 0}</td></tr>`).join("")}</tbody>
-    <tfoot><tr><td>Toplam</td>${cols.map(c => `<td class="r">${fmtN(recs.filter(r => r.cls === c).reduce((a, r) => a + r.days, 0))}</td>`).join("")}<td class="r">${fmtN(recs.reduce((a, r) => a + r.days, 0))}</td><td class="r">${new Set(recs.map(studentKey)).size}</td></tr></tfoot>`;
-  renderChart(keys.map(k => ({ k, v: tot(k), label: periodLabel(k, p, false) })));
-}
-
-function renderChart(data) {
-  const W = 900, H = 220, padL = 34, padB = 34, padT = 18, padR = 8;
-  const max = Math.max(1, ...data.map(d => d.v));
-  const step = max <= 5 ? 1 : max <= 12 ? 2 : max <= 30 ? 5 : max <= 60 ? 10 : Math.ceil(max / 50) * 10;
-  const top = Math.ceil(max / step) * step;
-  const iw = W - padL - padR, ih = H - padT - padB;
-  const bw = iw / data.length;
-  const y = v => padT + ih - (v / top) * ih;
-  let g = "";
-  for (let t = 0; t <= top; t += step) g += `<line class="grid" x1="${padL}" x2="${W - padR}" y1="${y(t)}" y2="${y(t)}"/><text x="${padL - 6}" y="${y(t) + 4}" text-anchor="end">${t}</text>`;
-  const every = Math.ceil(data.length / 14);
-  const bars = data.map((d, i) => {
-    const w = Math.max(2, Math.min(70, bw * 0.7)), x = padL + i * bw + (bw - w) / 2;
-    return `<rect class="bar" x="${x}" y="${y(d.v)}" width="${w}" height="${Math.max(0, padT + ih - y(d.v))}" rx="2"><title>${esc(d.label)}: ${fmtN(d.v)} gün</title></rect>` +
-      (d.v && data.length <= 31 ? `<text class="val" x="${x + w / 2}" y="${y(d.v) - 4}" text-anchor="middle">${fmtN(d.v)}</text>` : "") +
-      (i % every === 0 ? `<text x="${x + w / 2}" y="${H - padB + 16}" text-anchor="middle">${esc(d.label)}</text>` : "");
-  }).join("");
-  $("#chart").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Dönemlere göre toplam devamsızlık günü">${g}${bars}</svg>`;
-}
-
-function renderMatrix(recs, studentsF, statusByKey) {
-  const p = state.period;
-  const keys = periodRange([...new Set(recs.map(r => periodKey(r.date, p)))], p);
-  const names = { day: "Günlük", week: "Haftalık", month: "Aylık" };
-  $("#matrixTitle").textContent = `${names[p]} öğrenci listesi`;
-  if (!studentsF.length) { $("#matrixTable").innerHTML = `<tbody><tr><td class="empty">Seçilen filtrelerde devamsız öğrenci yok.</td></tr></tbody>`; return; }
-  const list = [...studentsF].sort((a, b) => trCmp(a.cls, b.cls) || (+a.no - +b.no));
-  const codes = unexcusedCodes();
-  let max = 1;
-  const cells = new Map();
-  for (const s of list) for (const r of s.recs) {
-    const k = `${s.key}|${periodKey(r.date, p)}`;
-    const c = cells.get(k) || { v: 0, ex: 0 };
-    c.v += r.days; if (!codes.has(r.type)) c.ex += r.days;
-    cells.set(k, c); max = Math.max(max, c.v);
-  }
-  const head = keys.map(k => {
-    const lab = p === "day" ? `${toDate(k).getUTCDate()}<br><span class="small">${TR_MON_S[toDate(k).getUTCMonth()]}</span>` : esc(periodLabel(k, p, false));
-    return `<th class="d">${lab}</th>`;
-  }).join("");
-  const body = list.map(s => {
-    const st = statusByKey.get(s.key);
-    const pill = st && st.level ? `<span class="pill ${st.level === 2 ? "crit" : "warn"}">${st.level === 2 ? "Sınır" : "Uyarı"}</span>` : "";
-    return `<tr><td class="sticky"><button class="link" data-student="${esc(s.key)}">${esc(s.name)}</button> ${pill}</td><td>${esc(s.cls)}</td><td class="r">${esc(s.no)}</td>` +
-      keys.map(k => {
-        const c = cells.get(`${s.key}|${k}`);
-        if (!c) return `<td class="heat"></td>`;
-        const pct = p === "day" ? 70 : Math.round(18 + 62 * c.v / max);
-        const col = c.ex === c.v ? "var(--accent)" : "var(--heat)";
-        const bg = p === "day" ? (c.ex === c.v ? "var(--accent)" : "var(--crit)") : `color-mix(in srgb, ${col} ${pct}%, transparent)`;
-        const fg = pct > 45 ? "var(--sheet)" : "var(--ink)";
-        const txt = p === "day" ? esc([...new Set(s.recs.filter(r => r.date === k).map(r => r.type))].join("")) : fmtN(c.v);
-        return `<td class="heat" style="background:${bg};color:${fg}" title="${esc(periodLabel(k, p, true))}: ${fmtN(c.v)} gün">${txt}</td>`;
-      }).join("") +
-      `<td class="r"><b>${fmtN(s.unexcused)}</b></td><td class="r">${fmtN(s.total)}</td></tr>`;
-  }).join("");
-  $("#matrixTable").innerHTML = `<thead><tr><th class="sticky">Adı soyadı</th><th>Sınıf</th><th class="r">No</th>${head}<th class="r">Özürsüz</th><th class="r">Toplam</th></tr></thead><tbody>${body}</tbody>`;
-}
-
-function renderClasses(recs, studentsAll) {
-  const classes = [...new Set(recs.map(r => r.cls))].sort(trCmp);
-  const rows = classes.map(c => {
-    const rs = recs.filter(r => r.cls === c);
-    const st = new Set(rs.map(studentKey));
-    const days = rs.reduce((a, r) => a + r.days, 0);
-    const perS = new Map(); rs.forEach(r => perS.set(studentKey(r), (perS.get(studentKey(r)) || 0) + r.days));
-    const mx = Math.max(...perS.values());
-    const crit = studentsAll.filter(s => s.cls === c && s.level === 2).length;
-    const warn = studentsAll.filter(s => s.cls === c && s.level === 1).length;
-    return { c, st: st.size, days, avg: days / st.size, mx, crit, warn, daysN: new Set(rs.map(r => r.date)).size };
-  }).sort((a, b) => b.days - a.days);
-  $("#classTable").innerHTML = rows.length ? `
-    <thead><tr><th>Sınıf</th><th class="r">Öğrenci</th><th class="r">Toplam gün</th><th class="r">Öğr. başı</th><th class="r">En yüksek</th><th class="r">Sınır / Uyarı</th></tr></thead>
-    <tbody>${rows.map(r => `<tr><td><button class="link" data-class="${esc(r.c)}">${esc(r.c)}</button></td><td class="r">${r.st}</td><td class="r"><b>${fmtN(r.days)}</b></td><td class="r">${fmtN(r.avg)}</td><td class="r">${fmtN(r.mx)}</td><td class="r">${r.crit ? `<span class="pill crit">${r.crit}</span>` : "0"} / ${r.warn ? `<span class="pill warn">${r.warn}</span>` : "0"}</td></tr>`).join("")}</tbody>`
-    : `<tbody><tr><td class="empty">Kayıt yok.</td></tr></tbody>`;
-}
-
-function renderTop(studentsF, statusByKey) {
-  const key = state.sort.top;
-  const list = [...studentsF].sort((a, b) => key === "streak" ? b.streak.len - a.streak.len : key === "unexcused" ? b.unexcused - a.unexcused || b.total - a.total : b.total - a.total || b.unexcused - a.unexcused).slice(0, 25);
-  const th = (k, t) => `<th class="r sortable" data-sort="${k}">${t}${key === k ? " ▼" : ""}</th>`;
-  $("#topTable").innerHTML = list.length ? `
-    <thead><tr><th class="r">#</th><th>Adı soyadı</th><th>Sınıf</th>${th("total", "Toplam")}${th("unexcused", "Özürsüz")}${th("streak", "Art arda")}</tr></thead>
-    <tbody>${list.map((s, i) => { const st = statusByKey.get(s.key); return `<tr><td class="r muted">${i + 1}</td><td><button class="link" data-student="${esc(s.key)}">${esc(s.name)}</button> ${st && st.level ? `<span class="pill ${st.level === 2 ? "crit" : "warn"}">${st.level === 2 ? "Sınır" : "Uyarı"}</span>` : ""}</td><td>${esc(s.cls)}</td><td class="r"><b>${fmtN(s.total)}</b></td><td class="r">${fmtN(s.unexcused)}</td><td class="r">${s.streak.len} gün</td></tr>`; }).join("")}</tbody>`
-    : `<tbody><tr><td class="empty">Kayıt yok.</td></tr></tbody>`;
 }
 
 function openStudent(key) {
@@ -874,7 +744,7 @@ function openStudent(key) {
     return `<div style="display:grid;gap:6px"><h3>${TR_MONTHS[m - 1]} ${y}</h3><div class="cal">${cells}</div></div>`;
   }).join("");
   $("#dlgBody").innerHTML = `
-    <div class="panel-head"><div><span class="eyebrow">${esc(s.cls)} · No ${esc(s.no)}</span><h2>${esc(s.name)}</h2></div><button type="button" id="dlgClose">Kapat</button></div>
+    <div class="panel-head"><div><span class="eyebrow">${esc(s.cls)} · No ${esc(s.no)}</span><h2>${esc(s.name)}</h2></div><div class="dayctl"><button type="button" class="primary" id="dlgReport">Bu öğrencinin raporu</button><button type="button" id="dlgClose">Kapat</button></div></div>
     <div class="kpis">
       <div class="kpi${s.unexcused > settings.limitU ? " crit" : s.unexcused >= settings.warn ? " warn" : ""}"><span class="eyebrow">Özürsüz</span><span class="v">${fmtN(s.unexcused)}</span><span class="muted small">sınır ${fmtN(settings.limitU)} gün</span></div>
       <div class="kpi${s.total > settings.limitT ? " crit" : ""}"><span class="eyebrow">Toplam</span><span class="v">${fmtN(s.total)}</span><span class="muted small">sınır ${fmtN(settings.limitT)} gün</span></div>
@@ -886,6 +756,10 @@ function openStudent(key) {
     <div class="tscroll"><table><thead><tr><th>Tarih</th><th>Gün</th><th>Türü</th><th class="r">Gün sayısı</th></tr></thead>
     <tbody>${s.recs.map(r => `<tr><td>${fmtDate(r.date)}</td><td>${TR_DAYS[dow(r.date)]}</td><td>${esc(r.type)} · ${esc(TYPE_NAMES[r.type] || "Diğer")}</td><td class="r">${fmtN(r.days)}</td></tr>`).join("")}</tbody></table></div>`;
   $("#dlgClose").onclick = () => $("#dlg").close();
+  $("#dlgReport").onclick = () => {
+    Object.assign(state.f, { students: [key], classes: [], from: "", to: "", view: "list" });
+    saveReportPrefs(); $("#dlg").close(); renderReport(); showTab("rapor");
+  };
   $("#dlg").showModal();
 }
 
@@ -1023,7 +897,7 @@ function makePdf(images) {
   obj(1, () => push("<< /Type /Catalog /Pages 2 0 R >>"));
   obj(2, () => push(`<< /Type /Pages /Kids [${images.map((_, i) => `${3 + 3 * i} 0 R`).join(" ")}] /Count ${images.length} >>`));
   images.forEach((im, i) => {
-    const PW = 595.28, PH = 841.89, m = 28;
+    const PW = im.land ? 841.89 : 595.28, PH = im.land ? 595.28 : 841.89, m = 28;
     const sc = Math.min((PW - 2 * m) / im.w, (PH - 2 * m) / im.h);
     const dw = im.w * sc, dh = im.h * sc, x = (PW - dw) / 2, y = PH - m - dh;
     obj(3 + 3 * i, () => push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /XObject << /Im${i} ${5 + 3 * i} 0 R >> >> /Contents ${4 + 3 * i} 0 R >>`));
@@ -1075,26 +949,345 @@ async function exportDay(kind, cls) {
   }
 }
 
-/* ---------- tabloyu Excel için kopyala ---------- */
-function tableToTsv(t) {
-  return [...t.querySelectorAll("tr")].map(tr => [...tr.children].map(c => c.innerText.replace(/\s+/g, " ").replace(/▼/g, "").trim()).join("\t")).join("\n");
+/* ---------- rapor oluştur: filtreler ---------- */
+function rangeFor(kind) {
+  const t = localToday();
+  const mStart = iso => iso.slice(0, 8) + "01";
+  const mEnd = iso => { const [y, m] = iso.split("-").map(Number); return toIso(new Date(Date.UTC(y, m, 0))); };
+  if (kind === "today") return [t, t];
+  if (kind === "week") { const s = weekStart(t); return [s, addDays(s, 4)]; }
+  if (kind === "lastweek") { const s = addDays(weekStart(t), -7); return [s, addDays(s, 4)]; }
+  if (kind === "month") return [mStart(t), mEnd(t)];
+  if (kind === "lastmonth") { const p = addDays(mStart(t), -1); return [mStart(p), mEnd(p)]; }
+  return ["", ""];
 }
+
+function reportRecords() {
+  const f = state.f, codes = unexcusedCodes();
+  const cs = new Set(f.classes), ss = new Set(f.students);
+  return state.records.filter(r =>
+    (!f.from || r.date >= f.from) && (!f.to || r.date <= f.to) &&
+    (!cs.size || cs.has(r.cls)) && (!ss.size || ss.has(studentKey(r))) &&
+    (!f.type || (f.type === "U") === codes.has(r.type)));
+}
+
+function studentLabel(key) {
+  const r = state.records.find(x => studentKey(x) === key);
+  return r ? `${r.name} (${r.cls}, No ${r.no})` : key;
+}
+
+function filterDesc(recs) {
+  const f = state.f, dates = recs.map(r => r.date).sort();
+  const from = f.from || dates[0], to = f.to || dates[dates.length - 1];
+  const parts = [];
+  parts.push(from ? `Tarih: ${fmtDate(from)}${to && to !== from ? ` – ${fmtDate(to)}` : ""}` : "Tarih: tüm kayıtlar");
+  parts.push(f.classes.length ? `Sınıf: ${[...f.classes].sort(trCmp).join(", ")}` : "Sınıf: tümü");
+  if (f.students.length) parts.push(`Öğrenci: ${f.students.map(studentLabel).join(", ")}`);
+  if (f.type) parts.push(f.type === "U" ? "Tür: yalnız özürsüz" : "Tür: yalnız özürlü / diğer");
+  return parts.join(" · ");
+}
+
+// "14, 15, 16 Eyl · 2 Eki" biçiminde kısa tarih listesi
+function compactDates(dates) {
+  const byMonth = new Map();
+  for (const d of [...new Set(dates)].sort()) {
+    const k = d.slice(0, 7);
+    if (!byMonth.has(k)) byMonth.set(k, []);
+    byMonth.get(k).push(+d.slice(8));
+  }
+  return [...byMonth.entries()].map(([k, days]) => `${days.join(", ")}\u00a0${TR_MON_S[+k.slice(5) - 1]}`).join(" · ");
+}
+
+/* ---------- rapor modeli: hem ekranda hem PDF/JPEG'de aynı tablo ---------- */
+const VIEW_TITLES = { list: "Devamsızlık Raporu", day: "Günlük Devamsızlık Raporu", week: "Haftalık Devamsızlık Raporu", month: "Aylık Devamsızlık Raporu", classes: "Sınıf Özeti" };
+
+function buildReport() {
+  const recs = reportRecords(), f = state.f, codes = unexcusedCodes();
+  const sumDays = rs => rs.reduce((a, r) => a + r.days, 0);
+  const byClass = new Map();
+  for (const r of recs) { if (!byClass.has(r.cls)) byClass.set(r.cls, []); byClass.get(r.cls).push(r); }
+  const classes = [...byClass.keys()].sort(trCmp);
+  const nStud = new Set(recs.map(studentKey)).size;
+  const uDays = sumDays(recs.filter(r => codes.has(r.type)));
+  const model = {
+    title: VIEW_TITLES[f.view], desc: filterDesc(recs), sections: [],
+    sum: recs.length ? `${classes.length} sınıf · ${nStud} öğrenci · ${fmtN(sumDays(recs))} gün devamsızlık (${fmtN(uDays)} özürsüz)` : "Seçimlerinize uyan devamsızlık kaydı yok."
+  };
+  const level = key => (state.status.get(key) || {}).level || 0;
+
+  if (f.view === "list") {
+    for (const cls of classes) {
+      const studs = buildStudents(byClass.get(cls)).sort((a, b) => +a.no - +b.no);
+      model.sections.push({
+        heading: cls, sub: `${studs.length} öğrenci · ${fmtN(sumDays(byClass.get(cls)))} gün devamsızlık`,
+        columns: [{ t: "Sıra", w: 60, a: "r" }, { t: "No", w: 70, a: "r" }, { t: "Adı Soyadı", w: 330, link: true },
+          { t: "Devamsız olduğu günler", w: 380, wrap: true }, { t: "Özürsüz", w: 100, a: "r" }, { t: "Toplam", w: 90, a: "r" }, { t: "Durum", w: 100, pill: true }],
+        rows: studs.map((s, i) => ({ key: s.key, level: level(s.key),
+          cells: [i + 1, s.no, s.name, compactDates(s.recs.map(r => r.date)), fmtN(s.unexcused), fmtN(s.total), levelText(level(s.key))] }))
+      });
+    }
+  } else if (f.view === "classes") {
+    const rows = classes.map(cls => {
+      const rs = byClass.get(cls), studs = buildStudents(rs).sort((a, b) => b.total - a.total);
+      const top = studs[0];
+      return { cells: [cls, studs.length, fmtN(sumDays(rs)), fmtN(sumDays(rs.filter(r => codes.has(r.type)))), fmtN(sumDays(rs) / studs.length), `${top.name} (${fmtN(top.total)})`] };
+    });
+    if (rows.length) rows.push({ total: true, cells: ["Toplam", nStud, fmtN(sumDays(recs)), fmtN(uDays), fmtN(sumDays(recs) / nStud), ""] });
+    model.sections.push({ heading: "Sınıflara göre", sub: "Seçilen tarih aralığında",
+      columns: [{ t: "Sınıf", w: 190 }, { t: "Öğrenci", w: 170, a: "r" }, { t: "Toplam gün", w: 140, a: "r" }, { t: "Özürsüz gün", w: 140, a: "r" }, { t: "Öğrenci başı", w: 140, a: "r" }, { t: "En çok devamsız", w: 350 }],
+      rows });
+    const p = recs.length && (recs.map(r => r.date).sort().at(-1) > addDays(recs.map(r => r.date).sort()[0], 120)) ? "month" : "week";
+    const keys = periodRange([...new Set(recs.map(r => periodKey(r.date, p)))], p);
+    const cell = (k, c) => sumDays(recs.filter(r => periodKey(r.date, p) === k && (!c || r.cls === c)));
+    if (keys.length) model.sections.push({ heading: p === "week" ? "Haftalara göre" : "Aylara göre", sub: "Gün sayısı",
+      columns: [{ t: p === "week" ? "Hafta" : "Ay", w: 200 }, ...classes.map(c => ({ t: c, w: 120, a: "r" })), { t: "Toplam", w: 110, a: "r" }],
+      rows: [...keys.map(k => ({ cells: [periodLabel(k, p, true), ...classes.map(c => fmtN(cell(k, c)) === "0" ? "–" : fmtN(cell(k, c))), fmtN(cell(k))] })),
+        { total: true, cells: ["Toplam", ...classes.map(c => fmtN(sumDays(byClass.get(c)))), fmtN(sumDays(recs))] }] });
+  } else {
+    const p = f.view;
+    const keys = p === "day" ? [...new Set(recs.map(r => r.date))].sort() : periodRange([...new Set(recs.map(r => periodKey(r.date, p)))], p);
+    const colW = p === "day" ? 66 : p === "week" ? 124 : 110;
+    const head = k => p === "day" ? `${k.slice(8)}.${k.slice(5, 7)}` : periodLabel(k, p, false);
+    for (const cls of classes) {
+      const studs = buildStudents(byClass.get(cls)).sort((a, b) => +a.no - +b.no);
+      model.sections.push({
+        heading: cls, sub: `${studs.length} öğrenci · ${fmtN(sumDays(byClass.get(cls)))} gün devamsızlık`,
+        columns: [{ t: "No", w: 70, a: "r" }, { t: "Adı Soyadı", w: 320, link: true }, ...keys.map(k => ({ t: head(k), w: colW, a: "c" })), { t: "Toplam", w: 90, a: "r" }],
+        rows: studs.map(s => {
+          const per = new Map();
+          s.recs.forEach(r => { const k = periodKey(r.date, p); per.set(k, (per.get(k) || 0) + r.days); });
+          const hl = new Set();
+          const vals = keys.map((k, i) => { if (per.get(k)) { hl.add(i + 2); return fmtN(per.get(k)); } return ""; });
+          return { key: s.key, level: level(s.key), hl, cells: [s.no, s.name, ...vals, fmtN(s.total)] };
+        })
+      });
+    }
+  }
+  return model;
+}
+
+function modelToHtml(model) {
+  if (!model.sections.length || !model.sections.some(s => s.rows.length)) return `<div class="empty">${esc(model.sum)}</div>`;
+  return model.sections.map(s => `
+    <div class="rsec">
+      <div class="rsec-head"><h3>${esc(s.heading)}</h3><span class="muted small">${esc(s.sub || "")}</span></div>
+      <div class="tscroll"><table>
+        <thead><tr>${s.columns.map(c => `<th class="${c.a === "r" ? "r" : c.a === "c" ? "c" : ""}">${esc(c.t)}</th>`).join("")}</tr></thead>
+        <tbody>${s.rows.map(r => `<tr class="${r.total ? "tot" : ""}">${r.cells.map((v, i) => {
+          const c = s.columns[i], cls = [c.a === "r" ? "r" : c.a === "c" ? "c" : "", r.hl && r.hl.has(i) ? "hl" : "", c.wrap ? "wr" : ""].join(" ").trim();
+          let inner = esc(v);
+          if (c.link && r.key) inner = `<button class="link" data-student="${esc(r.key)}">${esc(v)}</button>`;
+          if (c.pill) inner = v ? `<span class="pill ${r.level === 2 ? "crit" : "warn"}">${esc(v)}</span>` : "";
+          return `<td${cls ? ` class="${cls}"` : ""}>${inner}</td>`;
+        }).join("")}</tr>`).join("")}</tbody>
+      </table></div>
+    </div>`).join("");
+}
+
+function modelToTsv(model) {
+  const out = [model.title, model.desc, model.sum, ""];
+  for (const s of model.sections) {
+    out.push(s.heading, s.columns.map(c => c.t).join("\t"));
+    s.rows.forEach(r => out.push(r.cells.map(v => String(v)).join("\t")));
+    out.push("");
+  }
+  return out.join("\n");
+}
+
+/* ---------- raporu sayfa sayfa resme çiz (A4 oranında, açık renk) ---------- */
+function renderPages(model, split) {
+  const M = 56, FOOT = 70;
+  const tableW = Math.max(0, ...model.sections.map(s => s.columns.reduce((a, c) => a + c.w, 0)));
+  const W = Math.max(1240, tableW + 2 * M), land = W > 1400;
+  const H = Math.round(land ? W / 1.414 : W * 1.414);
+  const body = '"Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif', disp = '"Bitter", Georgia, serif';
+  const C = { ink: "#18233a", muted: "#5b6579", line: "#d9dfe8", accent: "#1f4fa3", crit: "#c0262d", warn: "#a35f00", zebra: "#f3f6fb", hl: "#dbe6f8" };
+  const pages = [];
+  let g, y, page;
+  const text = (t, x, yy, font, color, align = "left", maxW) => {
+    g.font = font; g.fillStyle = color; g.textAlign = align;
+    let s = String(t);
+    if (maxW) while (s.length > 1 && g.measureText(s).width > maxW) s = s.slice(0, -2) + "…";
+    g.fillText(s, x, yy);
+  };
+  const wrap = (t, maxW, font) => {
+    g.font = font; const words = String(t).split(" "), lines = [];
+    let cur = "";
+    for (const w of words) { const nx = cur ? cur + " " + w : w; if (g.measureText(nx).width > maxW && cur) { lines.push(cur); cur = w; } else cur = nx; }
+    if (cur) lines.push(cur);
+    return lines.length ? lines : [""];
+  };
+  function newPage() {
+    const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    g = cv.getContext("2d"); g.textBaseline = "alphabetic";
+    g.fillStyle = "#ffffff"; g.fillRect(0, 0, W, H);
+    g.fillStyle = C.accent; g.fillRect(0, 0, W, 12);
+    text(state.meta.school || "", M, 62, `400 22px ${body}`, C.muted, "left", W - 2 * M);
+    text(model.title, M, 116, `700 42px ${disp}`, C.ink);
+    y = 150;
+    for (const ln of wrap(model.desc, W - 2 * M, `400 21px ${body}`).slice(0, 4)) { text(ln, M, y, `400 21px ${body}`, C.ink); y += 28; }
+    text(model.sum, M, y + 2, `700 21px ${body}`, C.accent, "left", W - 2 * M);
+    y += 22;
+    g.fillStyle = C.line; g.fillRect(M, y, W - 2 * M, 2);
+    y += 18;
+    page = { cv, top: y, used: y, cls: "" }; pages.push(page);
+  }
+  const rowH = (s, r) => {
+    let lines = 1;
+    s.columns.forEach((c, i) => { if (c.wrap) lines = Math.max(lines, wrap(r.cells[i], c.w - 16, `400 21px ${body}`).length); });
+    return 22 + lines * 28;
+  };
+  function colHeader(s) {
+    let x = M;
+    for (const c of s.columns) {
+      const tx = c.a === "r" ? x + c.w - 8 : c.a === "c" ? x + c.w / 2 : x + 8;
+      text(c.t.toLocaleUpperCase("tr"), tx, y + 26, `700 16px ${body}`, C.muted, c.a === "r" ? "right" : c.a === "c" ? "center" : "left", c.w - 10);
+      x += c.w;
+    }
+    g.fillStyle = C.line; g.fillRect(M, y + 40, x - M, 1);
+    y += 44;
+  }
+  function secHeader(s, cont) {
+    text(s.heading + (cont ? " (devam)" : ""), M, y + 34, `700 30px ${disp}`, C.accent);
+    if (s.sub) text(s.sub, W - M, y + 34, `400 20px ${body}`, C.muted, "right");
+    y += 52; colHeader(s);
+    if (!page.cls) page.cls = s.heading;
+  }
+  newPage();
+  model.sections.forEach((s, si) => {
+    if (!s.rows.length) return;
+    if (si > 0 && split && y > page.top) newPage();
+    if (y + 96 + rowH(s, s.rows[0]) > H - FOOT) newPage();
+    secHeader(s, false);
+    s.rows.forEach((r, ri) => {
+      const h = rowH(s, r);
+      if (y + h > H - FOOT) { newPage(); secHeader(s, true); }
+      let x = M;
+      const tw = s.columns.reduce((a, c) => a + c.w, 0);
+      if (r.total) { g.fillStyle = C.line; g.fillRect(M, y, tw, h); }
+      else if (ri % 2) { g.fillStyle = C.zebra; g.fillRect(M, y, tw, h); }
+      s.columns.forEach((c, i) => {
+        const v = r.cells[i], bold = r.total || c.link || (r.hl && r.hl.has(i));
+        const font = `${bold ? 700 : 400} 21px ${body}`;
+        if (r.hl && r.hl.has(i)) { g.fillStyle = C.hl; g.fillRect(x + 3, y + 3, c.w - 6, h - 6); }
+        if (c.pill) {
+          if (v) {
+            g.font = `700 17px ${body}`;
+            const pw = g.measureText(v).width + 20, px = x + 8;
+            g.fillStyle = r.level === 2 ? C.crit : C.warn; g.beginPath(); g.roundRect(px, y + h / 2 - 14, pw, 28, 14); g.fill();
+            text(v, px + pw / 2, y + h / 2 + 6, `700 17px ${body}`, "#ffffff", "center");
+          }
+        } else if (c.wrap) {
+          wrap(v, c.w - 16, font).forEach((ln, li) => text(ln, x + 8, y + 33 + li * 28, font, C.ink));
+        } else {
+          const tx = c.a === "r" ? x + c.w - 8 : c.a === "c" ? x + c.w / 2 : x + 8;
+          const color = c.t === "Toplam" && r.level === 2 ? C.crit : C.ink;
+          text(v, tx, y + h / 2 + 7, font, color, c.a === "r" ? "right" : c.a === "c" ? "center" : "left", c.w - 14);
+        }
+        x += c.w;
+      });
+      g.fillStyle = C.line; g.fillRect(M, y + h, tw, 1);
+      y += h; page.used = y;
+    });
+    y += 28;
+  });
+  if (!model.sections.some(s => s.rows.length)) { text(model.sum, M, y + 30, `400 22px ${body}`, C.muted); page.used = y + 40; }
+  const groupOf = p => split ? p.cls : "";
+  pages.forEach((p, i) => {
+    const grp = pages.filter(q => groupOf(q) === groupOf(p));
+    const pn = grp.indexOf(p) + 1, pt = grp.length;
+    g = p.cv.getContext("2d");
+    const fy = Math.min(H - 30, p.used + 50);
+    p.footY = fy;
+    g.fillStyle = C.line; g.fillRect(M, fy - 30, W - 2 * M, 1);
+    text(`Kaynak: e-Okul IOK08002${state.meta.stamp ? ` · rapor tarihi ${fmtDate(state.meta.stamp)}` : ""} · hazırlanma ${fmtDate(localToday())}`, M, fy, `400 18px ${body}`, C.muted, "left", W - 2 * M - 160);
+    if (pt > 1) text(`Sayfa ${pn} / ${pt}`, W - M, fy, `400 18px ${body}`, C.muted, "right");
+  });
+  return pages.map(p => ({ cv: p.cv, land, cls: p.cls, h: p.footY + 30 }));
+}
+
+function cropCanvas(cv, h) {
+  const out = document.createElement("canvas"); out.width = cv.width; out.height = Math.min(cv.height, h);
+  out.getContext("2d").drawImage(cv, 0, 0);
+  return out;
+}
+
+async function exportReport(kind) {
+  const model = buildReport();
+  if (kind === "copy") {
+    const tsv = modelToTsv(model);
+    try { await navigator.clipboard.writeText(tsv); toast("Kopyalandı · Excel'e yapıştırabilirsiniz"); }
+    catch (e) { toast("Kopyalanamadı"); }
+    return;
+  }
+  if (!model.sections.some(s => s.rows.length)) { toast("Raporlanacak kayıt yok"); return; }
+  try { await document.fonts.ready; } catch (e) {}
+  const pages = renderPages(model, state.f.split);
+  const recs = reportRecords(), dates = recs.map(r => r.date).sort();
+  const from = state.f.from || dates[0], to = state.f.to || dates[dates.length - 1];
+  const base = `devamsizlik_${from}${to !== from ? "_" + to : ""}`;
+  if (kind === "pdf") {
+    const imgs = await Promise.all(pages.map(async p => ({ w: p.cv.width, h: p.cv.height, land: p.land, bytes: new Uint8Array(await (await canvasJpeg(p.cv)).arrayBuffer()) })));
+    const one = state.f.classes.length === 1 ? "_" + safeName(state.f.classes[0]) : "";
+    downloadBlob(makePdf(imgs), `${base}${one}.pdf`);
+    toast(`PDF indiriliyor (${pages.length} sayfa)`);
+    return;
+  }
+  const count = new Map();
+  const files = await Promise.all(pages.map(async (p, i) => {
+    const blob = await canvasJpeg(cropCanvas(p.cv, p.h));
+    let name;
+    if (state.f.split && p.cls) { const n = (count.get(p.cls) || 0) + 1; count.set(p.cls, n); name = `${base}_${safeName(p.cls)}${n > 1 ? "_" + n : ""}.jpg`; }
+    else name = `${base}${pages.length > 1 ? "_sayfa-" + (i + 1) : ""}.jpg`;
+    return new File([blob], name, { type: "image/jpeg" });
+  }));
+  if (kind === "share") {
+    try { await navigator.share({ files, title: model.title, text: `${model.title} · ${model.desc}` }); }
+    catch (e) { if (e.name !== "AbortError") toast("Paylaşılamadı; JPEG indirip gönderin"); }
+    return;
+  }
+  files.forEach((f, i) => setTimeout(() => downloadBlob(f, f.name), i * 400));
+  toast(files.length > 1 ? `${files.length} resim indiriliyor` : "Resim indiriliyor");
+}
+
+/* ---------- rapor oluştur: ekran ---------- */
+function renderReport() {
+  const f = state.f;
+  const classes = [...new Set(state.records.map(r => r.cls))].sort(trCmp);
+  f.classes = f.classes.filter(c => classes.includes(c));
+  const keys = new Set(state.records.map(studentKey));
+  f.students = f.students.filter(k => keys.has(k));
+  $("#rFrom").value = f.from; $("#rTo").value = f.to;
+  document.querySelectorAll("#qRange [data-range]").forEach(b => {
+    const [a, z] = rangeFor(b.dataset.range); b.setAttribute("aria-pressed", a === f.from && z === f.to);
+  });
+  $("#rClasses").innerHTML = `<button type="button" data-cls-toggle="" aria-pressed="${!f.classes.length}">Tüm sınıflar</button>` +
+    classes.map(c => `<button type="button" data-cls-toggle="${esc(c)}" aria-pressed="${f.classes.includes(c)}">${esc(c)}</button>`).join("");
+  const studs = buildStudents(state.records.filter(r => !f.classes.length || f.classes.includes(r.cls))).sort((a, b) => trCmp(a.cls, b.cls) || +a.no - +b.no);
+  state.studentOpts = new Map(studs.map(s => [`${s.name} — ${s.cls} — No ${s.no}`, s.key]));
+  $("#rStudentList").innerHTML = [...state.studentOpts.keys()].map(v => `<option value="${esc(v)}"></option>`).join("");
+  $("#rStudents").innerHTML = f.students.map(k => `<span class="chip">${esc(studentLabel(k))} <button type="button" class="x" data-rm-student="${esc(k)}" aria-label="Kaldır">×</button></span>`).join("") +
+    (f.students.length ? `<button type="button" class="link small" data-rm-student="*">Tüm öğrencileri göster</button>` : "");
+  document.querySelectorAll("#rView [data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === f.view));
+  $("#rType").value = f.type; $("#rSplit").checked = f.split;
+  $("#rShareWrap").innerHTML = shareSupported() ? `<button type="button" data-rexport="share">Paylaş</button>` : "";
+  const model = buildReport();
+  $("#rTitle").textContent = model.title;
+  $("#rDesc").textContent = model.desc;
+  $("#rSum").textContent = model.sum;
+  $("#rBody").innerHTML = modelToHtml(model);
+}
+function saveReportPrefs() { try { localStorage.setItem("devamsizlik.rapor", JSON.stringify(state.f)); } catch (e) {} }
+
 function toast(msg) {
   const el = document.createElement("div"); el.className = "toast"; el.textContent = msg; document.body.appendChild(el);
   setTimeout(() => el.remove(), 2200);
 }
-function copyTable(id) {
-  const t = document.getElementById(id), tsv = tableToTsv(t);
-  const fallback = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast("Tablo seçildi; Ctrl+C ile kopyalayın"); };
-  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tsv).then(() => toast("Kopyalandı · Excel'e yapıştırabilirsiniz"), fallback);
-  else fallback();
-}
-
 /* ---------- dosya yükleme ---------- */
 async function handleFiles(fileList) {
   const files = [...fileList].filter(f => /\.pdf$/i.test(f.name) || f.type === "application/pdf");
   if (!files.length) { toast("Lütfen PDF dosyası seçin"); return; }
-  if (state.sample) { state.records = []; state.files = []; state.sample = false; state.meta = { school: "", year: "", term: "", stamp: "" }; state.from = state.to = state.cls = ""; }
+  if (state.sample) { state.records = []; state.files = []; state.sample = false; state.meta = { school: "", year: "", term: "", stamp: "" }; }
   state.day = "";
   for (const f of files) {
     try {
@@ -1128,24 +1321,31 @@ $("#sPreset").addEventListener("change", e => {
   $("#" + id).addEventListener("input", e => { const v = parseFloat(e.target.value); if (!isNaN(v)) { settings[k] = v; settings.preset = "ozel"; $("#sPreset").value = "ozel"; saveSettings(); render(); } }));
 $("#sCodes").addEventListener("input", e => { settings.codes = e.target.value || "D"; saveSettings(); render(); });
 
-$("#fClass").addEventListener("change", e => { state.cls = e.target.value; render(); });
-$("#fType").addEventListener("change", e => { state.type = e.target.value; render(); });
-$("#fFrom").addEventListener("change", e => { state.from = e.target.value; render(); });
-$("#fTo").addEventListener("change", e => { state.to = e.target.value; render(); });
-$("#fSearch").addEventListener("input", e => { state.q = e.target.value; render(); });
-$("#resetFilters").addEventListener("click", () => {
-  Object.assign(state, { cls: "", from: "", to: "", type: "", q: "" });
-  $("#fFrom").value = $("#fTo").value = $("#fSearch").value = ""; render();
+const setF = (patch) => { Object.assign(state.f, patch); saveReportPrefs(); renderReport(); };
+$("#rFrom").addEventListener("change", e => setF({ from: e.target.value }));
+$("#rTo").addEventListener("change", e => setF({ to: e.target.value }));
+$("#rType").addEventListener("change", e => setF({ type: e.target.value }));
+$("#rSplit").addEventListener("change", e => setF({ split: e.target.checked }));
+$("#rReset").addEventListener("click", () => setF({ from: "", to: "", classes: [], students: [], type: "", view: "list" }));
+$("#rStudent").addEventListener("input", e => {
+  const key = state.studentOpts.get(e.target.value);
+  if (key) { e.target.value = ""; if (!state.f.students.includes(key)) setF({ students: [...state.f.students, key] }); }
 });
-document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.period = b.dataset.p; try { localStorage.setItem("devamsizlik.period", state.period); } catch (e) {} render(); }));
 document.addEventListener("click", e => {
   const s = e.target.closest("[data-student]"); if (s) { openStudent(s.dataset.student); return; }
-  const c = e.target.closest("[data-class]"); if (c) { state.cls = c.dataset.class; render(); showTab("raporlar"); return; }
   const tb = e.target.closest("[data-tab][role=tab], [data-goto]"); if (tb) { showTab(tb.dataset.goto || tb.dataset.tab); return; }
-  const t = e.target.closest("th[data-sort]"); if (t) { state.sort.top = t.dataset.sort; render(); return; }
-  const dy = e.target.closest("[data-day]"); if (dy) { state.day = dy.dataset.day; renderDay(); showTab("gunluk"); return; }
+  const rg = e.target.closest("[data-range]"); if (rg) { const [from, to] = rangeFor(rg.dataset.range); setF({ from, to }); return; }
+  const ct = e.target.closest("[data-cls-toggle]");
+  if (ct) {
+    const c = ct.dataset.clsToggle, cur = state.f.classes;
+    const classes = !c ? [] : cur.includes(c) ? cur.filter(x => x !== c) : [...cur, c];
+    setF({ classes });
+    return;
+  }
+  const rm = e.target.closest("[data-rm-student]"); if (rm) { const k = rm.dataset.rmStudent; setF({ students: k === "*" ? [] : state.f.students.filter(x => x !== k) }); return; }
+  const vw = e.target.closest("[data-view]"); if (vw) { setF({ view: vw.dataset.view }); return; }
+  const rx = e.target.closest("[data-rexport]"); if (rx) { exportReport(rx.dataset.rexport); return; }
   const ex = e.target.closest("[data-export]"); if (ex) { exportDay(ex.dataset.export, ex.dataset.cls || ""); return; }
-  const cp = e.target.closest("[data-copy]"); if (cp) copyTable(cp.dataset.copy);
 });
 $("#dlg").addEventListener("click", e => { if (e.target.id === "dlg") e.target.close(); });
 $("#fileInput").addEventListener("change", e => { handleFiles(e.target.files); e.target.value = ""; });
@@ -1159,7 +1359,7 @@ $("#clearBtn").addEventListener("click", async e => {
   }
   clearArmed = 0; btn.textContent = "Kayıtlı verileri sil";
   try { await storePut(undefined); } catch (err) {}
-  Object.assign(state, { records: sampleData(), files: [], sample: true, meta: { school: "", year: "", term: "", stamp: "2026-10-09" }, cls: "", from: "", to: "", type: "", q: "", day: "" });
+  Object.assign(state, { records: sampleData(), files: [], sample: true, meta: { school: "", year: "", term: "", stamp: "2026-10-09" }, day: "" });
   render(); toast("Kayıtlı veriler silindi");
 });
 const drop = $("#drop");
@@ -1173,20 +1373,17 @@ $("#dPrev").addEventListener("click", () => { state.day = prevSchoolDay(state.da
 $("#dNext").addEventListener("click", () => { state.day = nextSchoolDay(state.day || localToday()); renderDay(); });
 $("#dDate").addEventListener("change", e => { if (e.target.value) { state.day = e.target.value; renderDay(); } });
 
-const TABS = ["gunluk", "uyarilar", "raporlar", "siniflar", "veri"];
+const TABS = ["gunluk", "rapor", "uyarilar", "veri"];
 function showTab(t) {
   if (!TABS.includes(t)) t = "gunluk";
   document.querySelectorAll(".tabpanel").forEach(p => { p.hidden = p.dataset.tab !== t; });
   document.querySelectorAll(".tabs [role=tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
-  const fb = $("#filterBar"), active = document.querySelector(`.tabpanel[data-tab="${t}"]`);
-  fb.hidden = !(t === "raporlar" || t === "siniflar");
-  if (!fb.hidden) active.querySelector(".intro").after(fb);
   try { localStorage.setItem("devamsizlik.tab", t); history.replaceState(null, "", "#" + t); } catch (e) {}
   const nav = $(".tabs");
   if (nav.getBoundingClientRect().top < 0) nav.scrollIntoView();
 }
 
-try { const p = localStorage.getItem("devamsizlik.period"); if (p) state.period = p; } catch (e) {}
+try { Object.assign(state.f, JSON.parse(localStorage.getItem("devamsizlik.rapor") || "{}")); } catch (e) {}
 syncSettingsForm();
 {
   let t = location.hash.slice(1);
