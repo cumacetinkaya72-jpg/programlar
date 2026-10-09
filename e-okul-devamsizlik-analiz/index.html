@@ -359,7 +359,13 @@ function parseLines(lines, source) {
 
 async function parsePdf(file) {
   if (!window.pdfjsLib) throw new Error("PDF okuyucu yüklenemedi (internet bağlantısını kontrol edin).");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+    // tek dosya sürümünde worker sayfanın içine gömülüdür
+    const w = document.getElementById("pdfjs-worker");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = w
+      ? URL.createObjectURL(new Blob([w.textContent], { type: "text/javascript" }))
+      : "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
   const data = new Uint8Array(await file.arrayBuffer());
   const pdf = await pdfjsLib.getDocument({ data }).promise;
   const lines = [];

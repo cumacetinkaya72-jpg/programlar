@@ -6,12 +6,22 @@ PDF raporunu okuyup devamsızlıkları sınıf sınıf analiz eden tek dosyalık
 ## Kullanım
 
 1. e-Okul'dan IOK08002 raporunu PDF olarak indirin (tüm şubeler tek PDF'te olabilir).
-2. `index.html` dosyasını tarayıcıda açın (Chrome, Edge, Firefox).
+2. **`devamsizlik-analizi.html`** dosyasını bilgisayarınıza indirip çift tıklayarak tarayıcıda açın
+   (Chrome, Edge, Firefox). Tek dosyadır, internet bağlantısı gerektirmez; USB bellekle taşınabilir.
 3. PDF'i sayfaya sürükleyin veya **PDF seç** ile yükleyin. Birden çok PDF aynı anda yüklenebilir;
    aynı öğrenci + tarih + tür kaydı bir kez sayılır.
 
-PDF yalnızca tarayıcınızda okunur, hiçbir yere gönderilmez. PDF okuyucu (pdf.js) internetten
-yüklendiği için ilk açılışta internet bağlantısı gerekir.
+PDF yalnızca tarayıcınızda okunur, hiçbir yere gönderilmez.
+
+## Geliştirme
+
+Kaynak `index.html` dosyasıdır; PDF okuyucuyu (pdf.js 3.11.174) internetten yükler.
+Tek dosya sürümü pdf.js gömülü olarak şu komutla üretilir:
+
+```sh
+npm pack pdfjs-dist@3.11.174 && tar xzf pdfjs-dist-3.11.174.tgz
+python3 build.py package/build
+```
 
 ## Neler gösterir
 
