@@ -376,7 +376,7 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
         <div class="field"><label for="sCodes">Özürsüz sayılan türler</label><input type="text" id="sCodes" style="width:7em" placeholder="D"></div>
       </div>
       <p class="note">Varsayılanlar: özürsüz 10 gün, toplam 30 gün sınırı; 5 gün özürsüzde veliye bildirim uyarısı. Okulunuzun bağlı olduğu yönetmelikteki güncel sınırlara göre değiştirin; ayarlar bu tarayıcıda saklanır.</p>
-      <p class="note">Türü kodları: <b>D</b> özürsüz sayılır; diğer kodlar (Ö, R, S, İ…) özürlü/raporlu/izinli sayılır ve yalnızca toplama eklenir. Art arda devamsızlık hesabı hafta sonlarını atlar, resmî tatilleri bilmez.</p>
+      <p class="note">Türü kodları: <b>D</b> (tam gün) ve <b>Y</b> (yarım gün) özürsüz sayılır; diğer kodlar (S, İ, G…) yalnızca toplama eklenir. Okulunuzda farklıysa "Özürsüz sayılan türler" kutusundan değiştirin. Art arda devamsızlık hesabı hafta sonlarını atlar, resmî tatilleri bilmez.</p>
     </div>
   </section>
 </div>
@@ -432,7 +432,7 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
 const TR_MONTHS = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const TR_MON_S = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
 const TR_DAYS = ["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
-const TYPE_NAMES = { D: "Özürsüz", "Ö": "Özürlü", O: "Özürlü", R: "Raporlu", S: "Sevkli", "İ": "İzinli", I: "İzinli", G: "Görevli" };
+const TYPE_NAMES = { D: "Özürsüz", Y: "Yarım gün", "Ö": "Özürlü", O: "Özürlü", R: "Raporlu", S: "Sevkli", "İ": "İzinli", I: "İzinli", G: "Görevli" };
 const PRESETS = {
   temel: { warn: 5, limitU: 10, limitT: 30, streak: 5 },
   orta:  { warn: 5, limitU: 10, limitT: 30, streak: 5 }
@@ -483,7 +483,7 @@ function periodRange(keys, p) {
 /* ---------- PDF ayrıştırma ---------- */
 const ROW_RE = /^(\d+)\s+(.+?)\s+(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})\s+(\S{1,3})\s+(\d+(?:[.,]\d+)?)$/u;
 const HEAD_RE = /(\d{4}\s*-\s*\d{4})\s+(.+?)\s+Dönem\s+(.+?)\s+Şubesi/u;
-const STAMP_RE = /(\d{2})\/(\d{2})\/(\d{4})\s+\d{2}:\d{2}:\d{2}/;
+const STAMP_RE = /(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2}):\d{2}/;
 
 function linesFromItems(items) {
   const rows = [];
@@ -521,7 +521,7 @@ function parseLines(lines, source) {
       continue;
     }
     const s = line.match(STAMP_RE);
-    if (s) { out.stamp = `${s[3]}-${s[2]}-${s[1]}`; continue; }
+    if (s) { out.stamp = `${s[3]}-${s[2]}-${s[1]}`; out.stampTime = s[4]; continue; }
   }
   return out;
 }
@@ -558,22 +558,20 @@ const settings = loadSettings();
 function loadSettings() {
   let s = null;
   try { s = JSON.parse(localStorage.getItem("devamsizlik.settings") || "null"); } catch (e) {}
-  return Object.assign({ preset: "temel", codes: "D" }, PRESETS.temel, s || {});
+  if (s && !s.v && s.codes === "D") s.codes = "D, Y"; // eski varsayılan: yarım gün (Y) eklenmemişti
+  return Object.assign({ preset: "temel", codes: "D, Y" }, PRESETS.temel, s || {}, { v: 2 });
 }
 function saveSettings() { try { localStorage.setItem("devamsizlik.settings", JSON.stringify(settings)); } catch (e) {} }
 const unexcusedCodes = () => new Set(settings.codes.split(/[\s,;]+/).filter(Boolean).map(c => c.toLocaleUpperCase("tr")));
 
-// Yeni rapor, kapsadığı şube ve tarih aralığı için esas alınır: o aralıktaki eski kayıtlar
+// Yeni rapor, kapsadığı şubeler için ilk kaydından rapor tarihine kadar esas alınır: o aralıktaki eski kayıtlar
 // silinip yenileri eklenir (e-Okul'da düzeltilen ya da silinen devamsızlıklar da güncellenir).
-function addRecords(recs) {
-  const ranges = new Map();
-  for (const r of recs) {
-    const g = ranges.get(r.cls) || { min: r.date, max: r.date };
-    if (r.date < g.min) g.min = r.date; if (r.date > g.max) g.max = r.date;
-    ranges.set(r.cls, g);
-  }
+function addRecords(recs, until) {
+  const dates = recs.map(r => r.date).sort();
+  const min = dates[0], max = until && until > dates[dates.length - 1] ? until : dates[dates.length - 1];
+  const classes = new Set(recs.map(r => r.cls));
   const before = state.records.length;
-  state.records = state.records.filter(r => { const g = ranges.get(r.cls); return !g || r.date < g.min || r.date > g.max; });
+  state.records = state.records.filter(r => !classes.has(r.cls) || r.date < min || r.date > max);
   const removed = before - state.records.length;
   const seen = new Set(state.records.map(r => `${r.cls}|${r.no}|${r.date}|${r.type}`));
   let added = 0;
@@ -690,7 +688,7 @@ function render() {
   const m = state.meta;
   $("#schoolLine").textContent = state.sample
     ? "Örnek veri gösteriliyor (gerçek kişi değildir). Kendi raporunuzu yükleyin."
-    : [m.school, m.year && `${m.year} ${m.term} Dönem`, m.stamp && `rapor tarihi ${fmtDate(m.stamp)}`].filter(Boolean).join(" · ");
+    : [m.school, m.year && `${m.year} ${m.term} Dönem`, m.stamp && `rapor alınma: ${fmtDate(m.stamp)}${m.stampTime ? " " + m.stampTime : ""}`].filter(Boolean).join(" · ");
   $("#files").innerHTML = state.sample
     ? `<span class="chip sample">Örnek veri</span>`
     : state.files.map(f => `<span class="chip${f.err ? " err" : ""}" title="${esc(f.msg)}">${esc(f.name)} · ${esc(f.msg)}</span>`).join("");
@@ -806,6 +804,7 @@ function renderDay() {
   const last = lastDay();
   let sum = `<b>${esc(fmtLong(day))}</b>${isToday ? " (bugün)" : ""} · `;
   if (n) sum += `${data.length} sınıfta <b>${n}</b> öğrenci devamsız.`;
+  else if (state.meta.stamp && day > state.meta.stamp && !state.sample) sum += `<span class="pill warn">Veri yok</span> Yüklenen rapor ${fmtDate(state.meta.stamp)}${state.meta.stampTime ? " saat " + state.meta.stampTime : ""} tarihinde alınmış; bu günün devamsızlıkları raporda henüz yok. Görmek için e-Okul'dan güncel IOK08002 raporunu alıp yükleyin.`;
   else if (last && day > last) sum += `bu gün için kayıt yok. Yüklenen rapordaki son devamsızlık günü ${fmtDate(last)}; güncel listeyi görmek için e-Okul'dan bugünkü IOK08002 raporunu yükleyin.`;
   else sum += isWeekend(day) ? "hafta sonu." : "bu gün devamsız öğrenci yok.";
   $("#daySum").innerHTML = sum;
@@ -1289,13 +1288,19 @@ async function handleFiles(fileList) {
   if (!files.length) { toast("Lütfen PDF dosyası seçin"); return; }
   if (state.sample) { state.records = []; state.files = []; state.sample = false; state.meta = { school: "", year: "", term: "", stamp: "" }; }
   state.day = "";
+  let schoolChanged = false;
   for (const f of files) {
     try {
       const res = await parsePdf(f);
       if (!res.records.length) { state.files.push({ name: f.name, err: true, msg: "kayıt bulunamadı (IOK08002 raporu mu?)" }); continue; }
-      const added = addRecords(res.records);
+      if (res.school && state.meta.school && res.school !== state.meta.school && state.records.length) {
+        // başka okulun raporu: iki okulun verisi karışmasın
+        state.records = []; state.files = []; state.meta = { school: "", year: "", term: "", stamp: "", stampTime: "" };
+        schoolChanged = true;
+      }
+      const added = addRecords(res.records, res.stamp);
       for (const k of ["school", "year", "term"]) if (res[k]) state.meta[k] = res[k];
-      if (res.stamp && (!state.meta.stamp || res.stamp > state.meta.stamp)) state.meta.stamp = res.stamp;
+      if (res.stamp && (!state.meta.stamp || `${res.stamp} ${res.stampTime}` > `${state.meta.stamp} ${state.meta.stampTime || ""}`)) { state.meta.stamp = res.stamp; state.meta.stampTime = res.stampTime || ""; }
       const cls = new Set(res.records.map(r => r.cls)).size;
       state.files.push({ name: f.name, err: false, msg: `${cls} şube, ${res.records.length} kayıt${added ? `, ${added} yeni` : ""}`, at: new Date().toISOString() });
     } catch (e) {
@@ -1304,7 +1309,7 @@ async function handleFiles(fileList) {
   }
   if (state.records.length) await persist();
   render();
-  if (state.files.some(f => !f.err)) { showTab("gunluk"); toast("Rapor yüklendi"); }
+  if (state.files.some(f => !f.err)) { showTab("gunluk"); toast(schoolChanged ? "Farklı okulun raporu yüklendi; önceki okulun verileri silindi" : "Rapor yüklendi"); }
 }
 
 /* ---------- olaylar ---------- */
