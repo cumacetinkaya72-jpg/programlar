@@ -1215,6 +1215,71 @@
         }
     </style>
 
+    <style id="kararnameStil">
+        /* ==================================================================== */
+        /* ================= KARARNAMEDEN OTOMATİK DOLDURMA ==================== */
+        /* ==================================================================== */
+        .kp-ust-btn { background: #d97706; color: #fff; font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 8px; border: 1px solid #f59e0b; cursor: pointer; transition: background .15s; white-space: nowrap; }
+        .kp-ust-btn:hover { background: #b45309; }
+        .kp-mobil-btn { font-size: 12px; background: #d97706; color: #fff; border: 1px solid #b45309; padding: 6px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        #kpYukleAlani { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: 2px dashed #f59e0b; background: #fffbeb; border-radius: 14px; padding: 12px 14px; cursor: pointer; color: #78350f; transition: background .15s, border-color .15s; font: inherit; }
+        #kpYukleAlani:hover, #kpYukleAlani:focus-visible, #kpYukleAlani.kp-surukle { background: #fef3c7; border-color: #d97706; outline: none; }
+        #kpYukleAlani.kp-surukle { box-shadow: 0 0 0 4px rgba(245, 158, 11, .25); }
+        #kpYukleAlani .kp-ikon { font-size: 26px; line-height: 1; flex: none; }
+        #kpYukleAlani b { display: block; font-size: 13px; color: #78350f; }
+        #kpYukleAlani small { display: block; font-size: 11px; color: #92400e; line-height: 1.35; margin-top: 2px; }
+        #kpYukleAlani.kp-yukleniyor { opacity: .6; pointer-events: none; }
+        #kpYukleAlani.kp-yukleniyor b::after { content: " — okunuyor…"; font-weight: 600; }
+        .kp-dolduruldu { border-color: #10b981 !important; background-color: #ecfdf5 !important; box-shadow: 0 0 0 2px rgba(16, 185, 129, .2) !important; }
+
+        #kpPencere { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, .55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+        #kpPencere.hidden { display: none !important; }
+        body.kp-kilit { overflow: hidden; }
+        .kp-kart { background: #fff; color: #0f172a; width: 100%; max-width: 720px; max-height: calc(100vh - 32px); display: flex; flex-direction: column; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .35); overflow: hidden; }
+        .kp-kart-bas { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; background: #0f172a; color: #fff; }
+        .kp-kart-bas h2 { font-size: 15px; font-weight: 700; margin: 0; }
+        .kp-kapat { background: transparent; color: #cbd5e1; border: 0; font-size: 20px; line-height: 1; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+        .kp-kapat:hover { background: #1e293b; color: #fff; }
+        #kpPencereIcerik { padding: 14px 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+        #kpPencereIcerik > * { flex-shrink: 0; }
+        .kp-aciklama { color: #475569; font-size: 12.5px; margin: 0; }
+        .kp-tablo-kap { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+        .kp-tablo { width: 100%; border-collapse: collapse; }
+        .kp-tablo th { background: #f1f5f9; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: #475569; text-align: left; padding: 6px 8px; }
+        .kp-tablo td { border-top: 1px solid #e2e8f0; padding: 5px 8px; vertical-align: middle; font-size: 12.5px; }
+        .kp-tablo td:first-child { width: 32px; text-align: center; }
+        .kp-tablo td:nth-child(2) { width: 38%; font-weight: 600; color: #334155; }
+        .kp-tablo td:nth-child(2) label { cursor: pointer; }
+        .kp-tablo input[type="checkbox"], .kp-onay-satiri input[type="checkbox"] { width: 16px; height: 16px; accent-color: #4f46e5; cursor: pointer; flex: none; }
+        .kp-tablo input[type="text"] { width: 100%; font-size: 12.5px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; color: #0f172a; }
+        .kp-tablo tr.kp-bos td:nth-child(2) { color: #94a3b8; }
+        .kp-tablo tr.kp-bos input[type="text"] { background: #f8fafc; }
+        .kp-kutu { border-radius: 10px; padding: 9px 12px; font-size: 12.5px; line-height: 1.45; }
+        .kp-mavi { background: #eef2ff; border: 1px solid #c7d2fe; color: #312e81; display: flex; flex-direction: column; gap: 6px; }
+        .kp-mavi select { width: 100%; padding: 7px 8px; border: 1px solid #a5b4fc; border-radius: 6px; font-size: 12.5px; background: #fff; }
+        .kp-gri { background: #f8fafc; border: 1px solid #e2e8f0; color: #334155; }
+        .kp-bilgi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 16px; }
+        .kp-bilgi span { color: #64748b; font-weight: 600; }
+        .kp-sari { background: #fffbeb; border: 1px solid #fde68a; color: #78350f; }
+        .kp-onay-satiri { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: #334155; cursor: pointer; }
+        .kp-onay-satiri small { color: #64748b; }
+        .kp-uyari-satiri { background: #fef2f2; border: 1px solid #fecaca; color: #7f1d1d; border-radius: 10px; padding: 8px 10px; }
+        .kp-kart-alt { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 18px; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+        .kp-dugme { border: 0; border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .kp-dugme-ana { background: #4f46e5; color: #fff; }
+        .kp-dugme-ana:hover { background: #4338ca; }
+        .kp-dugme-ikincil { background: #e2e8f0; color: #334155; }
+        .kp-dugme-ikincil:hover { background: #cbd5e1; }
+        #kpBildirim { position: fixed; left: 50%; bottom: 84px; transform: translate(-50%, 20px); z-index: 110; background: #065f46; color: #fff; padding: 11px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 25px rgba(0, 0, 0, .25); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100vw - 32px); text-align: center; }
+        #kpBildirim.kp-goster { opacity: 1; transform: translate(-50%, 0); }
+        @media (min-width: 1024px) { #kpBildirim { bottom: 24px; } }
+        @media (max-width: 560px) {
+            .kp-bilgi { grid-template-columns: 1fr; }
+            .kp-tablo td:nth-child(2) { width: 34%; font-size: 11.5px; }
+            #kpPencere { padding: 8px; align-items: flex-end; }
+            .kp-kart { max-height: calc(100vh - 16px); }
+        }
+    </style>
 </head>
 <body class="bg-slate-100">
 
@@ -1259,6 +1324,9 @@
             </div>
             
             <div class="hidden md:flex items-center gap-2">
+                <button onclick="kararnameSec()" class="kp-ust-btn" title="MEBBİS'ten indirilen atama kararnamesini (PDF) yükleyin, bilgiler forma otomatik dolsun">
+                    📄 Kararname Yükle
+                </button>
                 <button onclick="fillSampleData()" class="bg-slate-800 hover:bg-slate-700 text-xs text-white px-3 py-2 rounded-lg font-semibold border border-slate-700 transition">
                     <i class="fa-solid fa-wand-magic-sparkles text-amber-400 mr-1"></i> Örnek Doldur
                 </button>
@@ -1275,6 +1343,7 @@
                     <i class="fa-solid fa-print"></i> Tek Sayfa Yazdır / PDF
                 </button>
                 <input type="file" id="iceriAktarInput" accept=".json,application/json" class="hidden" onchange="iceriAktarDosyaSecildi(event)">
+                <input type="file" id="kararnameInput" accept=".pdf,application/pdf" class="hidden" onchange="kararnameDosyaSecildi(event)">
             </div>
         </div>
     </header>
@@ -1287,6 +1356,9 @@
             
             <!-- Mobil Hızlı Butonlar -->
             <div class="md:hidden flex items-center justify-between gap-1.5 bg-slate-50 p-2.5 border-b border-slate-200">
+                <button onclick="kararnameSec()" class="kp-mobil-btn" title="Kararname Yükle (PDF)">
+                    📄 Kararname
+                </button>
                 <button onclick="fillSampleData()" class="text-xs bg-white border border-slate-300 text-slate-700 px-2 py-1.5 rounded-lg font-semibold active:scale-95 transition">
                     <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
                 </button>
@@ -1325,6 +1397,13 @@
 
                 <!-- TAB 1: Kimlik & Sicil -->
                 <div id="tab-content-1" class="tab-content space-y-3">
+                    <button type="button" id="kpYukleAlani" onclick="kararnameSec()">
+                        <span class="kp-ikon">📄</span>
+                        <span>
+                            <b>Kararnameden Otomatik Doldur</b>
+                            <small>MEBBİS'ten indirdiğiniz atama kararnamesini (PDF) buraya sürükleyin veya tıklayıp seçin. Kimlik, görev yeri, ünvan ve onay bilgileri forma otomatik yazılır.</small>
+                        </span>
+                    </button>
                     <h2 class="text-sm font-bold text-blue-900 border-b pb-2 flex items-center gap-2">
                         <i class="fa-solid fa-id-card text-blue-600"></i> Kimlik ve Sicil Numaraları
                     </h2>
@@ -4194,6 +4273,914 @@
             if (typeof initAileApp === 'function') initAileApp();
             showView('nakil');
         };
+    </script>
+
+    <!-- ============================================================ -->
+    <!-- ============ KARARNAMEDEN OTOMATİK DOLDURMA PENCERESİ ============ -->
+    <!-- ============================================================ -->
+    <div id="kpPencere" class="no-print hidden" role="dialog" aria-modal="true" aria-labelledby="kpPencereBaslik" onclick="if (event.target === this) kpPencereKapat()">
+        <div class="kp-kart">
+            <div class="kp-kart-bas">
+                <h2 id="kpPencereBaslik">📄 Kararnameden Okunan Bilgiler</h2>
+                <button type="button" class="kp-kapat" onclick="kpPencereKapat()" aria-label="Kapat">✕</button>
+            </div>
+            <div id="kpPencereIcerik"></div>
+            <div class="kp-kart-alt">
+                <button type="button" class="kp-dugme kp-dugme-ikincil" onclick="kpPencereKapat()">Vazgeç</button>
+                <button type="button" id="kpAktarBtn" class="kp-dugme kp-dugme-ana" onclick="kararnameyiFormaAktar()">✓ Forma Aktar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================= KARARNAME PDF OKUYUCU (çevrimdışı, kütüphanesiz) =================
+        // MEBBİS'ten indirilen atama kararnamesi PDF'indeki metni konumlarıyla birlikte çıkarır.
+        // Tarayıcının kendi DecompressionStream özelliğini kullanır; internet bağlantısı gerekmez.
+
+        const KP_WINANSI = { 128: '€', 130: '‚', 131: 'ƒ', 132: '„', 133: '…', 134: '†', 135: '‡', 136: 'ˆ', 137: '‰', 138: 'Š', 139: '‹', 140: 'Œ', 142: 'Ž', 145: '‘', 146: '’', 147: '“', 148: '”', 149: '•', 150: '–', 151: '—', 152: '˜', 153: '™', 154: 'š', 155: '›', 156: 'œ', 158: 'ž', 159: 'Ÿ' };
+
+        function kpBytesToLatin1(bytes) {
+            let s = '';
+            for (let i = 0; i < bytes.length; i += 8192) {
+                s += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+            }
+            return s;
+        }
+
+        async function kpInflate(bytes) {
+            const akis = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate'));
+            const parcalar = [];
+            const okuyucu = akis.getReader();
+            try {
+                while (true) {
+                    const { done, value } = await okuyucu.read();
+                    if (done) break;
+                    parcalar.push(value);
+                }
+            } catch (e) {
+                // Sonu bozuk akışlarda o ana kadar açılan kısım yeterlidir
+                if (!parcalar.length) throw e;
+            }
+            let toplam = 0;
+            parcalar.forEach(p => toplam += p.length);
+            const sonuc = new Uint8Array(toplam);
+            let k = 0;
+            parcalar.forEach(p => { sonuc.set(p, k); k += p.length; });
+            return sonuc;
+        }
+
+        // Basit PDF nesne ayrıştırıcısı (sözlük, dizi, isim, sayı, metin, referans)
+        class KpLexer {
+            constructor(s, pos) { this.s = s; this.p = pos || 0; }
+            bosluk() {
+                const s = this.s;
+                while (this.p < s.length) {
+                    const c = s.charCodeAt(this.p);
+                    if (c === 37) { while (this.p < s.length && s[this.p] !== '\n' && s[this.p] !== '\r') this.p++; }
+                    else if (c === 32 || c === 10 || c === 13 || c === 9 || c === 12 || c === 0) this.p++;
+                    else break;
+                }
+            }
+            sonraki() {
+                this.bosluk();
+                const s = this.s;
+                if (this.p >= s.length) return null;
+                const c = s[this.p];
+                if (c === '/') {
+                    let j = this.p + 1;
+                    while (j < s.length && !/[\s\/\[\]<>(){}%]/.test(s[j])) j++;
+                    const ad = s.slice(this.p + 1, j).replace(/#([0-9a-fA-F]{2})/g, (m, h) => String.fromCharCode(parseInt(h, 16)));
+                    this.p = j;
+                    return { t: 'name', v: ad };
+                }
+                if (c === '(') return { t: 'str', v: this.literal() };
+                if (c === '<') {
+                    if (s[this.p + 1] === '<') { this.p += 2; return { t: 'op', v: '<<' }; }
+                    const j = s.indexOf('>', this.p);
+                    let hex = s.slice(this.p + 1, j).replace(/\s+/g, '');
+                    if (hex.length % 2) hex += '0';
+                    let v = '';
+                    for (let i = 0; i < hex.length; i += 2) v += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+                    this.p = j + 1;
+                    return { t: 'str', v };
+                }
+                if (c === '>' && s[this.p + 1] === '>') { this.p += 2; return { t: 'op', v: '>>' }; }
+                if (c === '[' || c === ']' || c === '{' || c === '}') { this.p++; return { t: 'op', v: c }; }
+                let j = this.p;
+                while (j < s.length && !/[\s\/\[\]<>(){}%]/.test(s[j])) j++;
+                if (j === this.p) j++;
+                const kelime = s.slice(this.p, j);
+                this.p = j;
+                if (/^[+-]?(\d+\.?\d*|\.\d+)$/.test(kelime)) return { t: 'num', v: parseFloat(kelime) };
+                return { t: 'kw', v: kelime };
+            }
+            literal() {
+                const s = this.s;
+                let i = this.p + 1, derinlik = 1, v = '';
+                const kacis = { n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', '(': '(', ')': ')', '\\': '\\' };
+                while (i < s.length) {
+                    const c = s[i];
+                    if (c === '\\') {
+                        const d = s[i + 1];
+                        if (kacis[d] !== undefined) { v += kacis[d]; i += 2; }
+                        else if (/[0-7]/.test(d)) {
+                            let o = '';
+                            i++;
+                            while (o.length < 3 && /[0-7]/.test(s[i])) o += s[i++];
+                            v += String.fromCharCode(parseInt(o, 8) & 255);
+                        } else if (d === '\r' || d === '\n') { i += 2; if (d === '\r' && s[i] === '\n') i++; }
+                        else { v += d || ''; i += 2; }
+                        continue;
+                    }
+                    if (c === '(') derinlik++;
+                    if (c === ')') { derinlik--; if (derinlik === 0) { i++; break; } }
+                    v += c;
+                    i++;
+                }
+                this.p = i;
+                return v;
+            }
+            // Bir PDF değeri okur (referansları {ref:n} olarak döndürür)
+            deger(tok) {
+                tok = tok || this.sonraki();
+                if (!tok) return null;
+                if (tok.t === 'op' && tok.v === '<<') {
+                    const d = {};
+                    while (true) {
+                        const k = this.sonraki();
+                        if (!k || (k.t === 'op' && k.v === '>>')) break;
+                        if (k.t === 'name') d[k.v] = this.deger();
+                    }
+                    return d;
+                }
+                if (tok.t === 'op' && tok.v === '[') {
+                    const a = [];
+                    while (true) {
+                        const k = this.sonraki();
+                        if (!k || (k.t === 'op' && k.v === ']')) break;
+                        a.push(this.deger(k));
+                    }
+                    return a;
+                }
+                if (tok.t === 'num') {
+                    // "12 0 R" referansı mı?
+                    const kayit = this.p;
+                    const t2 = this.sonraki();
+                    if (t2 && t2.t === 'num') {
+                        const t3 = this.sonraki();
+                        if (t3 && t3.t === 'kw' && t3.v === 'R') return { ref: tok.v };
+                    }
+                    this.p = kayit;
+                    return tok.v;
+                }
+                if (tok.t === 'name') return { name: tok.v };
+                if (tok.t === 'str') return tok.v;
+                if (tok.t === 'kw') return tok.v === 'true' ? true : tok.v === 'false' ? false : tok.v === 'null' ? null : tok.v;
+                return null;
+            }
+        }
+
+        class KpBelge {
+            constructor(bytes) {
+                this.bytes = bytes;
+                this.s = kpBytesToLatin1(bytes);
+                this.nesneler = {};
+                this.akisOnbellek = {};
+                const re = /(\d+)\s+(\d+)\s+obj\b/g;
+                let m;
+                while ((m = re.exec(this.s))) {
+                    const lx = new KpLexer(this.s, re.lastIndex);
+                    let dict;
+                    try { dict = lx.deger(); } catch (e) { continue; }
+                    const nesne = { dict, akisBas: -1, akisSon: -1 };
+                    lx.bosluk();
+                    if (this.s.startsWith('stream', lx.p)) {
+                        let bas = lx.p + 6;
+                        if (this.s[bas] === '\r') bas++;
+                        if (this.s[bas] === '\n') bas++;
+                        let uzunluk = dict && typeof dict.Length === 'number' ? dict.Length : -1;
+                        let son = uzunluk >= 0 ? bas + uzunluk : -1;
+                        if (son < 0 || this.s.substr(son, 30).indexOf('endstream') < 0) {
+                            son = this.s.indexOf('endstream', bas);
+                        }
+                        nesne.akisBas = bas;
+                        nesne.akisSon = son;
+                        re.lastIndex = son > 0 ? son : re.lastIndex;
+                    }
+                    this.nesneler[parseInt(m[1], 10)] = nesne;
+                }
+            }
+            coz(v) {
+                let sinir = 0;
+                while (v && typeof v === 'object' && v.ref !== undefined && sinir++ < 20) {
+                    const n = this.nesneler[v.ref];
+                    v = n ? n.dict : null;
+                }
+                return v;
+            }
+            async akis(ref) {
+                const no = ref && ref.ref !== undefined ? ref.ref : ref;
+                if (this.akisOnbellek[no]) return this.akisOnbellek[no];
+                const n = this.nesneler[no];
+                if (!n || n.akisBas < 0) return '';
+                let veri = this.bytes.subarray(n.akisBas, n.akisSon);
+                const filtre = this.coz(n.dict.Filter);
+                const filtreler = Array.isArray(filtre) ? filtre.map(f => this.coz(f)) : (filtre ? [filtre] : []);
+                for (const f of filtreler) {
+                    if (f && (f.name === 'FlateDecode' || f.name === 'Fl')) veri = await kpInflate(veri);
+                    else if (f) return ''; // Desteklenmeyen filtre (ör. görüntü)
+                }
+                const metin = kpBytesToLatin1(veri);
+                this.akisOnbellek[no] = metin;
+                return metin;
+            }
+            sayfalar() {
+                const liste = [];
+                const gez = (dugum, mirasKaynak) => {
+                    const d = this.coz(dugum);
+                    if (!d) return;
+                    const kaynak = d.Resources ? this.coz(d.Resources) : mirasKaynak;
+                    const tip = d.Type && d.Type.name;
+                    if (tip === 'Pages' || d.Kids) {
+                        (this.coz(d.Kids) || []).forEach(k => gez(k, kaynak));
+                    } else {
+                        liste.push({ dict: d, kaynak });
+                    }
+                };
+                const katalogNo = Object.keys(this.nesneler).find(k => {
+                    const d = this.nesneler[k].dict;
+                    return d && d.Type && d.Type.name === 'Catalog';
+                });
+                if (katalogNo) gez(this.nesneler[katalogNo].dict.Pages, null);
+                return liste;
+            }
+        }
+
+        // ToUnicode CMap'ini çözer
+        function kpCmapCoz(metin) {
+            const harita = {};
+            let kodUzunluk = 2;
+            const alan = metin.match(/begincodespacerange\s*<([0-9a-fA-F]+)>/);
+            if (alan) kodUzunluk = alan[1].length / 2;
+            const hexMetin = h => {
+                let s = '';
+                for (let i = 0; i + 4 <= h.length; i += 4) s += String.fromCharCode(parseInt(h.substr(i, 4), 16));
+                return s;
+            };
+            const charBloklari = metin.match(/beginbfchar([\s\S]*?)endbfchar/g) || [];
+            charBloklari.forEach(b => {
+                const re = /<([0-9a-fA-F]+)>\s*<([0-9a-fA-F]*)>/g;
+                let m;
+                while ((m = re.exec(b))) harita[parseInt(m[1], 16)] = hexMetin(m[2]);
+            });
+            const aralikBloklari = metin.match(/beginbfrange([\s\S]*?)endbfrange/g) || [];
+            aralikBloklari.forEach(b => {
+                const re = /<([0-9a-fA-F]+)>\s*<([0-9a-fA-F]+)>\s*(<([0-9a-fA-F]*)>|\[([^\]]*)\])/g;
+                let m;
+                while ((m = re.exec(b))) {
+                    const bas = parseInt(m[1], 16), son = parseInt(m[2], 16);
+                    if (son - bas > 65535) continue;
+                    if (m[4] !== undefined) {
+                        const ilk = m[4];
+                        const sonKarakter = parseInt(ilk.slice(-4), 16);
+                        for (let c = bas; c <= son; c++) {
+                            harita[c] = hexMetin(ilk.slice(0, -4)) + String.fromCharCode(sonKarakter + (c - bas));
+                        }
+                    } else {
+                        const ogeler = m[5].match(/<([0-9a-fA-F]*)>/g) || [];
+                        ogeler.forEach((o, i) => { harita[bas + i] = hexMetin(o.slice(1, -1)); });
+                    }
+                }
+            });
+            return { harita, kodUzunluk };
+        }
+
+        async function kpFontHazirla(belge, fontRef, onbellek) {
+            const anahtar = fontRef && fontRef.ref !== undefined ? 'r' + fontRef.ref : null;
+            if (anahtar && onbellek[anahtar]) return onbellek[anahtar];
+            const f = belge.coz(fontRef) || {};
+            const font = { ikiBayt: false, harita: null, genislikler: {}, varsayilan: 500 };
+            const alt = f.Subtype && f.Subtype.name;
+            if (alt === 'Type0') {
+                font.ikiBayt = true;
+                const alt0 = (belge.coz(f.DescendantFonts) || [])[0];
+                const cid = belge.coz(alt0) || {};
+                font.varsayilan = typeof cid.DW === 'number' ? cid.DW : 1000;
+                const w = belge.coz(cid.W) || [];
+                for (let i = 0; i < w.length;) {
+                    const bas = w[i], ikinci = belge.coz(w[i + 1]);
+                    if (Array.isArray(ikinci)) {
+                        ikinci.forEach((g, j) => { font.genislikler[bas + j] = g; });
+                        i += 2;
+                    } else {
+                        for (let c = bas; c <= ikinci && c - bas < 65536; c++) font.genislikler[c] = w[i + 2];
+                        i += 3;
+                    }
+                }
+            } else {
+                const ilk = typeof f.FirstChar === 'number' ? f.FirstChar : 0;
+                (belge.coz(f.Widths) || []).forEach((g, j) => { font.genislikler[ilk + j] = g; });
+            }
+            if (f.ToUnicode) {
+                const cm = kpCmapCoz(await belge.akis(f.ToUnicode));
+                font.harita = cm.harita;
+                if (alt !== 'Type0') font.ikiBayt = cm.kodUzunluk === 2;
+            }
+            if (anahtar) onbellek[anahtar] = font;
+            return font;
+        }
+
+        // Ham metnin metin uzayındaki genişliği (yazı tipi boyutu 1 için)
+        function kpGenislik(font, ham, d) {
+            let toplam = 0;
+            const adim = font.ikiBayt ? 2 : 1;
+            for (let i = 0; i + adim <= ham.length; i += adim) {
+                const kod = font.ikiBayt ? (ham.charCodeAt(i) << 8) | ham.charCodeAt(i + 1) : ham.charCodeAt(i);
+                const g = font.genislikler[kod] !== undefined ? font.genislikler[kod] : font.varsayilan;
+                toplam += (g / 1000) * d.boyut + d.tc + (!font.ikiBayt && kod === 32 ? d.tw : 0);
+            }
+            return toplam;
+        }
+
+        function kpMetniCoz(font, ham) {
+            let s = '';
+            if (font.ikiBayt) {
+                for (let i = 0; i + 1 < ham.length; i += 2) {
+                    const kod = (ham.charCodeAt(i) << 8) | ham.charCodeAt(i + 1);
+                    s += font.harita && font.harita[kod] !== undefined ? font.harita[kod] : '';
+                }
+            } else {
+                for (let i = 0; i < ham.length; i++) {
+                    const kod = ham.charCodeAt(i);
+                    if (font.harita && font.harita[kod] !== undefined) s += font.harita[kod];
+                    else s += KP_WINANSI[kod] || String.fromCharCode(kod);
+                }
+            }
+            return s;
+        }
+
+        function kpCarp(a, b) {
+            return [
+                a[0] * b[0] + a[1] * b[2], a[0] * b[1] + a[1] * b[3],
+                a[2] * b[0] + a[3] * b[2], a[2] * b[1] + a[3] * b[3],
+                a[4] * b[0] + a[5] * b[2] + b[4], a[4] * b[1] + a[5] * b[3] + b[5]
+            ];
+        }
+
+        // Bir içerik akışını çalıştırıp metin parçalarını (x, y, metin) toplar
+        async function kpIcerikIsle(belge, icerik, kaynak, baslangicCtm, parcalar, fontOnbellek, derinlik) {
+            if (derinlik > 8) return;
+            kaynak = belge.coz(kaynak) || {};
+            const fontlar = belge.coz(kaynak.Font) || {};
+            const xobjeler = belge.coz(kaynak.XObject) || {};
+            const gsler = belge.coz(kaynak.ExtGState) || {};
+            let d = { ctm: baslangicCtm.slice(), alfa: 1, font: null, boyut: 10, tl: 0, tc: 0, tw: 0, tz: 1 };
+            const yigin = [];
+            let tm = [1, 0, 0, 1, 0, 0], tlm = [1, 0, 0, 1, 0, 0];
+            const lx = new KpLexer(icerik, 0);
+            let islenenler = [];
+
+            const metinEkle = (metin, ilerleme) => {
+                if (!d.font) return;
+                const m = kpCarp(tm, d.ctm);
+                const egik = Math.abs(m[1]) > 0.01 || Math.abs(m[2]) > 0.01;
+                tm = kpCarp([1, 0, 0, 1, ilerleme * d.tz, 0], tm);
+                // Filigranlar (yarı saydam veya eğik yazı) atlanır
+                if (!egik && d.alfa >= 0.5 && metin.trim()) {
+                    const son = kpCarp(tm, d.ctm);
+                    parcalar.push({ x: m[4], x2: son[4], y: m[5], s: metin, h: Math.abs(m[3]) * d.boyut || d.boyut });
+                }
+            };
+            const hamEkle = (ham) => {
+                if (!d.font) return;
+                metinEkle(kpMetniCoz(d.font, ham), kpGenislik(d.font, ham, d));
+            };
+
+            while (true) {
+                const tok = lx.sonraki();
+                if (!tok) break;
+                if (tok.t !== 'kw') {
+                    if (tok.t === 'op' && (tok.v === '[' || tok.v === '<<')) islenenler.push(lx.deger(tok));
+                    else if (tok.t === 'num') islenenler.push(tok.v);
+                    else if (tok.t === 'name') islenenler.push({ name: tok.v });
+                    else islenenler.push(tok.v);
+                    continue;
+                }
+                const op = tok.v;
+                const a = islenenler;
+                islenenler = [];
+                switch (op) {
+                    case 'q': yigin.push(Object.assign({}, d, { ctm: d.ctm.slice() })); break;
+                    case 'Q': if (yigin.length) d = yigin.pop(); break;
+                    case 'cm': if (a.length >= 6) d.ctm = kpCarp(a.slice(-6), d.ctm); break;
+                    case 'gs': {
+                        const g = a[0] && belge.coz(gsler[a[0].name]);
+                        if (g && typeof g.ca === 'number') d.alfa = g.ca;
+                        break;
+                    }
+                    case 'BT': tm = [1, 0, 0, 1, 0, 0]; tlm = [1, 0, 0, 1, 0, 0]; break;
+                    case 'Tf':
+                        if (a[0] && a[0].name) d.font = await kpFontHazirla(belge, fontlar[a[0].name], fontOnbellek);
+                        if (typeof a[1] === 'number') d.boyut = a[1];
+                        break;
+                    case 'TL': d.tl = a[0] || 0; break;
+                    case 'Tc': d.tc = a[0] || 0; break;
+                    case 'Tw': d.tw = a[0] || 0; break;
+                    case 'Tz': d.tz = (typeof a[0] === 'number' ? a[0] : 100) / 100; break;
+                    case 'Td': case 'TD':
+                        if (op === 'TD') d.tl = -(a[1] || 0);
+                        tlm = kpCarp([1, 0, 0, 1, a[0] || 0, a[1] || 0], tlm); tm = tlm.slice(); break;
+                    case 'Tm': if (a.length >= 6) { tlm = a.slice(-6); tm = tlm.slice(); } break;
+                    case 'T*': tlm = kpCarp([1, 0, 0, 1, 0, -d.tl], tlm); tm = tlm.slice(); break;
+                    case 'Tj': if (typeof a[0] === 'string') hamEkle(a[0]); break;
+                    case "'": tlm = kpCarp([1, 0, 0, 1, 0, -d.tl], tlm); tm = tlm.slice(); if (typeof a[0] === 'string') hamEkle(a[0]); break;
+                    case '"': tlm = kpCarp([1, 0, 0, 1, 0, -d.tl], tlm); tm = tlm.slice(); if (typeof a[2] === 'string') hamEkle(a[2]); break;
+                    case 'TJ': {
+                        const dizi = Array.isArray(a[0]) ? a[0] : [];
+                        if (!d.font) break;
+                        let birlesik = '', ilerleme = 0;
+                        dizi.forEach(o => {
+                            if (typeof o === 'string') {
+                                birlesik += kpMetniCoz(d.font, o);
+                                ilerleme += kpGenislik(d.font, o, d);
+                            } else if (typeof o === 'number') {
+                                ilerleme -= (o / 1000) * d.boyut;
+                                if (o < -250 && birlesik && !birlesik.endsWith(' ')) birlesik += ' '; // Büyük boşluk = kelime arası
+                            }
+                        });
+                        if (birlesik) metinEkle(birlesik, ilerleme);
+                        break;
+                    }
+                    case 'Do': {
+                        const ad = a[0] && a[0].name;
+                        const ref = ad && xobjeler[ad];
+                        const x = ref && belge.coz(ref);
+                        if (x && x.Subtype && x.Subtype.name === 'Form') {
+                            const matris = Array.isArray(x.Matrix) ? x.Matrix : [1, 0, 0, 1, 0, 0];
+                            const altIcerik = await belge.akis(ref);
+                            await kpIcerikIsle(belge, altIcerik, x.Resources || kaynak, kpCarp(matris, d.ctm), parcalar, fontOnbellek, derinlik + 1);
+                        }
+                        break;
+                    }
+                    case 'BI': {
+                        // Satır içi görüntüyü atla
+                        const son = icerik.indexOf('EI', lx.p);
+                        lx.p = son < 0 ? icerik.length : son + 2;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Harf aralığı (kerning) yüzünden bölünmüş kelimeleri birleştirir: "A" + "YŞE" -> "AYŞE"
+        function kpBitisikleriBirlestir(parcalar) {
+            const sirali = parcalar.slice().sort((a, b) => (Math.abs(a.y - b.y) < 1 ? a.x - b.x : b.y - a.y));
+            const sonuc = [];
+            sirali.forEach(p => {
+                const o = sonuc[sonuc.length - 1];
+                if (o && Math.abs(o.y - p.y) < 1 && Math.abs(o.h - p.h) < 0.5) {
+                    const bosluk = p.x - o.x2;
+                    if (bosluk > -o.h * 0.5 && bosluk < o.h * 0.2) {
+                        const araya = bosluk > o.h * 0.08 && !/\s$/.test(o.s) && !/^\s/.test(p.s) ? ' ' : '';
+                        o.s += araya + p.s;
+                        o.x2 = p.x2;
+                        return;
+                    }
+                }
+                sonuc.push(Object.assign({}, p));
+            });
+            return sonuc;
+        }
+
+        // PDF'teki her sayfanın metin parçalarını döndürür
+        async function kpPdfMetinParcalari(arrayBuffer) {
+            const belge = new KpBelge(new Uint8Array(arrayBuffer));
+            const sonuc = [];
+            const fontOnbellek = {};
+            for (const sayfa of belge.sayfalar()) {
+                let icerikler = sayfa.dict.Contents;
+                icerikler = Array.isArray(belge.coz(icerikler)) ? belge.coz(icerikler) : [icerikler];
+                let metin = '';
+                for (const c of icerikler) metin += (await belge.akis(c)) + '\n';
+                const parcalar = [];
+                await kpIcerikIsle(belge, metin, sayfa.kaynak, [1, 0, 0, 1, 0, 0], parcalar, fontOnbellek, 0);
+                sonuc.push(kpBitisikleriBirlestir(parcalar));
+            }
+            return sonuc;
+        }
+
+        // ================= KARARNAME ALANLARINI AYIKLAMA =================
+
+        function kpAnahtar(s) {
+            return (s || '').toLocaleLowerCase('tr').replace(/[^a-zçğıöşü]/g, '');
+        }
+
+        const KP_ETIKETLER = {
+            sayi: ['sayı'], konu: ['konu'], tebligatAdresi: ['tebligat adresi'],
+            tcNo: ['t.c.kimlik no', 't.c. kimlik no', 'tc kimlik no', 'kimlik no'],
+            adSoyad: ['adı soyadı', 'adı ve soyadı'], dogum: ['doğum yılı / yeri', 'doğum tarihi / yeri', 'doğum yeri ve tarihi'],
+            okul: ['bitirdiği okul', 'mezun olduğu okul', 'öğrenim durumu'],
+            gorevYeri: ['görev yeri', 'kurumu'], alan: ['alanı', 'branşı'], hizmetSinifi: ['hizmet sınıfı'],
+            unvan: ['ünvanı', 'unvanı', 'kadro unvanı'], gorev: ['görevi'], derece: ['derece / kademe', 'derece/kademe', 'derecesi / kademesi'],
+            bakanlikTarih: ['bakanlık onay tarihi'], bakanlikSayi: ['bakanlık onay sayısı'],
+            valilikTarih: ['valilik onay tarihi'], valilikSayi: ['valilik onay sayısı'],
+            neden: ['atama nedeni ve', 'atama nedeni', 'atama nedeni ve açıklama'], aciklama: ['açıklama']
+        };
+        const KP_ETIKET_HARITA = {};
+        Object.keys(KP_ETIKETLER).forEach(k => KP_ETIKETLER[k].forEach(e => { KP_ETIKET_HARITA[kpAnahtar(e)] = k; }));
+
+        const KP_TARIH_RE = /^\d{1,2}[.\/-]\d{1,2}[.\/-]\d{4}$/;
+
+        function kpTarihNokta(t) {
+            const m = (t || '').match(/(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})/);
+            return m ? `${m[1].padStart(2, '0')}.${m[2].padStart(2, '0')}.${m[3]}` : '';
+        }
+
+        // Tek sayfalık metin parçalarından kararname kaydı oluşturur
+        function kpSayfaCoz(parcalar) {
+            const ogeler = parcalar.map(p => Object.assign({}, p, { s: p.s.replace(/\s+/g, ' ').trim() })).filter(p => p.s);
+
+            // Bölüm başlıkları (y konumuna göre)
+            const baslikBul = re => { const o = ogeler.find(p => re.test(p.s.toLocaleUpperCase('tr'))); return o ? o.y : null; };
+            const yAtandigi = baslikBul(/ATANDI[ĞG]I G[ÖO]REVE/);
+            const yAyrildigi = baslikBul(/AYRILDI[ĞG]I G[ÖO]REV/);
+            const yEsas = baslikBul(/ATAMAYA ESAS/);
+            const bolum = y => {
+                const sinirlar = [['esas', yEsas], ['ayrildigi', yAyrildigi], ['atandigi', yAtandigi]]
+                    .filter(b => b[1] !== null).sort((a, b) => a[1] - b[1]);
+                for (const [ad, by] of sinirlar) if (y < by) return ad;
+                return 'ust';
+            };
+
+            const etiketler = [];
+            const degerler = [];
+            ogeler.forEach(o => {
+                const anahtar = KP_ETIKET_HARITA[kpAnahtar(o.s)];
+                if (anahtar) etiketler.push(Object.assign(o, { alan: anahtar, bolum: bolum(o.y), satirlar: [] }));
+                else degerler.push(o);
+            });
+
+            // Her değeri, aynı satırdaki en yakın soldaki etikete bağla
+            const kalan = [];
+            degerler.forEach(d => {
+                if (d.s === ':') return;
+                let enIyi = null;
+                etiketler.forEach(e => {
+                    if (e.x >= d.x - 1) return;
+                    const dy = Math.abs(e.y - d.y);
+                    if (dy > Math.max(7, d.h * 0.9)) return;
+                    if (!enIyi || dy < enIyi.dy - 2 || (Math.abs(dy - enIyi.dy) <= 2 && e.x > enIyi.e.x)) enIyi = { e, dy };
+                });
+                if (enIyi && !(enIyi.e.alan === 'konu' && KP_TARIH_RE.test(d.s) && d.x > 350)) enIyi.e.satirlar.push(d);
+                else kalan.push(d);
+            });
+
+            const sonuc = { atandigi: {}, ayrildigi: {}, esas: {}, ust: {} };
+            etiketler.forEach(e => {
+                if (!e.satirlar.length) return;
+                const satirlar = [];
+                e.satirlar.sort((a, b) => (b.y - a.y) || (a.x - b.x)).forEach(p => {
+                    const son = satirlar[satirlar.length - 1];
+                    if (son && Math.abs(son.y - p.y) < 2) son.s += ' ' + p.s;
+                    else satirlar.push({ y: p.y, s: p.s });
+                });
+                const hedef = sonuc[e.bolum];
+                const alan = e.alan === 'aciklama' ? 'neden' : e.alan;
+                const metinler = satirlar.map(s => s.s.replace(/^:\s*/, '').trim()).filter(Boolean);
+                if (!metinler.length) return;
+                if (hedef[alan]) hedef[alan] = hedef[alan].concat(metinler);
+                else hedef[alan] = metinler;
+            });
+
+            // Kimlik alanları "ust" bölümünde (ilk bölüm başlığından önce) yer alır
+            const ust = sonuc.ust;
+            const tek = (o, k) => (o[k] || []).join(' ').replace(/\s+/g, ' ').trim();
+            const tarihOge = kalan.find(p => KP_TARIH_RE.test(p.s) && (yAtandigi === null || p.y > yAtandigi)) ||
+                ogeler.find(p => KP_TARIH_RE.test(p.s) && p.x > 350 && (yAtandigi === null || p.y > yAtandigi));
+
+            const gorevYeriAyir = satirlar => {
+                const tum = (satirlar || []).join(' ');
+                let ilIlce = '', kurum = '', kurumKodu = '';
+                (satirlar || []).forEach(s => {
+                    const m = s.match(/^\((\d+)\)\s*(.+)$/);
+                    if (m) { kurumKodu = m[1]; kurum = m[2].trim(); }
+                    else if (/\//.test(s) && !ilIlce) ilIlce = s.trim();
+                    else kurum = kurum ? kurum + ' ' + s.trim() : s.trim();
+                });
+                if (!kurum && !ilIlce) kurum = tum;
+                return { ilIlce, kurum, kurumKodu };
+            };
+
+            const gorevBilgisi = b => {
+                const yer = gorevYeriAyir(b.gorevYeri);
+                return {
+                    ilIlce: yer.ilIlce, kurum: yer.kurum, kurumKodu: yer.kurumKodu,
+                    alan: tek(b, 'alan'), hizmetSinifi: tek(b, 'hizmetSinifi'),
+                    unvan: tek(b, 'unvan'), gorev: tek(b, 'gorev'), derece: tek(b, 'derece')
+                };
+            };
+
+            const kayit = {
+                tcNo: (tek(ust, 'tcNo').match(/\d{11}/) || [''])[0],
+                adSoyad: tek(ust, 'adSoyad'),
+                dogum: tek(ust, 'dogum'),
+                okul: tek(ust, 'okul'),
+                tebligatAdresi: tek(ust, 'tebligatAdresi'),
+                yaziSayi: tek(ust, 'sayi'),
+                yaziTarihi: tarihOge ? kpTarihNokta(tarihOge.s) : '',
+                atandigi: gorevBilgisi(sonuc.atandigi),
+                ayrildigi: gorevBilgisi(sonuc.ayrildigi),
+                bakanlikTarih: kpTarihNokta(tek(sonuc.esas, 'bakanlikTarih')),
+                bakanlikSayi: tek(sonuc.esas, 'bakanlikSayi'),
+                valilikTarih: kpTarihNokta(tek(sonuc.esas, 'valilikTarih')),
+                valilikSayi: tek(sonuc.esas, 'valilikSayi'),
+                neden: tek(sonuc.esas, 'neden')
+            };
+            if (!kayit.adSoyad) kayit.adSoyad = tek(ust, 'konu');
+            return kayit;
+        }
+
+        function kararnameCoz(sayfalar) {
+            return sayfalar.map(kpSayfaCoz).filter(k => k.tcNo || k.adSoyad);
+        }
+
+        // ================= KARARNAME YÜKLEME ARAYÜZÜ =================
+
+        let kpKayitlar = [];
+        let kpSeciliIndeks = 0;
+
+        function kpHtml(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function kpBildirim(mesaj) {
+            let el = document.getElementById('kpBildirim');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'kpBildirim';
+                el.className = 'no-print';
+                document.body.appendChild(el);
+            }
+            el.textContent = mesaj;
+            el.classList.add('kp-goster');
+            clearTimeout(el._zaman);
+            el._zaman = setTimeout(() => el.classList.remove('kp-goster'), 6000);
+        }
+
+        function kararnameSec() {
+            document.getElementById('kararnameInput').click();
+        }
+
+        function kararnameDosyaSecildi(event) {
+            const dosya = event.target.files[0];
+            event.target.value = '';
+            if (dosya) kararnameIsle(dosya);
+        }
+
+        async function kararnameIsle(dosya) {
+            const pdfMi = /\.pdf$/i.test(dosya.name) || dosya.type === 'application/pdf';
+            if (!pdfMi) {
+                alert('Lütfen MEBBİS\'ten indirdiğiniz PDF formatındaki atama kararnamesini seçiniz.');
+                return;
+            }
+            if (typeof DecompressionStream === 'undefined') {
+                alert('Tarayıcınız kararname okumayı desteklemiyor. Lütfen Chrome, Edge veya Firefox\'un güncel sürümünü kullanınız.');
+                return;
+            }
+            const alan = document.getElementById('kpYukleAlani');
+            if (alan) alan.classList.add('kp-yukleniyor');
+            try {
+                const sayfalar = await kpPdfMetinParcalari(await dosya.arrayBuffer());
+                kpKayitlar = kararnameCoz(sayfalar);
+                if (!kpKayitlar.length) {
+                    const metinVar = sayfalar.some(p => p.length);
+                    alert(metinVar
+                        ? 'Bu PDF\'te atama kararnamesi bilgileri bulunamadı.\nLütfen MEBBİS\'ten indirilen atama kararnamesini yükleyiniz.'
+                        : 'Bu PDF\'te okunabilir yazı yok (taranmış veya fotoğraftan oluşturulmuş olabilir).\nLütfen MEBBİS\'ten indirilen orijinal PDF dosyasını yükleyiniz.');
+                    return;
+                }
+                kpPencereAc(0);
+            } catch (err) {
+                console.error(err);
+                alert('Kararname okunamadı. Dosya bozuk veya desteklenmeyen bir biçimde olabilir.\n\nAyrıntı: ' + (err && err.message ? err.message : err));
+            } finally {
+                if (alan) alan.classList.remove('kp-yukleniyor');
+            }
+        }
+
+        function kpUnvan(g) {
+            const u = (g.gorev || g.unvan || '').trim();
+            if (u.toLocaleLowerCase('tr') === 'öğretmen' && g.alan) return `${g.alan} Öğretmeni`;
+            return u;
+        }
+
+        function kpGorevYeri(g) {
+            return [g.kurum, g.ilIlce].filter(Boolean).join(' - ');
+        }
+
+        function kpKariyer(g) {
+            const u = ((g.gorev || '') + ' ' + (g.unvan || '')).toLocaleLowerCase('tr');
+            if (u.includes('başöğretmen')) return 'Başöğretmen';
+            if (u.includes('uzman öğretmen')) return 'Uzman Öğretmen';
+            if (u.includes('öğretmen')) return 'Öğretmen';
+            return '';
+        }
+
+        function kpOnay(k) {
+            if (k.bakanlikTarih || k.bakanlikSayi) return { makam: 'Milli Eğitim Bakanlığı', tarih: k.bakanlikTarih, sayi: k.bakanlikSayi };
+            if (k.valilikTarih || k.valilikSayi) {
+                const il = (k.atandigi.ilIlce || '').split('/')[0].trim();
+                const ilAdi = il ? il.charAt(0) + il.slice(1).toLocaleLowerCase('tr') : '';
+                return { makam: ilAdi ? `${ilAdi} Valiliği` : 'Valilik', tarih: k.valilikTarih, sayi: k.valilikSayi };
+            }
+            return { makam: '', tarih: '', sayi: '' };
+        }
+
+        // Kararname kaydını nakil formundaki alanlara eşler
+        function kpAlanListesi(k) {
+            const onay = kpOnay(k);
+            const kararname = [onay.tarih, onay.sayi ? `${onay.sayi} Sayılı` : ''].filter(Boolean).join(' / ');
+            return [
+                { id: 'in_adSoyad', etiket: 'Adı Soyadı', deger: k.adSoyad },
+                { id: 'in_tcNo', etiket: 'T.C. Kimlik No', deger: k.tcNo },
+                { id: 'in_eskiUnvan', etiket: 'Eski Ünvanı', deger: kpUnvan(k.ayrildigi) },
+                { id: 'in_yeniUnvan', etiket: 'Yeni Ünvanı', deger: kpUnvan(k.atandigi) },
+                { id: 'in_eskiGorevYeri', etiket: 'Eski Görev Yeri', deger: kpGorevYeri(k.ayrildigi) },
+                { id: 'in_yeniGorevYeri', etiket: 'Yeni Görev Yeri', deger: kpGorevYeri(k.atandigi) },
+                { id: 'in_eskiDerece', etiket: 'Eski Derece / Kademe', deger: k.ayrildigi.derece },
+                { id: 'in_yeniDerece', etiket: 'Yeni Derece / Kademe', deger: k.atandigi.derece },
+                { id: 'in_kararname', etiket: 'Atama Kararname Tarih ve No', deger: kararname },
+                { id: 'in_ogrenim', etiket: 'Öğrenim Durumu', deger: k.okul },
+                { id: 'in_kariyerDurumu', etiket: 'Kariyer Durumu', deger: kpKariyer(k.atandigi), secim: true }
+            ];
+        }
+
+        function kpPencereAc(indeks) {
+            kpSeciliIndeks = indeks;
+            const k = kpKayitlar[indeks];
+            const alanlar = kpAlanListesi(k);
+            const onay = kpOnay(k);
+            const mevcutTc = (document.getElementById('in_tcNo').value || '').trim();
+            const baskaKisi = mevcutTc && mevcutTc !== k.tcNo;
+
+            let kisiSecimi = '';
+            if (kpKayitlar.length > 1) {
+                kisiSecimi = `<div class="kp-kutu kp-mavi">
+                    <label for="kpKisiSec"><b>Bu dosyada ${kpKayitlar.length} kişinin kararnamesi var.</b> Aktarılacak kişiyi seçiniz:</label>
+                    <select id="kpKisiSec" onchange="kpPencereAc(parseInt(this.value, 10))">
+                        ${kpKayitlar.map((r, i) => `<option value="${i}"${i === indeks ? ' selected' : ''}>${i + 1}. ${kpHtml(r.adSoyad)} (${kpHtml(r.tcNo)})</option>`).join('')}
+                    </select>
+                </div>`;
+            }
+
+            const satirlar = alanlar.map((a, i) => `
+                <tr class="${a.deger ? '' : 'kp-bos'}">
+                    <td><input type="checkbox" id="kpSec${i}" ${a.deger ? 'checked' : ''} aria-label="${kpHtml(a.etiket)} alanını aktar"></td>
+                    <td><label for="kpDeger${i}">${kpHtml(a.etiket)}</label></td>
+                    <td><input type="text" id="kpDeger${i}" value="${kpHtml(a.deger)}" placeholder="Kararnamede yok" oninput="document.getElementById('kpSec${i}').checked = this.value.trim() !== ''"${a.secim ? ' list="kpKariyerListe"' : ''}></td>
+                </tr>`).join('');
+
+            const bilgi = [
+                ['Atama Nedeni', k.neden],
+                ['Onay Makamı', onay.makam],
+                ['Yazı Tarihi / Sayısı', [k.yaziTarihi, k.yaziSayi].filter(Boolean).join(' - ')],
+                ['Doğum Yılı / Yeri', k.dogum],
+                ['Ayrıldığı Kurum Kodu', k.ayrildigi.kurumKodu],
+                ['Atandığı Kurum Kodu', k.atandigi.kurumKodu],
+                ['Hizmet Sınıfı', k.atandigi.hizmetSinifi]
+            ].filter(b => b[1]).map(b => `<div><span>${kpHtml(b[0])}:</span> ${kpHtml(b[1])}</div>`).join('');
+
+            const eksikler = alanlar.filter(a => !a.deger).map(a => a.etiket);
+
+            document.getElementById('kpPencereIcerik').innerHTML = `
+                ${kisiSecimi}
+                <p class="kp-aciklama">Kararnameden okunan bilgiler aşağıdadır. Kontrol edip gerekirse düzeltin; işaretli alanlar forma aktarılacaktır.</p>
+                <div class="kp-tablo-kap">
+                    <table class="kp-tablo">
+                        <thead><tr><th></th><th>Form Alanı</th><th>Kararnameden Okunan</th></tr></thead>
+                        <tbody>${satirlar}</tbody>
+                    </table>
+                </div>
+                <datalist id="kpKariyerListe"><option value="Öğretmen"><option value="Uzman Öğretmen"><option value="Başöğretmen"></datalist>
+                ${bilgi ? `<div class="kp-kutu kp-gri kp-bilgi">${bilgi}</div>` : ''}
+                ${eksikler.length ? `<div class="kp-kutu kp-sari">Kararnamede yer almayan alanlar: <b>${kpHtml(eksikler.join(', '))}</b>. Bunları ve tebliğ, ayrılış, hak kazanma tarihlerini elle giriniz.</div>` : ''}
+                <label class="kp-onay-satiri"><input type="checkbox" id="kpYollukAile" checked> Sürekli Görev Yolluğu ve Aile Durumu ekranlarına da aktar</label>
+                ${baskaKisi ? `<label class="kp-onay-satiri kp-uyari-satiri"><input type="checkbox" id="kpTemizle" checked> Formda başka bir personelin (T.C. ${kpHtml(mevcutTc)}) bilgileri var; önce formu temizle <small>(imza yetkilileri korunur)</small></label>` : ''}
+            `;
+            document.getElementById('kpPencere').classList.remove('hidden');
+            document.body.classList.add('kp-kilit');
+            setTimeout(() => { const b = document.getElementById('kpAktarBtn'); if (b) b.focus(); }, 50);
+        }
+
+        function kpPencereKapat() {
+            document.getElementById('kpPencere').classList.add('hidden');
+            document.body.classList.remove('kp-kilit');
+        }
+
+        function kpFormuTemizle() {
+            const korunacaklar = ['duzenleyenUnvan', 'duzenleyenAd', 'gerceklesUnvan', 'gerceklesAd', 'harcamaUnvan', 'harcamaAd'];
+            const sakla = {};
+            korunacaklar.forEach(f => { const el = document.getElementById('in_' + f); if (el) sakla[f] = el.value; });
+            document.getElementById('nakilForm').reset();
+            korunacaklar.forEach(f => { const el = document.getElementById('in_' + f); if (el) el.value = sakla[f]; });
+            if (typeof yollukDurumuDegisti === 'function') yollukDurumuDegisti();
+        }
+
+        function kararnameyiFormaAktar() {
+            const k = kpKayitlar[kpSeciliIndeks];
+            if (!k) return;
+            const alanlar = kpAlanListesi(k);
+            const temizleEl = document.getElementById('kpTemizle');
+            if (temizleEl && temizleEl.checked) kpFormuTemizle();
+
+            let sayac = 0;
+            alanlar.forEach((a, i) => {
+                const sec = document.getElementById('kpSec' + i);
+                const deger = (document.getElementById('kpDeger' + i).value || '').trim();
+                const el = document.getElementById(a.id);
+                if (!sec || !sec.checked || !deger || !el) return;
+                if (el.tagName === 'SELECT' && ![...el.options].some(o => o.value === deger)) return;
+                el.value = deger;
+                el.classList.add('kp-dolduruldu');
+                el.addEventListener('input', () => el.classList.remove('kp-dolduruldu'), { once: true });
+                el.addEventListener('change', () => el.classList.remove('kp-dolduruldu'), { once: true });
+                sayac++;
+            });
+            updateReport();
+
+            const yollukAile = document.getElementById('kpYollukAile');
+            if (yollukAile && yollukAile.checked) kpYollukVeAileyeAktar(k);
+
+            kpPencereKapat();
+            switchTab(1);
+            kpBildirim(`✓ Kararnameden ${sayac} alan dolduruldu. Yeşil işaretli alanları kontrol edip eksik bilgileri tamamlayınız.`);
+        }
+
+        function kpYollukVeAileyeAktar(k) {
+            const deger = id => (document.getElementById(id) || {}).value || '';
+            if (typeof ortakVerileriYollukFormunaAktar === 'function') {
+                ortakVerileriYollukFormunaAktar({
+                    adSoyad: deger('in_adSoyad'),
+                    tcNo: deger('in_tcNo'),
+                    unvan: deger('in_yeniUnvan') || deger('in_eskiUnvan'),
+                    derece: deger('in_yeniDerece') || deger('in_eskiDerece'),
+                    nereden: deger('in_eskiGorevYeri'),
+                    nereye: deger('in_yeniGorevYeri'),
+                    evrakTarihi: deger('in_tebligTarihi'),
+                    kararname: deger('in_kararname')
+                });
+            }
+            const onay = kpOnay(k);
+            const makamEl = document.getElementById('onayMakami');
+            if (makamEl && onay.makam) makamEl.value = onay.makam;
+
+            const sinif = (k.atandigi.hizmetSinifi || '').toLocaleLowerCase('tr');
+            const sinifEl = document.getElementById('hizmetSinifi');
+            let kod = '';
+            if (sinif.includes('eğitim')) kod = 'EOH';
+            else if (sinif.includes('genel idare')) kod = 'GIH';
+            else if (sinif.includes('yardımcı')) kod = 'YHS';
+            if (sinifEl && kod) {
+                sinifEl.value = kod;
+                if (typeof otomatikEkGostergeHesapla === 'function') otomatikEkGostergeHesapla();
+            }
+            if (typeof aileOrtakVerileriGetir === 'function') aileOrtakVerileriGetir(true);
+        }
+
+        // Sürükle-bırak: PDF sayfanın herhangi bir yerine bırakılabilir.
+        // Tarayıcının PDF'i açıp programı kapatmasını da engeller.
+        function kpSurukleBirakKur() {
+            const alan = document.getElementById('kpYukleAlani');
+            const dosyaVar = e => e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files');
+            let sayac = 0;
+            document.addEventListener('dragenter', e => {
+                if (!dosyaVar(e)) return;
+                e.preventDefault();
+                sayac++;
+                if (alan) alan.classList.add('kp-surukle');
+            });
+            document.addEventListener('dragleave', e => {
+                if (!dosyaVar(e)) return;
+                sayac = Math.max(0, sayac - 1);
+                if (!sayac && alan) alan.classList.remove('kp-surukle');
+            });
+            document.addEventListener('dragover', e => { if (dosyaVar(e)) e.preventDefault(); });
+            document.addEventListener('drop', e => {
+                if (!dosyaVar(e)) return;
+                e.preventDefault();
+                sayac = 0;
+                if (alan) alan.classList.remove('kp-surukle');
+                const dosya = e.dataTransfer.files[0];
+                if (!dosya) return;
+                if (!/\.pdf$/i.test(dosya.name) && dosya.type !== 'application/pdf') return;
+                showView('nakil');
+                kararnameIsle(dosya);
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && !document.getElementById('kpPencere').classList.contains('hidden')) kpPencereKapat();
+            });
+        }
+        document.addEventListener('DOMContentLoaded', kpSurukleBirakKur);
     </script>
 </body>
 </html>
