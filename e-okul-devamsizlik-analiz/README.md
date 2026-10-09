@@ -32,6 +32,9 @@ python3 build.py package/build
 
 ## Neler gösterir
 
+Arayüz beş bölümden oluşur: **1. Günlük liste**, **2. Uyarılar**, **3. Raporlar**, **4. Sınıflar**,
+**5. Rapor yükle ve ayarlar**.
+
 - **Özet:** devamsız öğrenci sayısı, toplam devamsızlık günü, sınırı aşan ve uyarı düzeyindeki öğrenciler.
 - **Sınırı aşan / dikkat gereken öğrenciler:** özürsüz ve toplam devamsızlık sınırını aşanlar,
   veli bildirimi eşiğine gelenler ve art arda uzun süre gelmeyenler (sürüyorsa ayrıca belirtilir).

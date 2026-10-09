@@ -147,10 +147,25 @@ dialog .dbody { padding: 18px; display: grid; gap: 14px; overflow: auto; max-hei
 .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: .8rem; color: var(--muted); }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
 
-details.settings summary { cursor: pointer; font-weight: 700; font-family: var(--font-display); }
-.setgrid { display: flex; flex-wrap: wrap; gap: 12px 20px; padding-top: 12px; align-items: end; }
+.setgrid { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 8px 16px; border-radius: 6px; font-weight: 700; z-index: 50; }
 .note { font-size: .82rem; color: var(--muted); max-width: 75ch; }
+/* bölümler */
+.topacts { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.banner { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: var(--r); background: var(--warn-soft); border: 1px solid var(--warn); }
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; display: flex; gap: 4px; overflow-x: auto; background: var(--paper); border-bottom: 2px solid var(--line); padding-top: 4px; scrollbar-width: thin; }
+.tabs button { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 6px 6px 0 0; background: none; padding: 10px 14px; color: var(--muted); font-size: .95rem; margin-bottom: -2px; border-bottom: 3px solid transparent; }
+.tabs button:hover { color: var(--ink); background: var(--accent-soft); }
+.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); background: var(--sheet); }
+.tabs .tn { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--line); color: var(--ink); font-size: .75rem; }
+.tabs button[aria-selected="true"] .tn { background: var(--accent); color: var(--sheet); }
+.badge { display: inline-block; min-width: 1.6em; padding: 0 6px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .78rem; text-align: center; font-variant-numeric: tabular-nums; }
+.badge:empty { display: none; }
+.badge.crit { background: var(--crit); color: var(--sheet); }
+.tabpanel { display: grid; gap: 16px; min-width: 0; }
+.intro { display: grid; gap: 4px; max-width: 80ch; }
+.intro h2 { font-size: 1.35rem; }
+.steps { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; max-width: 80ch; }
 /* günlük liste */
 .dayctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .dayctl .today { background: var(--crit); border-color: var(--crit); color: var(--sheet); }
@@ -165,6 +180,9 @@ details.settings summary { cursor: pointer; font-weight: 700; font-family: var(-
 .ccard .acts button { padding: 5px 10px; font-size: .85rem; }
 button.day { border: none; background: none; padding: 0; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 @media (max-width: 560px) {
+  .tabs { flex-wrap: wrap; gap: 6px; border-bottom: none; position: static; padding-top: 0; }
+  .tabs button { border: 1px solid var(--line); border-radius: 6px; margin: 0; padding: 8px 10px; background: var(--sheet); }
+  .tabs button[aria-selected="true"] { border-color: var(--accent); }
   .alert { grid-template-columns: 1fr; }
   h1 { font-size: 1.45rem; }
 }
@@ -174,44 +192,152 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
 <div class="wrap">
   <header class="top">
     <div class="meta">
-      <span class="eyebrow">e-Okul · IOK08002 · Öğrenci Devamsızlıkları (Detaylı)</span>
+      <span class="eyebrow">e-Okul · IOK08002 · Öğrenci Devamsızlıkları</span>
       <h1>Devamsızlık Analizi</h1>
       <p class="muted small" id="schoolLine">Rapor yüklenmedi.</p>
     </div>
+    <div class="topacts">
+      <span class="small" id="storeMini"></span>
+      <label class="btn primary" for="fileInput">Rapor yükle (PDF)</label>
+    </div>
   </header>
 
-  <section class="drop" id="drop" aria-label="PDF yükleme alanı">
-    <div style="display:grid;gap:4px;min-width:0">
-      <strong>e-Okul PDF raporunu buraya bırakın</strong>
-      <span class="muted small">Günlük Devamsızlık Girişi → Raporlar → <b>IOK08002</b>. Birden çok PDF (farklı şube/tarih) aynı anda yüklenebilir. Yüklenen veriler bu bilgisayarda saklanır; yeni rapor yükledikçe eklenir ve güncellenir. Dosyalar bilgisayarınızdan çıkmaz.</span>
-      <div class="files" id="files"></div>
-      <span class="small" id="storeInfo"></span>
+  <div class="banner" id="sampleBanner" hidden>
+    <div><b>Şu an örnek veri gösteriliyor.</b> Kendi okulunuzun verilerini görmek için e-Okul'dan IOK08002 raporunu PDF olarak alıp yükleyin.</div>
+    <div class="dayctl"><label class="btn primary" for="fileInput">Rapor yükle (PDF)</label><button type="button" data-goto="veri">Nasıl alınır?</button></div>
+  </div>
+
+  <nav class="tabs" role="tablist" aria-label="Bölümler">
+    <button type="button" role="tab" data-tab="gunluk"><span class="tn">1</span>Günlük liste <span class="badge" id="bGunluk"></span></button>
+    <button type="button" role="tab" data-tab="uyarilar"><span class="tn">2</span>Uyarılar <span class="badge crit" id="bUyari"></span></button>
+    <button type="button" role="tab" data-tab="raporlar"><span class="tn">3</span>Raporlar</button>
+    <button type="button" role="tab" data-tab="siniflar"><span class="tn">4</span>Sınıflar</button>
+    <button type="button" role="tab" data-tab="veri"><span class="tn">5</span>Rapor yükle ve ayarlar</button>
+  </nav>
+
+  <!-- 1. Günlük liste -->
+  <section class="tabpanel" data-tab="gunluk" id="daySection">
+    <div class="intro">
+      <h2>Günlük devamsız listesi</h2>
+      <p class="muted">Seçilen gün devamsız olan öğrenciler, sınıf sınıf. Her sınıfın listesini resim (JPEG) ya da PDF olarak indirip sınıf öğretmenine gönderebilirsiniz.</p>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <label class="btn primary" for="fileInput">PDF seç</label>
-      <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple>
-      <button id="clearBtn" type="button">Kayıtlı verileri sil</button>
+    <div class="panel">
+      <div class="dayctl">
+        <button type="button" class="today" id="dToday">Bugün</button>
+        <button type="button" id="dPrev" aria-label="Önceki gün">◀ Önceki gün</button>
+        <input type="date" id="dDate" aria-label="Gün seç">
+        <button type="button" id="dNext" aria-label="Sonraki gün">Sonraki gün ▶</button>
+        <button type="button" id="dLast">Rapordaki son gün</button>
+      </div>
+      <p class="daysum" id="daySum"></p>
+      <div class="dayctl" id="dayAll"></div>
     </div>
+    <div class="classcards" id="dayCards"></div>
+    <p class="note">"Öz. / Top." sütunu, seçilen güne kadarki özürsüz ve toplam devamsızlık günüdür. "Paylaş" düğmesi telefonda WhatsApp, e-posta gibi uygulamalarla doğrudan gönderir.</p>
   </section>
 
-  <section class="panel">
+  <!-- 2. Uyarılar -->
+  <section class="tabpanel" data-tab="uyarilar" hidden>
+    <div class="intro">
+      <h2>Sınırı aşan ve dikkat gereken öğrenciler</h2>
+      <p class="muted">Devamsızlık sınırını aşan, sınıra yaklaşan veya art arda okula gelmeyen öğrenciler. Kırmızı: sınır, turuncu: uyarı. Sınırları "Rapor yükle ve ayarlar" bölümünden değiştirebilirsiniz.</p>
+      <p class="muted small" id="alertNote"></p>
+    </div>
+    <div class="alerts" id="alerts"></div>
+  </section>
+
+  <!-- 3–4 için ortak filtreler -->
+  <section class="panel" id="filterBar" hidden>
     <div class="filters">
       <div class="field"><label for="fClass">Sınıf / Şube</label><select id="fClass"></select></div>
       <div class="field"><label for="fFrom">Başlangıç</label><input type="date" id="fFrom"></div>
       <div class="field"><label for="fTo">Bitiş</label><input type="date" id="fTo"></div>
-      <div class="field"><label>Görünüm</label>
+      <div class="field"><label for="fType">Türü</label><select id="fType"></select></div>
+      <div class="field" style="flex:1 1 180px"><label for="fSearch">Öğrenci ara</label><input type="search" id="fSearch" placeholder="Ad veya numara"></div>
+      <button type="button" id="resetFilters">Filtreleri sıfırla</button>
+    </div>
+  </section>
+
+  <!-- 3. Raporlar -->
+  <section class="tabpanel" data-tab="raporlar" hidden>
+    <div class="intro">
+      <h2>Günlük, haftalık ve aylık raporlar</h2>
+      <p class="muted">Devamsızlıkların zamana göre dökümü. Aşağıdaki filtrelerle sınıf, tarih aralığı veya öğrenci seçebilirsiniz.</p>
+    </div>
+    <section class="kpis" id="kpis" aria-label="Özet"></section>
+    <div class="panel">
+      <div class="panel-head">
         <div class="seg" role="group" aria-label="Zaman görünümü">
           <button type="button" data-p="day">Günlük</button>
           <button type="button" data-p="week">Haftalık</button>
           <button type="button" data-p="month">Aylık</button>
         </div>
+        <button type="button" data-copy="periodTable">Tabloyu kopyala</button>
       </div>
-      <div class="field"><label for="fType">Türü</label><select id="fType"></select></div>
-      <div class="field" style="flex:1 1 180px"><label for="fSearch">Öğrenci ara</label><input type="search" id="fSearch" placeholder="Ad veya numara"></div>
-      <button type="button" id="resetFilters">Filtreleri sıfırla</button>
+      <h2 id="periodTitle">Dönemlere göre devamsızlık</h2>
+      <div class="chart" id="chart"></div>
+      <div class="tscroll"><table id="periodTable"></table></div>
     </div>
-    <details class="settings" id="settingsBox">
-      <summary>Devamsızlık sınırları</summary>
+    <div class="panel">
+      <div class="panel-head">
+        <h2 id="matrixTitle">Öğrenci listesi</h2>
+        <button type="button" data-copy="matrixTable">Tabloyu kopyala</button>
+      </div>
+      <p class="muted small">Hücreler o gün / hafta / ayda devamsız olunan gün sayısıdır. Ayrıntı için öğrencinin adına tıklayın.</p>
+      <div class="tscroll" style="max-height:560px"><table id="matrixTable" class="matrix"></table></div>
+    </div>
+  </section>
+
+  <!-- 4. Sınıflar -->
+  <section class="tabpanel" data-tab="siniflar" hidden>
+    <div class="intro">
+      <h2>Sınıflar ve en çok devamsız olanlar</h2>
+      <p class="muted">Sınıfların devamsızlık karşılaştırması. Bir sınıfın adına tıklayınca o sınıfın raporu açılır.</p>
+    </div>
+    <div class="two">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Sınıf karşılaştırması</h2>
+          <button type="button" data-copy="classTable">Kopyala</button>
+        </div>
+        <div class="tscroll"><table id="classTable"></table></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>En çok devamsız olanlar</h2>
+          <button type="button" data-copy="topTable">Kopyala</button>
+        </div>
+        <div class="tscroll"><table id="topTable"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Rapor yükle ve ayarlar -->
+  <section class="tabpanel" data-tab="veri" hidden>
+    <div class="intro">
+      <h2>Rapor yükle</h2>
+      <p class="muted">Her gün yeni raporu yüklemeniz yeterli; veriler bu bilgisayarda saklanır ve yeni raporla güncellenir.</p>
+    </div>
+    <ol class="steps">
+      <li><b>e-Okul'da Günlük Devamsızlık Girişi</b> ekranını açın.</li>
+      <li><b>Raporlar bölümünden IOK08002</b> (Öğrenci Devamsızlıkları – Detaylı) raporunu tüm şubeler için PDF olarak indirin.</li>
+      <li><b>PDF'i aşağıya sürükleyin</b> veya "PDF seç" düğmesine basın. Birden çok PDF aynı anda yüklenebilir.</li>
+    </ol>
+    <section class="drop" id="drop" aria-label="PDF yükleme alanı">
+      <div style="display:grid;gap:4px;min-width:0">
+        <strong>PDF raporunu buraya bırakın</strong>
+        <span class="muted small">Dosyalar bilgisayarınızdan çıkmaz; yalnızca bu tarayıcıda okunur ve saklanır.</span>
+        <div class="files" id="files"></div>
+        <span class="small" id="storeInfo"></span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <label class="btn primary" for="fileInput">PDF seç</label>
+        <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple>
+        <button id="clearBtn" type="button">Kayıtlı verileri sil</button>
+      </div>
+    </section>
+    <div class="panel" id="settingsBox">
+      <h2>Devamsızlık sınırları</h2>
       <div class="setgrid">
         <div class="field"><label for="sPreset">Kademe</label>
           <select id="sPreset">
@@ -225,73 +351,10 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
         <div class="field"><label for="sStreak">Art arda uyarı (iş günü)</label><input type="number" id="sStreak" min="1" step="1"></div>
         <div class="field"><label for="sCodes">Özürsüz sayılan türler</label><input type="text" id="sCodes" style="width:7em" placeholder="D"></div>
       </div>
-      <p class="note" style="padding-top:10px">Varsayılanlar: özürsüz devamsızlık için 10 gün, toplam devamsızlık için 30 gün sınırı; 5 gün özürsüzde veliye bildirim uyarısı. Okulunuzun bağlı olduğu yönetmelikteki güncel sınırlara göre değiştirin; ayarlar bu tarayıcıda saklanır. Sınır hesabı tarih filtresinden bağımsız olarak yüklenen tüm kayıtlar üzerinden yapılır.</p>
-    </details>
-  </section>
-
-  <section class="kpis" id="kpis" aria-label="Özet"></section>
-
-  <section class="panel" id="daySection">
-    <div class="panel-head">
-      <h2>Günlük devamsız listesi</h2>
-      <div class="dayctl">
-        <button type="button" class="today" id="dToday">Bugün</button>
-        <button type="button" id="dPrev" aria-label="Önceki gün">◀</button>
-        <input type="date" id="dDate" aria-label="Gün seç">
-        <button type="button" id="dNext" aria-label="Sonraki gün">▶</button>
-        <button type="button" id="dLast">Rapordaki son gün</button>
-      </div>
+      <p class="note">Varsayılanlar: özürsüz 10 gün, toplam 30 gün sınırı; 5 gün özürsüzde veliye bildirim uyarısı. Okulunuzun bağlı olduğu yönetmelikteki güncel sınırlara göre değiştirin; ayarlar bu tarayıcıda saklanır.</p>
+      <p class="note">Türü kodları: <b>D</b> özürsüz sayılır; diğer kodlar (Ö, R, S, İ…) özürlü/raporlu/izinli sayılır ve yalnızca toplama eklenir. Art arda devamsızlık hesabı hafta sonlarını atlar, resmî tatilleri bilmez.</p>
     </div>
-    <p class="daysum" id="daySum"></p>
-    <div class="dayctl" id="dayAll"></div>
-    <div class="classcards" id="dayCards"></div>
-    <p class="note">Her sınıfın listesini JPEG resim ya da PDF olarak indirip sınıf öğretmenine gönderebilirsiniz. "Paylaş" düğmesi telefonda ve destekleyen tarayıcılarda WhatsApp, e-posta gibi uygulamalarla doğrudan gönderir. Özürsüz / toplam sütunları seçilen güne kadarki kayıtlardır.</p>
   </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Sınırı aşan ve dikkat gereken öğrenciler</h2>
-      <span class="muted small" id="alertNote"></span>
-    </div>
-    <div class="alerts" id="alerts"></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <h2 id="periodTitle">Dönemlere göre devamsızlık</h2>
-      <button type="button" data-copy="periodTable">Tabloyu kopyala</button>
-    </div>
-    <div class="chart" id="chart"></div>
-    <div class="tscroll"><table id="periodTable"></table></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <h2 id="matrixTitle">Öğrenci listesi</h2>
-      <button type="button" data-copy="matrixTable">Tabloyu kopyala</button>
-    </div>
-    <p class="muted small">Hücreler o gün / hafta / ayda devamsız olunan gün sayısıdır. Ayrıntı için öğrencinin adına tıklayın.</p>
-    <div class="tscroll" style="max-height:560px"><table id="matrixTable" class="matrix"></table></div>
-  </section>
-
-  <div class="two">
-    <section class="panel">
-      <div class="panel-head">
-        <h2>Sınıf karşılaştırması</h2>
-        <button type="button" data-copy="classTable">Kopyala</button>
-      </div>
-      <div class="tscroll"><table id="classTable"></table></div>
-    </section>
-    <section class="panel">
-      <div class="panel-head">
-        <h2>En çok devamsız olanlar</h2>
-        <button type="button" data-copy="topTable">Kopyala</button>
-      </div>
-      <div class="tscroll"><table id="topTable"></table></div>
-    </section>
-  </div>
-
-  <p class="note">Türü kodları: <b>D</b> özürsüz (devamsız) olarak kabul edilir; diğer kodlar (ör. Ö, R, S, İ) özürlü/raporlu/izinli sayılır ve yalnızca toplam sınırına eklenir. Art arda devamsızlık hesabı hafta sonlarını atlar, resmî tatilleri bilmez. "Tabloyu kopyala" ile kopyalanan tablo Excel'e doğrudan yapıştırılabilir.</p>
 </div>
 
 <dialog id="dlg"><div class="dbody" id="dlgBody"></div></dialog>
@@ -528,8 +591,11 @@ async function persist() {
   renderStoreInfo();
 }
 function renderStoreInfo() {
-  const el = $("#storeInfo");
-  if (state.sample) { el.textContent = ""; return; }
+  const el = $("#storeInfo"), mini = $("#storeMini");
+  if (state.sample) { el.textContent = ""; mini.textContent = ""; return; }
+  mini.innerHTML = storeStatus.ok
+    ? `<span style="color:var(--ok)">●</span> <span class="muted">${state.records.length} kayıt kayıtlı</span>`
+    : `<span style="color:var(--crit)">● Veriler saklanamıyor</span>`;
   if (!storeStatus.ok) { el.innerHTML = `<span style="color:var(--crit)">Veriler bu tarayıcıda saklanamadı (gizli pencere olabilir); sayfa kapanınca silinir.</span>`; return; }
   const d = storeStatus.savedAt ? new Date(storeStatus.savedAt) : null;
   el.innerHTML = `<span style="color:var(--ok)">●</span> Bu bilgisayarda kayıtlı: <b>${state.records.length}</b> devamsızlık kaydı${d ? ` · son güncelleme ${d.toLocaleDateString("tr-TR")} ${d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}` : ""}`;
@@ -624,9 +690,8 @@ function render() {
   const recs = filtered();
   const reportEnd = m.stamp || (all.length ? all.reduce((a, r) => r.date > a ? r.date : a, "") : "");
 
-  // sınır uyarıları: tarih filtresinden bağımsız, sınıf/arama filtresine bağlı
-  const scope = state.records.filter(r => (!state.cls || r.cls === state.cls));
-  const studentsAll = buildStudents(scope).map(s => Object.assign(s, classify(s, reportEnd)));
+  // sınır uyarıları: filtrelerden bağımsız, yüklenen tüm kayıtlar üzerinden
+  const studentsAll = buildStudents(state.records).map(s => Object.assign(s, classify(s, reportEnd)));
   const studentsF = buildStudents(recs);
   const statusByKey = new Map(studentsAll.map(s => [s.key, s]));
 
@@ -638,6 +703,9 @@ function render() {
   renderTop(studentsF, statusByKey);
   renderDay();
   renderStoreInfo();
+  $("#sampleBanner").hidden = !state.sample;
+  const nAlert = studentsAll.filter(s => s.level === 2).length;
+  $("#bUyari").textContent = nAlert || "";
 }
 
 function fillSelect(sel, opts, val) {
@@ -647,8 +715,9 @@ function fillSelect(sel, opts, val) {
 
 function renderKpis(recs, studentsF, studentsAll) {
   const days = recs.reduce((a, r) => a + r.days, 0);
-  const crit = studentsAll.filter(s => s.level === 2).length;
-  const warn = studentsAll.filter(s => s.level === 1).length;
+  const inCls = studentsAll.filter(s => !state.cls || s.cls === state.cls);
+  const crit = inCls.filter(s => s.level === 2).length;
+  const warn = inCls.filter(s => s.level === 1).length;
   const dates = recs.map(r => r.date).sort();
   const range = dates.length ? `${fmtDate(dates[0])} – ${fmtDate(dates[dates.length - 1])}` : "kayıt yok";
   $("#kpis").innerHTML = `
@@ -830,7 +899,7 @@ const fmtLong = iso => { const d = toDate(iso); return `${d.getUTCDate()} ${TR_M
 // seçilen günün devamsızları, sınıf sınıf; her öğrenci için o güne kadarki toplamlar
 function dayData(day) {
   const codes = unexcusedCodes();
-  const todays = state.records.filter(r => r.date === day && (!state.cls || r.cls === state.cls));
+  const todays = state.records.filter(r => r.date === day);
   const byClass = new Map();
   for (const r of todays) {
     const k = studentKey(r);
@@ -862,10 +931,11 @@ function renderDay() {
   const isToday = day === localToday();
   const last = lastDay();
   let sum = `<b>${esc(fmtLong(day))}</b>${isToday ? " (bugün)" : ""} · `;
-  if (n) sum += `${data.length} sınıfta <b>${n}</b> öğrenci devamsız${state.cls ? ` (yalnız ${esc(state.cls)})` : ""}.`;
+  if (n) sum += `${data.length} sınıfta <b>${n}</b> öğrenci devamsız.`;
   else if (last && day > last) sum += `bu gün için kayıt yok. Yüklenen rapordaki son devamsızlık günü ${fmtDate(last)}; güncel listeyi görmek için e-Okul'dan bugünkü IOK08002 raporunu yükleyin.`;
   else sum += isWeekend(day) ? "hafta sonu." : "bu gün devamsız öğrenci yok.";
   $("#daySum").innerHTML = sum;
+  $("#bGunluk").textContent = n || "";
   const canShare = shareSupported();
   $("#dayAll").innerHTML = n ? `<span class="muted small">Tüm sınıflar:</span>
     <button type="button" data-export="pdf-all">PDF indir (her sınıf ayrı sayfa)</button>
@@ -1041,6 +1111,7 @@ async function handleFiles(fileList) {
   }
   if (state.records.length) await persist();
   render();
+  if (state.files.some(f => !f.err)) { showTab("gunluk"); toast("Rapor yüklendi"); }
 }
 
 /* ---------- olaylar ---------- */
@@ -1069,9 +1140,10 @@ $("#resetFilters").addEventListener("click", () => {
 document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.period = b.dataset.p; try { localStorage.setItem("devamsizlik.period", state.period); } catch (e) {} render(); }));
 document.addEventListener("click", e => {
   const s = e.target.closest("[data-student]"); if (s) { openStudent(s.dataset.student); return; }
-  const c = e.target.closest("[data-class]"); if (c) { state.cls = c.dataset.class; render(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+  const c = e.target.closest("[data-class]"); if (c) { state.cls = c.dataset.class; render(); showTab("raporlar"); return; }
+  const tb = e.target.closest("[data-tab][role=tab], [data-goto]"); if (tb) { showTab(tb.dataset.goto || tb.dataset.tab); return; }
   const t = e.target.closest("th[data-sort]"); if (t) { state.sort.top = t.dataset.sort; render(); return; }
-  const dy = e.target.closest("[data-day]"); if (dy) { state.day = dy.dataset.day; renderDay(); $("#daySection").scrollIntoView({ behavior: "smooth" }); return; }
+  const dy = e.target.closest("[data-day]"); if (dy) { state.day = dy.dataset.day; renderDay(); showTab("gunluk"); return; }
   const ex = e.target.closest("[data-export]"); if (ex) { exportDay(ex.dataset.export, ex.dataset.cls || ""); return; }
   const cp = e.target.closest("[data-copy]"); if (cp) copyTable(cp.dataset.copy);
 });
@@ -1101,8 +1173,26 @@ $("#dPrev").addEventListener("click", () => { state.day = prevSchoolDay(state.da
 $("#dNext").addEventListener("click", () => { state.day = nextSchoolDay(state.day || localToday()); renderDay(); });
 $("#dDate").addEventListener("change", e => { if (e.target.value) { state.day = e.target.value; renderDay(); } });
 
+const TABS = ["gunluk", "uyarilar", "raporlar", "siniflar", "veri"];
+function showTab(t) {
+  if (!TABS.includes(t)) t = "gunluk";
+  document.querySelectorAll(".tabpanel").forEach(p => { p.hidden = p.dataset.tab !== t; });
+  document.querySelectorAll(".tabs [role=tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  const fb = $("#filterBar"), active = document.querySelector(`.tabpanel[data-tab="${t}"]`);
+  fb.hidden = !(t === "raporlar" || t === "siniflar");
+  if (!fb.hidden) active.querySelector(".intro").after(fb);
+  try { localStorage.setItem("devamsizlik.tab", t); history.replaceState(null, "", "#" + t); } catch (e) {}
+  const nav = $(".tabs");
+  if (nav.getBoundingClientRect().top < 0) nav.scrollIntoView();
+}
+
 try { const p = localStorage.getItem("devamsizlik.period"); if (p) state.period = p; } catch (e) {}
 syncSettingsForm();
+{
+  let t = location.hash.slice(1);
+  if (!TABS.includes(t)) { try { t = localStorage.getItem("devamsizlik.tab") || ""; } catch (e) {} }
+  showTab(t);
+}
 (async () => {
   let saved = null;
   try { saved = await storeGet(); } catch (e) { storeStatus.ok = false; }
