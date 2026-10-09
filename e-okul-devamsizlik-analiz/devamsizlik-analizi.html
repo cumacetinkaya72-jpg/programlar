@@ -183,13 +183,14 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
   <section class="drop" id="drop" aria-label="PDF yükleme alanı">
     <div style="display:grid;gap:4px;min-width:0">
       <strong>e-Okul PDF raporunu buraya bırakın</strong>
-      <span class="muted small">Günlük Devamsızlık Girişi → Raporlar → <b>IOK08002</b>. Birden çok PDF (farklı şube/tarih) aynı anda yüklenebilir; tekrar eden kayıtlar bir kez sayılır. Dosyalar bilgisayarınızdan çıkmaz.</span>
+      <span class="muted small">Günlük Devamsızlık Girişi → Raporlar → <b>IOK08002</b>. Birden çok PDF (farklı şube/tarih) aynı anda yüklenebilir. Yüklenen veriler bu bilgisayarda saklanır; yeni rapor yükledikçe eklenir ve güncellenir. Dosyalar bilgisayarınızdan çıkmaz.</span>
       <div class="files" id="files"></div>
+      <span class="small" id="storeInfo"></span>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <label class="btn primary" for="fileInput">PDF seç</label>
       <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple>
-      <button id="clearBtn" type="button">Temizle</button>
+      <button id="clearBtn" type="button">Kayıtlı verileri sil</button>
     </div>
   </section>
 
@@ -474,7 +475,18 @@ function loadSettings() {
 function saveSettings() { try { localStorage.setItem("devamsizlik.settings", JSON.stringify(settings)); } catch (e) {} }
 const unexcusedCodes = () => new Set(settings.codes.split(/[\s,;]+/).filter(Boolean).map(c => c.toLocaleUpperCase("tr")));
 
+// Yeni rapor, kapsadığı şube ve tarih aralığı için esas alınır: o aralıktaki eski kayıtlar
+// silinip yenileri eklenir (e-Okul'da düzeltilen ya da silinen devamsızlıklar da güncellenir).
 function addRecords(recs) {
+  const ranges = new Map();
+  for (const r of recs) {
+    const g = ranges.get(r.cls) || { min: r.date, max: r.date };
+    if (r.date < g.min) g.min = r.date; if (r.date > g.max) g.max = r.date;
+    ranges.set(r.cls, g);
+  }
+  const before = state.records.length;
+  state.records = state.records.filter(r => { const g = ranges.get(r.cls); return !g || r.date < g.min || r.date > g.max; });
+  const removed = before - state.records.length;
   const seen = new Set(state.records.map(r => `${r.cls}|${r.no}|${r.date}|${r.type}`));
   let added = 0;
   for (const r of recs) {
@@ -482,7 +494,45 @@ function addRecords(recs) {
     if (seen.has(k)) continue;
     seen.add(k); state.records.push(r); added++;
   }
-  return added;
+  return Math.max(0, added - removed);
+}
+
+/* ---------- kalıcı saklama (bu tarayıcıda, IndexedDB) ---------- */
+const STORE_KEY = "veri";
+function idb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open("devamsizlik-analizi", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("kv");
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function storeGet() {
+  const db = await idb();
+  return new Promise((res, rej) => { const q = db.transaction("kv").objectStore("kv").get(STORE_KEY); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
+}
+async function storePut(val) {
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const t = db.transaction("kv", "readwrite"), os = t.objectStore("kv");
+    if (val === undefined) os.delete(STORE_KEY); else os.put(val, STORE_KEY);
+    t.oncomplete = () => res(); t.onerror = () => rej(t.error);
+  });
+}
+const storeStatus = { ok: true, savedAt: "" };
+async function persist() {
+  try {
+    const savedAt = new Date().toISOString();
+    await storePut({ v: 1, records: state.records, files: state.files.slice(-20), meta: state.meta, savedAt });
+    storeStatus.ok = true; storeStatus.savedAt = savedAt;
+  } catch (e) { storeStatus.ok = false; }
+  renderStoreInfo();
+}
+function renderStoreInfo() {
+  const el = $("#storeInfo");
+  if (state.sample) { el.textContent = ""; return; }
+  if (!storeStatus.ok) { el.innerHTML = `<span style="color:var(--crit)">Veriler bu tarayıcıda saklanamadı (gizli pencere olabilir); sayfa kapanınca silinir.</span>`; return; }
+  const d = storeStatus.savedAt ? new Date(storeStatus.savedAt) : null;
+  el.innerHTML = `<span style="color:var(--ok)">●</span> Bu bilgisayarda kayıtlı: <b>${state.records.length}</b> devamsızlık kaydı${d ? ` · son güncelleme ${d.toLocaleDateString("tr-TR")} ${d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}` : ""}`;
 }
 
 /* ---------- örnek veri (kurgusal) ---------- */
@@ -587,6 +637,7 @@ function render() {
   renderClasses(recs, studentsAll);
   renderTop(studentsF, statusByKey);
   renderDay();
+  renderStoreInfo();
 }
 
 function fillSelect(sel, opts, val) {
@@ -983,11 +1034,12 @@ async function handleFiles(fileList) {
       for (const k of ["school", "year", "term"]) if (res[k]) state.meta[k] = res[k];
       if (res.stamp && (!state.meta.stamp || res.stamp > state.meta.stamp)) state.meta.stamp = res.stamp;
       const cls = new Set(res.records.map(r => r.cls)).size;
-      state.files.push({ name: f.name, err: false, msg: `${cls} şube, ${added} yeni kayıt` });
+      state.files.push({ name: f.name, err: false, msg: `${cls} şube, ${res.records.length} kayıt${added ? `, ${added} yeni` : ""}`, at: new Date().toISOString() });
     } catch (e) {
       state.files.push({ name: f.name, err: true, msg: e.message || "okunamadı" });
     }
   }
+  if (state.records.length) await persist();
   render();
 }
 
@@ -1025,9 +1077,18 @@ document.addEventListener("click", e => {
 });
 $("#dlg").addEventListener("click", e => { if (e.target.id === "dlg") e.target.close(); });
 $("#fileInput").addEventListener("change", e => { handleFiles(e.target.files); e.target.value = ""; });
-$("#clearBtn").addEventListener("click", () => {
+let clearArmed = 0;
+$("#clearBtn").addEventListener("click", async e => {
+  const btn = e.currentTarget;
+  if (!state.sample && Date.now() - clearArmed > 4000) {
+    clearArmed = Date.now(); btn.textContent = "Emin misiniz? Silmek için tekrar basın";
+    setTimeout(() => { if (Date.now() - clearArmed >= 4000) btn.textContent = "Kayıtlı verileri sil"; }, 4100);
+    return;
+  }
+  clearArmed = 0; btn.textContent = "Kayıtlı verileri sil";
+  try { await storePut(undefined); } catch (err) {}
   Object.assign(state, { records: sampleData(), files: [], sample: true, meta: { school: "", year: "", term: "", stamp: "2026-10-09" }, cls: "", from: "", to: "", type: "", q: "", day: "" });
-  render();
+  render(); toast("Kayıtlı veriler silindi");
 });
 const drop = $("#drop");
 ["dragenter", "dragover"].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
@@ -1041,9 +1102,18 @@ $("#dNext").addEventListener("click", () => { state.day = nextSchoolDay(state.da
 $("#dDate").addEventListener("change", e => { if (e.target.value) { state.day = e.target.value; renderDay(); } });
 
 try { const p = localStorage.getItem("devamsizlik.period"); if (p) state.period = p; } catch (e) {}
-state.records = sampleData(); state.meta.stamp = "2026-10-09";
 syncSettingsForm();
-render();
+(async () => {
+  let saved = null;
+  try { saved = await storeGet(); } catch (e) { storeStatus.ok = false; }
+  if (saved && saved.records && saved.records.length) {
+    Object.assign(state, { records: saved.records, files: saved.files || [], meta: saved.meta || state.meta, sample: false });
+    storeStatus.savedAt = saved.savedAt || "";
+  } else {
+    state.records = sampleData(); state.meta.stamp = "2026-10-09";
+  }
+  render();
+})();
 </script>
 
 </body>

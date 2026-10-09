@@ -9,9 +9,16 @@ PDF raporunu okuyup devamsızlıkları sınıf sınıf analiz eden tek dosyalık
 2. **`devamsizlik-analizi.html`** dosyasını bilgisayarınıza indirip çift tıklayarak tarayıcıda açın
    (Chrome, Edge, Firefox). Tek dosyadır, internet bağlantısı gerektirmez; USB bellekle taşınabilir.
 3. PDF'i sayfaya sürükleyin veya **PDF seç** ile yükleyin. Birden çok PDF aynı anda yüklenebilir;
-   aynı öğrenci + tarih + tür kaydı bir kez sayılır.
+   aynı kayıt bir kez sayılır.
 
 PDF yalnızca tarayıcınızda okunur, hiçbir yere gönderilmez.
+
+**Veriler saklanır:** yüklenen devamsızlık kayıtları o bilgisayardaki tarayıcıda (IndexedDB) saklanır;
+program kapatılıp açıldığında yerinde durur. Her gün yeni raporu yüklemeniz yeterlidir: yeni rapor,
+kapsadığı şube ve tarih aralığı için esas alınır (e-Okul'da düzeltilen kayıtlar da güncellenir),
+diğer kayıtlar korunur. **Kayıtlı verileri sil** düğmesi (iki kez basılır) tüm verileri siler.
+Veriler tarayıcıya bağlıdır: başka tarayıcıda, gizli pencerede ya da tarayıcı verileri
+temizlendiğinde görünmez.
 
 ## Geliştirme
 
