@@ -44,7 +44,7 @@
   --warn: #f0b45a; --warn-soft: #3a2d17; --ok: #6fcf97; --heat: #7ea6ec; color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.5; }
 .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 20px; }
 h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.2; }
 h1 { font-size: 1.75rem; }
@@ -192,6 +192,42 @@ tr.tot td { font-weight: 700; background: var(--paper); }
 .intro { display: grid; gap: 4px; max-width: 80ch; }
 .intro h2 { font-size: 1.35rem; }
 .steps { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; max-width: 80ch; }
+/* ana sayfa ve ekranlar */
+.screen { display: grid; gap: 18px; min-width: 0; }
+.ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ic-lg { width: 48px; height: 48px; color: var(--accent); }
+button, .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; }
+.big { font-size: 1.05rem; padding: 12px 22px; min-height: 52px; }
+header.top { align-items: center; padding-bottom: 12px; border-bottom: 2px solid var(--line); }
+.brand { border: none; background: none; padding: 0; display: grid; justify-items: start; gap: 0; min-height: 0; text-align: left; color: var(--ink); }
+.brand .h1 { font-family: var(--font-display); font-size: 1.7rem; font-weight: 700; }
+.topmeta { display: grid; gap: 2px; justify-items: end; text-align: right; color: var(--muted); }
+.welcome { display: grid; gap: 10px; padding: 22px; border-radius: var(--r); background: var(--accent-soft); border: 1px solid var(--accent); max-width: 900px; }
+.welcome h2 { font-size: 1.5rem; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tile { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "ic title" "ic num" "ic sub" "ic go"; align-content: start; justify-items: start; column-gap: 16px; row-gap: 4px; text-align: left; padding: 22px; border: 2px solid var(--line); border-radius: 12px; background: var(--sheet); font-weight: 400; min-height: 190px; }
+.tile:hover { border-color: var(--accent); background: var(--accent-soft); }
+.t-ic { grid-area: ic; align-self: start; display: grid; place-items: center; width: 60px; height: 60px; border-radius: 14px; background: var(--accent-soft); color: var(--accent); }
+.t-ic .ic { width: 32px; height: 32px; }
+.t-title { grid-area: title; font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; }
+.t-num { grid-area: num; font-family: var(--font-display); font-size: 2.6rem; font-weight: 700; line-height: 1.1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.t-sub { grid-area: sub; color: var(--muted); font-size: 1rem; }
+.t-go { grid-area: go; margin-top: 8px; color: var(--accent); font-weight: 700; }
+.tile-warn .t-ic { background: var(--crit-soft); color: var(--crit); }
+.tile-warn .t-num { color: var(--crit); }
+.homelinks { display: flex; flex-wrap: wrap; gap: 10px; }
+.backbar { display: flex; }
+.back { font-size: 1.05rem; padding: 10px 20px; border-width: 2px; }
+.dropin { display: grid; justify-items: center; gap: 10px; text-align: center; padding: 18px; width: 100%; }
+.drop { flex-direction: column; align-items: stretch; padding: 24px; }
+.helptext { max-width: 820px; gap: 10px; }
+.helptext h3 { margin-top: 8px; font-size: 1.15rem; }
+details.more summary { cursor: pointer; color: var(--accent); font-weight: 700; padding: 6px 0; }
+@media (max-width: 700px) {
+  .tiles { grid-template-columns: 1fr; }
+  .tile { min-height: 0; }
+  .topmeta { justify-items: start; text-align: left; }
+}
 /* günlük liste */
 .dayctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .dayctl .today { background: var(--crit); border-color: var(--crit); color: var(--sheet); }
@@ -217,35 +253,69 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
 
 <div class="wrap">
   <header class="top">
-    <div class="meta">
-      <span class="eyebrow">e-Okul · IOK08002 · Öğrenci Devamsızlıkları</span>
-      <h1>Devamsızlık Analizi</h1>
-      <p class="muted small" id="schoolLine">Rapor yüklenmedi.</p>
-    </div>
-    <div class="topacts">
+    <button type="button" class="brand" data-goto="home" aria-label="Ana sayfa">
+      <span class="eyebrow">e-Okul devamsızlık raporu</span>
+      <span class="h1">Devamsızlık Takip</span>
+    </button>
+    <div class="topmeta">
+      <span class="small" id="schoolLine">Rapor yüklenmedi.</span>
       <span class="small" id="storeMini"></span>
-      <button type="button" class="danger" id="clearTop" hidden>Verileri temizle</button>
-      <label class="btn primary" for="fileInput">Rapor yükle (PDF)</label>
     </div>
   </header>
 
-  <div class="banner" id="sampleBanner" hidden>
-    <div><b>Şu an örnek veri gösteriliyor.</b> Kendi okulunuzun verilerini görmek için e-Okul'dan IOK08002 raporunu PDF olarak alıp yükleyin.</div>
-    <div class="dayctl"><label class="btn primary" for="fileInput">Rapor yükle (PDF)</label><button type="button" data-goto="veri">Nasıl alınır?</button></div>
-  </div>
+  <!-- Ana sayfa -->
+  <section class="screen" data-screen="home">
+    <div class="welcome" id="welcome" hidden>
+      <h2>Hoş geldiniz</h2>
+      <p>Bu program, e-Okul'dan aldığınız devamsızlık raporunu okur. Bugün gelmeyenleri ve devamsızlık sınırını aşanları gösterir, öğretmenlere gönderilecek listeleri hazırlar.</p>
+      <p><b>Başlamak için:</b> e-Okul'dan aldığınız devamsızlık raporunu (PDF dosyası) yükleyin.</p>
+      <div class="dayctl">
+        <label class="btn primary big" for="fileInput"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>Raporu yükle</label>
+        <button type="button" class="big" data-goto="yardim"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg>Raporu nasıl alırım?</button>
+      </div>
+      <p class="muted small">Şimdilik aşağıda <b>örnek veriler</b> var. Kutulara tıklayarak programı deneyebilirsiniz.</p>
+    </div>
+    <div class="tiles">
+      <button type="button" class="tile" data-goto="gunluk">
+        <span class="t-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M10 13l4 4M14 13l-4 4"/></svg></span>
+        <span class="t-title">Bugün gelmeyenler</span>
+        <span class="t-num" id="hToday">0</span>
+        <span class="t-sub" id="hTodaySub">öğrenci</span>
+        <span class="t-go">Listeyi aç →</span>
+      </button>
+      <button type="button" class="tile" data-goto="rapor">
+        <span class="t-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 12v6M9 15l3 3 3-3"/></svg></span>
+        <span class="t-title">Rapor al</span>
+        <span class="t-sub">İstediğiniz tarih, sınıf veya öğrenci için rapor hazırlayın; PDF ya da resim olarak indirip öğretmenlerle paylaşın.</span>
+        <span class="t-go">Rapor hazırla →</span>
+      </button>
+      <button type="button" class="tile tile-warn" data-goto="uyarilar">
+        <span class="t-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+        <span class="t-title">Dikkat edilecek öğrenciler</span>
+        <span class="t-num" id="hAlert">0</span>
+        <span class="t-sub" id="hAlertSub">öğrenci devamsızlık sınırını aştı</span>
+        <span class="t-go">Listeyi aç →</span>
+      </button>
+      <button type="button" class="tile" data-goto="yukle">
+        <span class="t-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></span>
+        <span class="t-title">Yeni rapor yükle</span>
+        <span class="t-sub" id="hReport">e-Okul'dan aldığınız güncel raporu yükleyin.</span>
+        <span class="t-go">Yükle →</span>
+      </button>
+    </div>
+    <div class="homelinks">
+      <button type="button" data-goto="yardim"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg>Nasıl kullanılır?</button>
+      <button type="button" data-goto="ayarlar"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Ayarlar</button>
+      <button type="button" class="danger" id="clearTop" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>Verileri temizle</button>
+    </div>
+  </section>
 
-  <nav class="tabs" role="tablist" aria-label="Bölümler">
-    <button type="button" role="tab" data-tab="gunluk">Bugün <span class="badge" id="bGunluk"></span></button>
-    <button type="button" role="tab" data-tab="rapor">Rapor oluştur</button>
-    <button type="button" role="tab" data-tab="uyarilar">Uyarılar <span class="badge crit" id="bUyari"></span></button>
-    <button type="button" role="tab" data-tab="veri">Rapor yükle ve ayarlar</button>
-  </nav>
-
-  <!-- 1. Günlük liste -->
-  <section class="tabpanel" data-tab="gunluk" id="daySection">
+  <!-- Bugün gelmeyenler -->
+  <section class="screen" data-screen="gunluk" id="daySection" hidden>
+    <div class="backbar"><button type="button" class="back" data-goto="home"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Ana sayfa</button></div>
     <div class="intro">
-      <h2>Bugün kimler gelmedi?</h2>
-      <p class="muted">Seçilen gün devamsız olan öğrenciler, sınıf sınıf. Her sınıfın listesini resim (JPEG) ya da PDF olarak indirip sınıf öğretmenine gönderebilirsiniz.</p>
+      <h2>Bugün gelmeyenler</h2>
+      <p class="muted">Seçilen gün okula gelmeyen öğrenciler, sınıf sınıf. Her sınıfın listesini indirip sınıf öğretmenine gönderebilirsiniz.</p>
     </div>
     <div class="panel">
       <div class="dayctl">
@@ -259,19 +329,20 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
       <div class="dayctl" id="dayAll"></div>
     </div>
     <div class="classcards" id="dayCards"></div>
-    <p class="note">"Öz. / Top." sütunu, seçilen güne kadarki özürsüz ve toplam devamsızlık günüdür. "Paylaş" düğmesi telefonda WhatsApp, e-posta gibi uygulamalarla doğrudan gönderir.</p>
+    <p class="note">"Özürsüz / Toplam" sütunu, öğrencinin seçilen güne kadarki devamsızlık günü sayısıdır. Telefonda "Paylaş" düğmesiyle listeyi doğrudan WhatsApp'tan gönderebilirsiniz.</p>
   </section>
 
-  <!-- 2. Rapor oluştur -->
-  <section class="tabpanel" data-tab="rapor" hidden>
+  <!-- Rapor al -->
+  <section class="screen" data-screen="rapor" hidden>
+    <div class="backbar"><button type="button" class="back" data-goto="home"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Ana sayfa</button></div>
     <div class="intro">
-      <h2>Rapor oluştur</h2>
-      <p class="muted">Soldan sırayla seçin; rapor seçimlerinize göre hemen hazırlanır. Hazır raporu PDF veya JPEG olarak indirip öğretmenlerle paylaşabilirsiniz.</p>
+      <h2>Rapor al</h2>
+      <p class="muted">Soldaki soruları sırayla cevaplayın. Rapor sağda hemen hazırlanır; en altta indirme düğmeleri var.</p>
     </div>
     <div class="rlayout">
       <aside class="panel fpanel" aria-label="Rapor seçimleri">
         <div class="fstep">
-          <h3><span class="sn">1</span>Tarih aralığı</h3>
+          <h3><span class="sn">1</span>Hangi tarihler?</h3>
           <div class="chips" id="qRange">
             <button type="button" data-range="today">Bugün</button>
             <button type="button" data-range="week">Bu hafta</button>
@@ -286,18 +357,18 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
           </div>
         </div>
         <div class="fstep">
-          <h3><span class="sn">2</span>Sınıflar</h3>
+          <h3><span class="sn">2</span>Hangi sınıflar?</h3>
           <div class="chips" id="rClasses"></div>
-          <p class="muted small">Birden çok sınıf seçebilirsiniz.</p>
+          <p class="muted small">Birden fazla sınıfa tıklayabilirsiniz. Hiçbirini seçmezseniz tüm okul raporlanır.</p>
         </div>
         <div class="fstep">
-          <h3><span class="sn">3</span>Öğrenciler <span class="muted small">(isteğe bağlı)</span></h3>
-          <input type="search" id="rStudent" list="rStudentList" placeholder="Ad veya numara yazıp listeden seçin" autocomplete="off">
+          <h3><span class="sn">3</span>Belirli öğrenciler <span class="muted small">(isterseniz)</span></h3>
+          <input type="search" id="rStudent" list="rStudentList" placeholder="Öğrencinin adını yazın, listeden seçin" autocomplete="off">
           <datalist id="rStudentList"></datalist>
           <div class="chips" id="rStudents"></div>
         </div>
         <div class="fstep">
-          <h3><span class="sn">4</span>Rapor türü</h3>
+          <h3><span class="sn">4</span>Rapor nasıl görünsün?</h3>
           <div class="chips" id="rView">
             <button type="button" data-view="list">Öğrenci listesi</button>
             <button type="button" data-view="day">Gün gün</button>
@@ -305,8 +376,10 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
             <button type="button" data-view="month">Ay ay</button>
             <button type="button" data-view="classes">Sınıf özeti</button>
           </div>
-          <div class="field"><label for="rType">Devamsızlık türü</label>
-            <select id="rType"><option value="">Tümü</option><option value="U">Yalnız özürsüz</option><option value="E">Yalnız özürlü / diğer</option></select></div>
+          <details class="more"><summary>Diğer seçenekler</summary>
+            <div class="field"><label for="rType">Devamsızlık türü</label>
+              <select id="rType"><option value="">Tümü</option><option value="U">Yalnız özürsüz</option><option value="E">Yalnız özürlü / diğer</option></select></div>
+          </details>
         </div>
         <button type="button" id="rReset">Seçimleri temizle</button>
       </aside>
@@ -318,51 +391,82 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
         </div>
         <div class="exportbar">
           <span class="sn">5</span>
-          <button type="button" class="primary" data-rexport="pdf">PDF indir</button>
-          <button type="button" class="primary" data-rexport="jpg">JPEG indir</button>
+          <button type="button" class="primary big" data-rexport="pdf">PDF olarak indir</button>
+          <button type="button" class="primary big" data-rexport="jpg">Resim olarak indir</button>
           <span id="rShareWrap"></span>
           <button type="button" data-rexport="copy">Excel'e kopyala</button>
-          <label class="check"><input type="checkbox" id="rSplit"> Her sınıf ayrı sayfa / ayrı resim</label>
+          <label class="check"><input type="checkbox" id="rSplit"> Her sınıf ayrı sayfada olsun (her öğretmene kendi sınıfını göndermek için)</label>
         </div>
         <div id="rBody"></div>
       </div>
     </div>
   </section>
 
-  <!-- 3. Uyarılar -->
-  <section class="tabpanel" data-tab="uyarilar" hidden>
+  <!-- Dikkat edilecek öğrenciler -->
+  <section class="screen" data-screen="uyarilar" hidden>
+    <div class="backbar"><button type="button" class="back" data-goto="home"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Ana sayfa</button></div>
     <div class="intro">
-      <h2>Sınırı aşan ve dikkat gereken öğrenciler</h2>
-      <p class="muted">Devamsızlık sınırını aşan, sınıra yaklaşan veya art arda okula gelmeyen öğrenciler. Kırmızı: sınır, turuncu: uyarı. Sınırları "Rapor yükle ve ayarlar" bölümünden değiştirebilirsiniz.</p>
+      <h2>Dikkat edilecek öğrenciler</h2>
+      <p class="muted"><span class="pill crit">Sınır</span> devamsızlık sınırını aşan, <span class="pill warn">Uyarı</span> sınıra yaklaşan veya art arda okula gelmeyen öğrenciler. Ayrıntı için öğrencinin adına tıklayın.</p>
       <p class="muted small" id="alertNote"></p>
     </div>
     <div class="alerts" id="alerts"></div>
   </section>
 
-  <!-- 4. Rapor yükle ve ayarlar -->
-  <section class="tabpanel" data-tab="veri" hidden>
+  <!-- Rapor yükle -->
+  <section class="screen" data-screen="yukle" hidden>
+    <div class="backbar"><button type="button" class="back" data-goto="home"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Ana sayfa</button></div>
     <div class="intro">
-      <h2>Rapor yükle</h2>
-      <p class="muted">Her gün yeni raporu yüklemeniz yeterli; veriler bu bilgisayarda saklanır ve yeni raporla güncellenir.</p>
+      <h2>Yeni rapor yükle</h2>
+      <p class="muted">Her gün e-Okul'dan yeni raporu alıp buraya yüklemeniz yeterli. Program eski verileri kendisi günceller.</p>
     </div>
-    <ol class="steps">
-      <li><b>e-Okul'da Günlük Devamsızlık Girişi</b> ekranını açın.</li>
-      <li><b>Raporlar bölümünden IOK08002</b> (Öğrenci Devamsızlıkları – Detaylı) raporunu tüm şubeler için PDF olarak indirin.</li>
-      <li><b>PDF'i aşağıya sürükleyin</b> veya "PDF seç" düğmesine basın. Birden çok PDF aynı anda yüklenebilir.</li>
-    </ol>
     <section class="drop" id="drop" aria-label="PDF yükleme alanı">
-      <div style="display:grid;gap:4px;min-width:0">
-        <strong>PDF raporunu buraya bırakın</strong>
-        <span class="muted small">Dosyalar bilgisayarınızdan çıkmaz; yalnızca bu tarayıcıda okunur ve saklanır.</span>
-        <div class="files" id="files"></div>
-        <span class="small" id="storeInfo"></span>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <label class="btn primary" for="fileInput">PDF seç</label>
+      <div class="dropin">
+        <svg class="ic ic-lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        <strong>PDF dosyasını buraya sürükleyin</strong>
+        <span class="muted">ya da</span>
+        <label class="btn primary big" for="fileInput">Bilgisayardan dosya seç</label>
         <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple>
-        <button id="clearBtn" type="button" class="danger">Verileri temizle</button>
+        <span class="muted small">Dosya hiçbir yere gönderilmez; yalnızca bu bilgisayarda okunur ve saklanır.</span>
       </div>
+      <div class="files" id="files"></div>
+      <span class="small" id="storeInfo"></span>
     </section>
+    <p><button type="button" class="link" data-goto="yardim">e-Okul'dan raporu nasıl alırım?</button></p>
+  </section>
+
+  <!-- Yardım -->
+  <section class="screen" data-screen="yardim" hidden>
+    <div class="backbar"><button type="button" class="back" data-goto="home"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Ana sayfa</button></div>
+    <div class="intro">
+      <h2>Nasıl kullanılır?</h2>
+    </div>
+    <div class="panel helptext">
+      <h3>1. e-Okul'dan raporu alın</h3>
+      <ol class="steps">
+        <li>e-Okul'da <b>Günlük Devamsızlık Girişi</b> ekranını açın.</li>
+        <li><b>Raporlar</b> bölümünden <b>IOK08002</b> (Öğrenci Devamsızlıkları – Detaylı) raporunu seçin.</li>
+        <li>Tüm şubeleri seçip raporu <b>PDF</b> olarak bilgisayarınıza kaydedin.</li>
+      </ol>
+      <h3>2. Raporu programa yükleyin</h3>
+      <p>Ana sayfada <b>"Yeni rapor yükle"</b> kutusuna tıklayın ve kaydettiğiniz PDF dosyasını seçin. Bilgiler bu bilgisayarda saklanır; programı kapatıp açtığınızda kaybolmaz.</p>
+      <h3>3. Kullanın</h3>
+      <ul class="steps">
+        <li><b>Bugün gelmeyenler:</b> o gün okula gelmeyen öğrenciler sınıf sınıf görünür. Her sınıfın listesini indirip öğretmenine gönderebilirsiniz.</li>
+        <li><b>Rapor al:</b> tarih, sınıf veya öğrenci seçip rapor hazırlayın; PDF ya da resim olarak indirin.</li>
+        <li><b>Dikkat edilecek öğrenciler:</b> devamsızlık sınırını aşan veya yaklaşan öğrenciler.</li>
+      </ul>
+      <h3>Her gün</h3>
+      <p>e-Okul'dan güncel raporu alıp yeniden yükleyin. Program eski bilgileri kendisi günceller.</p>
+    </div>
+  </section>
+
+  <!-- Ayarlar -->
+  <section class="screen" data-screen="ayarlar" hidden>
+    <div class="backbar"><button type="button" class="back" data-goto="home"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Ana sayfa</button></div>
+    <div class="intro">
+      <h2>Ayarlar</h2>
+    </div>
     <div class="panel" id="settingsBox">
       <h2>Devamsızlık sınırları</h2>
       <div class="setgrid">
@@ -380,6 +484,11 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
       </div>
       <p class="note">Varsayılanlar: özürsüz 10 gün, toplam 30 gün sınırı; 5 gün özürsüzde veliye bildirim uyarısı. Okulunuzun bağlı olduğu yönetmelikteki güncel sınırlara göre değiştirin; ayarlar bu tarayıcıda saklanır.</p>
       <p class="note">Türü kodları: <b>D</b> (tam gün) ve <b>Y</b> (yarım gün) özürsüz sayılır; diğer kodlar (S, İ, G…) yalnızca toplama eklenir. Okulunuzda farklıysa "Özürsüz sayılan türler" kutusundan değiştirin. Art arda devamsızlık hesabı hafta sonlarını atlar, resmî tatilleri bilmez.</p>
+    </div>
+    <div class="panel">
+      <h2>Verileri temizle</h2>
+      <p class="muted">Bu bilgisayarda kayıtlı tüm devamsızlık bilgilerini siler. Başka bir okulun raporunu yükleyecekseniz veya bilgisayar ortak kullanılıyorsa işinize yarar.</p>
+      <div><button id="clearBtn" type="button" class="danger"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>Verileri temizle</button></div>
     </div>
   </section>
 </div>
@@ -714,9 +823,26 @@ function render() {
   renderReport();
   renderDay();
   renderStoreInfo();
-  $("#sampleBanner").hidden = !state.sample;
   $("#clearTop").hidden = state.sample;
-  $("#bUyari").textContent = studentsAll.filter(s => s.level === 2).length || "";
+  renderHome(studentsAll);
+}
+
+function renderHome(studentsAll) {
+  $("#welcome").hidden = !state.sample;
+  const t = localToday(), m = state.meta;
+  const nToday = new Set(state.records.filter(r => r.date === t).map(studentKey)).size;
+  if (nToday || state.sample || !m.stamp || t <= m.stamp) {
+    $("#hToday").textContent = nToday;
+    $("#hTodaySub").textContent = isWeekend(t) && !nToday ? "Bugün hafta sonu." : nToday ? "öğrenci bugün okula gelmedi" : "Bugün devamsız öğrenci yok.";
+  } else {
+    $("#hToday").textContent = "?";
+    $("#hTodaySub").textContent = `Bugünün raporu henüz yüklenmedi. Son yüklenen rapor ${fmtDate(m.stamp)} tarihli.`;
+  }
+  const crit = studentsAll.filter(s => s.level === 2).length, warn = studentsAll.filter(s => s.level === 1).length;
+  $("#hAlert").textContent = crit;
+  $("#hAlertSub").textContent = `öğrenci devamsızlık sınırını aştı${warn ? ` · ${warn} öğrenci sınıra yaklaştı` : ""}`;
+  $("#hReport").textContent = state.sample ? "e-Okul'dan aldığınız devamsızlık raporunu (PDF) yükleyin."
+    : `Son yüklenen rapor: ${fmtDate(m.stamp || lastDay())}${m.stampTime ? " saat " + m.stampTime : ""}. Her gün güncel raporu yükleyin.`;
 }
 
 function renderAlerts(studentsAll) {
@@ -823,21 +949,19 @@ function renderDay() {
   else if (last && day > last) sum += `bu gün için kayıt yok. Yüklenen rapordaki son devamsızlık günü ${fmtDate(last)}; güncel listeyi görmek için e-Okul'dan bugünkü IOK08002 raporunu yükleyin.`;
   else sum += isWeekend(day) ? "hafta sonu." : "bu gün devamsız öğrenci yok.";
   $("#daySum").innerHTML = sum;
-  $("#bGunluk").textContent = n || "";
   const canShare = shareSupported();
-  $("#dayAll").innerHTML = n ? `<span class="muted small">Tüm sınıflar:</span>
-    <button type="button" data-export="pdf-all">PDF indir (her sınıf ayrı sayfa)</button>
-    <button type="button" data-export="jpg-all">JPEG indir (her sınıf ayrı resim)</button>
+  $("#dayAll").innerHTML = n ? `<button type="button" class="primary" data-export="pdf-all">Tüm sınıfları PDF olarak indir</button>
+    <button type="button" class="primary" data-export="jpg-all">Tüm sınıfları resim olarak indir</button>
     ${canShare ? `<button type="button" data-export="share-all">Paylaş</button>` : ""}` : "";
   $("#dayCards").innerHTML = data.map(c => `
     <article class="ccard">
       <header><h3>${esc(c.cls)}</h3><span class="muted small">${c.rows.length} öğrenci</span></header>
       <div class="tscroll" style="border:none;border-radius:0"><table>
-        <thead><tr><th class="r">No</th><th>Adı soyadı</th><th>Türü</th><th class="r" title="Bu güne kadar özürsüz / toplam gün">Öz. / Top.</th></tr></thead>
-        <tbody>${c.rows.map(r => `<tr><td class="r">${esc(r.no)}</td><td><button class="link" data-student="${esc(c.cls + "|" + r.no)}">${esc(r.name)}</button>${r.level ? ` <span class="pill ${r.level === 2 ? "crit" : "warn"}">${levelText(r.level)}</span>` : ""}${r.run > 1 ? ` <span class="pill info">${r.run}. gün</span>` : ""}</td><td>${esc([...r.types].join(", "))}</td><td class="r">${fmtN(r.cumU)} / ${fmtN(r.cumT)}</td></tr>`).join("")}</tbody>
+        <thead><tr><th class="r">No</th><th>Adı soyadı</th><th>Türü</th><th class="r" title="Bu güne kadar özürsüz / toplam gün">Özürsüz / Toplam</th></tr></thead>
+        <tbody>${c.rows.map(r => `<tr><td class="r">${esc(r.no)}</td><td><button class="link" data-student="${esc(c.cls + "|" + r.no)}">${esc(r.name)}</button>${r.level ? ` <span class="pill ${r.level === 2 ? "crit" : "warn"}">${levelText(r.level)}</span>` : ""}${r.run > 1 ? ` <span class="pill info">${r.run} gündür gelmiyor</span>` : ""}</td><td>${esc([...r.types].map(t => TYPE_NAMES[t] || t).join(", "))}</td><td class="r">${fmtN(r.cumU)} / ${fmtN(r.cumT)}</td></tr>`).join("")}</tbody>
       </table></div>
       <div class="acts">
-        <button type="button" data-export="jpg" data-cls="${esc(c.cls)}">JPEG indir</button>
+        <button type="button" data-export="jpg" data-cls="${esc(c.cls)}">Resim indir</button>
         <button type="button" data-export="pdf" data-cls="${esc(c.cls)}">PDF indir</button>
         ${canShare ? `<button type="button" data-export="share" data-cls="${esc(c.cls)}">Paylaş</button>` : ""}
       </div>
@@ -1324,7 +1448,7 @@ async function handleFiles(fileList) {
   }
   if (state.records.length) await persist();
   render();
-  if (state.files.some(f => !f.err)) { showTab("gunluk"); toast(schoolChanged ? "Farklı okulun raporu yüklendi; önceki okulun verileri silindi" : "Rapor yüklendi"); }
+  if (state.files.some(f => !f.err)) { showTab("home"); toast(schoolChanged ? "Farklı okulun raporu yüklendi; önceki okulun verileri silindi" : "Rapor yüklendi"); }
 }
 
 /* ---------- olaylar ---------- */
@@ -1353,7 +1477,8 @@ $("#rStudent").addEventListener("input", e => {
 });
 document.addEventListener("click", e => {
   const s = e.target.closest("[data-student]"); if (s) { openStudent(s.dataset.student); return; }
-  const tb = e.target.closest("[data-tab][role=tab], [data-goto]"); if (tb) { showTab(tb.dataset.goto || tb.dataset.tab); return; }
+  const tb = e.target.closest("[data-goto]");
+  if (tb) { if (tb.dataset.goto === "gunluk") { state.day = localToday(); renderDay(); } showTab(tb.dataset.goto); return; }
   const rg = e.target.closest("[data-range]"); if (rg) { const [from, to] = rangeFor(rg.dataset.range); setF({ from, to }); return; }
   const ct = e.target.closest("[data-cls-toggle]");
   if (ct) {
@@ -1397,21 +1522,19 @@ $("#dPrev").addEventListener("click", () => { state.day = prevSchoolDay(state.da
 $("#dNext").addEventListener("click", () => { state.day = nextSchoolDay(state.day || localToday()); renderDay(); });
 $("#dDate").addEventListener("change", e => { if (e.target.value) { state.day = e.target.value; renderDay(); } });
 
-const TABS = ["gunluk", "rapor", "uyarilar", "veri"];
+const TABS = ["home", "gunluk", "rapor", "uyarilar", "yukle", "yardim", "ayarlar"];
 function showTab(t) {
-  if (!TABS.includes(t)) t = "gunluk";
-  document.querySelectorAll(".tabpanel").forEach(p => { p.hidden = p.dataset.tab !== t; });
-  document.querySelectorAll(".tabs [role=tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  if (!TABS.includes(t)) t = "home";
+  document.querySelectorAll(".screen").forEach(p => { p.hidden = p.dataset.screen !== t; });
   try { localStorage.setItem("devamsizlik.tab", t); history.replaceState(null, "", "#" + t); } catch (e) {}
-  const nav = $(".tabs");
-  if (nav.getBoundingClientRect().top < 0) nav.scrollIntoView();
+  window.scrollTo(0, 0);
 }
 
 try { Object.assign(state.f, JSON.parse(localStorage.getItem("devamsizlik.rapor") || "{}")); } catch (e) {}
 syncSettingsForm();
 {
   let t = location.hash.slice(1);
-  if (!TABS.includes(t)) { try { t = localStorage.getItem("devamsizlik.tab") || ""; } catch (e) {} }
+  if (!TABS.includes(t)) t = "home";
   showTab(t);
 }
 (async () => {

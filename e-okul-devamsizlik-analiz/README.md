@@ -30,19 +30,22 @@ npm pack pdfjs-dist@3.11.174 && tar xzf pdfjs-dist-3.11.174.tgz
 python3 build.py package/build
 ```
 
-## Bölümler
+## Ekranlar
 
-- **Bugün:** o gün devamsız olan öğrenciler sınıf sınıf. Her sınıfın listesi JPEG / PDF olarak
-  indirilip sınıf öğretmenine gönderilebilir (telefonda **Paylaş** ile WhatsApp vb.).
-- **Rapor oluştur:** sırayla seçin:
-  1. **Tarih aralığı:** Bugün, Bu hafta, Geçen hafta, Bu ay, Geçen ay, Tüm kayıtlar ya da istediğiniz iki tarih.
-  2. **Sınıflar:** bir veya birden çok sınıf.
-  3. **Öğrenciler** (isteğe bağlı): ad ya da numara yazıp listeden seçin.
-  4. **Rapor türü:** Öğrenci listesi, Gün gün, Hafta hafta, Ay ay, Sınıf özeti; devamsızlık türü (özürsüz/özürlü).
-  5. **PDF indir / JPEG indir / Excel'e kopyala.** "Her sınıf ayrı sayfa / ayrı resim" seçiliyken her sınıf
-     ayrı sayfada ve ayrı JPEG dosyasında olur; öğretmenlere ayrı ayrı gönderilebilir.
-- **Uyarılar:** sınırı aşan, sınıra yaklaşan ve art arda gelmeyen öğrenciler.
-- **Rapor yükle ve ayarlar:** PDF yükleme, kayıtlı veriler, devamsızlık sınırları.
+Program açılınca **ana sayfa** gelir; büyük kutulardan birine tıklayarak işe başlanır. Her ekranda
+**← Ana sayfa** düğmesiyle geri dönülür.
+
+- **Bugün gelmeyenler:** o gün okula gelmeyen öğrenciler sınıf sınıf. Her sınıfın listesi resim ya da PDF
+  olarak indirilip sınıf öğretmenine gönderilebilir (telefonda **Paylaş** ile WhatsApp vb.).
+- **Rapor al:** sırayla seçin:
+  1. **Hangi tarihler?** Bugün, Bu hafta, Geçen hafta, Bu ay, Geçen ay, Tüm kayıtlar ya da istediğiniz iki tarih.
+  2. **Hangi sınıflar?** Bir veya birden çok sınıf.
+  3. **Belirli öğrenciler** (isterseniz): adı yazıp listeden seçin.
+  4. **Rapor nasıl görünsün?** Öğrenci listesi, Gün gün, Hafta hafta, Ay ay, Sınıf özeti.
+  5. **PDF olarak indir / Resim olarak indir / Excel'e kopyala.** "Her sınıf ayrı sayfada olsun" seçiliyken
+     her sınıf ayrı sayfada ve ayrı resim dosyasında olur.
+- **Dikkat edilecek öğrenciler:** sınırı aşan, sınıra yaklaşan ve art arda gelmeyen öğrenciler.
+- **Yeni rapor yükle**, **Nasıl kullanılır?**, **Ayarlar** (devamsızlık sınırları, verileri temizle).
 
 Öğrencinin adına tıklayınca takvimi açılır; **Bu öğrencinin raporu** ile yalnız o öğrencinin raporu hazırlanır.
 
