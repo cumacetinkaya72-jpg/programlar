@@ -151,7 +151,7 @@ dialog .dbody { padding: 18px; display: grid; gap: 14px; overflow: auto; max-hei
 .tabs button { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 6px 6px 0 0; background: none; padding: 10px 14px; color: var(--muted); font-size: .95rem; margin-bottom: -2px; border-bottom: 3px solid transparent; }
 .tabs button:hover { color: var(--ink); background: var(--accent-soft); }
 .tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); background: var(--sheet); }
-.rlayout { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.rlayout { display: grid; grid-template-columns: minmax(250px, 290px) minmax(0, 1fr); gap: 16px; align-items: start; }
 .fpanel { gap: 18px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 60px); }
 .fstep { display: grid; gap: 8px; }
 .fstep h3 { display: flex; align-items: center; gap: 8px; }
@@ -170,6 +170,9 @@ dialog .dbody { padding: 18px; display: grid; gap: 14px; overflow: auto; max-hei
 .rsec-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; justify-content: space-between; }
 .rsec-head h3 { color: var(--accent); font-size: 1.1rem; }
 #rBody { display: grid; gap: 22px; }
+#rBody th { white-space: normal; vertical-align: bottom; min-width: 4.5em; }
+#rBody th, #rBody td { padding: 6px 7px; }
+#rBody td.wr { min-width: 8em; }
 td.c, th.c { text-align: center; }
 td.hl { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
 td.wr { white-space: normal; min-width: 14em; }
@@ -380,6 +383,7 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
           <h2 id="rTitle"></h2>
           <p class="small" id="rDesc"></p>
           <p class="rsum" id="rSum"></p>
+          <p class="muted small" id="rNote"></p>
         </div>
         <div class="exportbar">
           <span class="sn">5</span>
@@ -1103,14 +1107,19 @@ function buildReport() {
   const level = key => (state.status.get(key) || {}).level || 0;
 
   if (f.view === "list") {
+    model.note = "\"Bu tarihlerde\": seçilen tarihlerdeki devamsızlık günü. \"Özürsüz / Özürlü / Genel toplam\": öğrencinin yüklenen rapordaki tüm devamsızlığı (dönem başından bugüne).";
     for (const cls of classes) {
       const studs = buildStudents(byClass.get(cls)).sort((a, b) => +a.no - +b.no);
       model.sections.push({
         heading: cls, sub: `${studs.length} öğrenci · ${fmtN(sumDays(byClass.get(cls)))} gün devamsızlık`,
-        columns: [{ t: "Sıra", w: 60, a: "r" }, { t: "No", w: 70, a: "r" }, { t: "Adı Soyadı", w: 330, link: true },
-          { t: "Devamsız olduğu günler", w: 380, wrap: true }, { t: "Özürsüz", w: 100, a: "r" }, { t: "Toplam", w: 90, a: "r" }, { t: "Durum", w: 100, pill: true }],
-        rows: studs.map((s, i) => ({ key: s.key, level: level(s.key),
-          cells: [i + 1, s.no, s.name, compactDates(s.recs.map(r => r.date)), fmtN(s.unexcused), fmtN(s.total), levelText(level(s.key))] }))
+        columns: [{ t: "Sıra", w: 52, a: "r" }, { t: "No", w: 64, a: "r" }, { t: "Adı Soyadı", w: 300, link: true },
+          { t: "Devamsız olduğu günler", w: 300, wrap: true }, { t: "Bu tarihlerde", w: 120, a: "r" },
+          { t: "Özürsüz toplam", w: 104, a: "r", alarm: true }, { t: "Özürlü toplam", w: 104, a: "r" }, { t: "Genel toplam", w: 100, a: "r", alarm: true }, { t: "Durum", w: 96, pill: true }],
+        rows: studs.map((s, i) => {
+          const all = state.status.get(s.key) || s;
+          return { key: s.key, level: level(s.key),
+            cells: [i + 1, s.no, s.name, compactDates(s.recs.map(r => r.date)), fmtN(s.total), fmtN(all.unexcused), fmtN(all.excused), fmtN(all.total), levelText(level(s.key))] };
+        })
       });
     }
   } else if (f.view === "classes") {
@@ -1215,6 +1224,8 @@ function renderPages(model, split) {
     for (const ln of wrap(model.desc, W - 2 * M, `400 21px ${body}`).slice(0, 4)) { text(ln, M, y, `400 21px ${body}`, C.ink); y += 28; }
     text(model.sum, M, y + 2, `700 21px ${body}`, C.accent, "left", W - 2 * M);
     y += 22;
+    if (model.note) for (const ln of wrap(model.note, W - 2 * M, `400 18px ${body}`).slice(0, 3)) { y += 26; text(ln, M, y, `400 18px ${body}`, C.muted); }
+    if (model.note) y += 14;
     g.fillStyle = C.line; g.fillRect(M, y, W - 2 * M, 2);
     y += 18;
     page = { cv, top: y, used: y, cls: "" }; pages.push(page);
@@ -1225,14 +1236,17 @@ function renderPages(model, split) {
     return 22 + lines * 28;
   };
   function colHeader(s) {
+    const hf = `700 16px ${body}`;
+    const labels = s.columns.map(c => wrap(c.t.toLocaleUpperCase("tr"), c.w - 12, hf).slice(0, 2));
+    const nl = Math.max(...labels.map(l => l.length));
     let x = M;
-    for (const c of s.columns) {
+    s.columns.forEach((c, i) => {
       const tx = c.a === "r" ? x + c.w - 8 : c.a === "c" ? x + c.w / 2 : x + 8;
-      text(c.t.toLocaleUpperCase("tr"), tx, y + 26, `700 16px ${body}`, C.muted, c.a === "r" ? "right" : c.a === "c" ? "center" : "left", c.w - 10);
+      labels[i].forEach((ln, li) => text(ln, tx, y + 26 + (nl - labels[i].length + li) * 20, hf, C.muted, c.a === "r" ? "right" : c.a === "c" ? "center" : "left", c.w - 10));
       x += c.w;
-    }
-    g.fillStyle = C.line; g.fillRect(M, y + 40, x - M, 1);
-    y += 44;
+    });
+    g.fillStyle = C.line; g.fillRect(M, y + 20 + nl * 20, x - M, 1);
+    y += 24 + nl * 20;
   }
   function secHeader(s, cont) {
     text(s.heading + (cont ? " (devam)" : ""), M, y + 34, `700 30px ${disp}`, C.accent);
@@ -1244,7 +1258,7 @@ function renderPages(model, split) {
   model.sections.forEach((s, si) => {
     if (!s.rows.length) return;
     if (si > 0 && split && y > page.top) newPage();
-    if (y + 96 + rowH(s, s.rows[0]) > H - FOOT) newPage();
+    if (y + 120 + rowH(s, s.rows[0]) > H - FOOT) newPage();
     secHeader(s, false);
     s.rows.forEach((r, ri) => {
       const h = rowH(s, r);
@@ -1268,7 +1282,7 @@ function renderPages(model, split) {
           wrap(v, c.w - 16, font).forEach((ln, li) => text(ln, x + 8, y + 33 + li * 28, font, C.ink));
         } else {
           const tx = c.a === "r" ? x + c.w - 8 : c.a === "c" ? x + c.w / 2 : x + 8;
-          const color = c.t === "Toplam" && r.level === 2 ? C.crit : C.ink;
+          const color = (c.t === "Toplam" || c.alarm) && r.level === 2 ? C.crit : C.ink;
           text(v, tx, y + h / 2 + 7, font, color, c.a === "r" ? "right" : c.a === "c" ? "center" : "left", c.w - 14);
         }
         x += c.w;
@@ -1362,6 +1376,7 @@ function renderReport() {
   $("#rTitle").textContent = model.title;
   $("#rDesc").textContent = model.desc;
   $("#rSum").textContent = model.sum;
+  $("#rNote").textContent = model.note || "";
   $("#rBody").innerHTML = modelToHtml(model);
 }
 function saveReportPrefs() { try { localStorage.setItem("devamsizlik.rapor", JSON.stringify(state.f)); } catch (e) {} }
