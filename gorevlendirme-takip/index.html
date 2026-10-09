@@ -67,8 +67,24 @@
   .rules td, .rules th { white-space: normal; position: static; cursor: default; }
   .muted { color: var(--muted); }
   .empty { padding: 30px; text-align: center; color: var(--muted); }
+  input[type=date] { font: inherit; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel); color: var(--text); }
+  #saveStatus { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--green-bg); color: var(--green); }
+  #saveStatus.warn { background: var(--amber-bg); color: var(--amber); }
+  #saveStatus.err { background: var(--red-bg); color: var(--red); }
+  td.islem button { padding: 3px 9px; font-size: 12px; }
+  .tag { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 6px; font-size: 11px; background: var(--gray-bg); color: var(--muted); }
+  dialog { border: 1px solid var(--border); border-radius: 12px; background: var(--panel); color: var(--text); padding: 0; width: min(560px, calc(100vw - 32px)); }
+  dialog::backdrop { background: rgba(0,0,0,.45); }
+  dialog form { padding: 18px; }
+  dialog h2 { margin: 0 0 14px; font-size: 18px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+  .form-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+  .form-grid label.full { grid-column: 1 / -1; }
+  .form-grid input { width: 100%; color: var(--text); }
+  .form-err { color: var(--red); min-height: 18px; margin: 8px 0 0; font-size: 13px; }
+  @media (max-width: 520px) { .form-grid { grid-template-columns: 1fr; } }
   @media print {
-    header, #drop, .no-print, details { display: none !important; }
+    header, #drop, .no-print, details, td.islem, th.islem { display: none !important; }
     #alert { animation: none; }
     body { background: #fff; }
   }
@@ -91,6 +107,24 @@
     </div>
   </div>
 
+  <div class="panel no-print">
+    <div class="row">
+      <strong>Otomatik kayıt:</strong>
+      <span id="saveStatus">Kaydedilecek veri yok</span>
+      <span id="fileSaveInfo" class="muted"></span>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="bindFileBtn" title="Her değişiklikte veriler seçtiğiniz dosyaya da otomatik yazılır">Kayıt dosyası oluştur</button>
+      <button id="openFileBtn" title="Daha önce oluşturduğunuz kayıt dosyasını açar ve ona otomatik kaydetmeye devam eder">Kayıt dosyasını aç</button>
+      <button id="reconnectBtn" style="display:none" class="primary">Kayıt dosyasına yeniden bağlan</button>
+      <button id="backupBtn">Yedek indir</button>
+      <button id="restoreBtn">Yedekten geri yükle</button>
+      <input type="file" id="restoreFile" accept=".json,application/json">
+    </div>
+    <p class="muted" style="margin:8px 0 0;font-size:13px">Her değişiklik anında tarayıcının kalıcı hafızasına iki ayrı yere yazılır; elektrik kesilse de sayfa yeniden açıldığında veriler geri gelir.
+      Ek güvence için <em>Kayıt dosyası oluştur</em> ile bilgisayarınıza bir dosya seçerseniz (Chrome / Edge) her değişiklik o dosyaya da otomatik yazılır.</p>
+  </div>
+
   <div id="alert"></div>
 
   <div class="panel">
@@ -101,6 +135,7 @@
     <div class="row">
       <input type="text" id="search" placeholder="Ad, soyad, T.C., kurum ara…" style="flex:1;min-width:200px">
       <select id="roleFilter"><option value="">Tüm görevler</option></select>
+      <button id="addBtn" class="primary">+ Öğretmen ekle</button>
       <button id="exportBtn" disabled>Excel'e aktar</button>
       <button id="printBtn" disabled>Yazdır</button>
       <button id="clearBtn" disabled>Listeyi temizle</button>
@@ -139,6 +174,31 @@
   </details>
 </main>
 
+<dialog id="recDialog">
+  <form id="recForm" method="dialog" novalidate>
+    <h2 id="recTitle">Öğretmen ekle</h2>
+    <div class="form-grid">
+      <label>Adı *<input type="text" name="ad" required></label>
+      <label>Soyadı *<input type="text" name="soyad" required></label>
+      <label>T.C. Kimlik No<input type="text" name="tc" inputmode="numeric" maxlength="11"></label>
+      <label>Görev *<input type="text" name="gorev" list="gorevList" required></label>
+      <label>Branş<input type="text" name="brans" list="bransList"></label>
+      <label>Başlama tarihi *<input type="date" name="baslama" required></label>
+      <label class="full">Görevlendirildiği Kurum<input type="text" name="kurum" list="kurumList"></label>
+      <label class="full">Süre (ay) — boş bırakılırsa görev adına göre otomatik (müdür, müdür yrd., şube müdürü, MEBBİS: 6 ay)
+        <input type="number" name="sure" min="0" max="120" placeholder="Otomatik"></label>
+    </div>
+    <p class="form-err" id="formErr"></p>
+    <div class="row" style="justify-content:flex-end;margin-top:6px">
+      <button type="button" id="cancelRec">Vazgeç</button>
+      <button type="submit" class="primary" id="saveRec">Kaydet</button>
+    </div>
+  </form>
+</dialog>
+<datalist id="gorevList"></datalist>
+<datalist id="bransList"></datalist>
+<datalist id="kurumList"></datalist>
+
 <script>
 (function () {
   "use strict";
@@ -164,7 +224,8 @@
     { id: "durum", label: "Durum" },
     { id: "kurum", label: "Görevlendirildiği Kurum" },
     { id: "brans", label: "Branş" },
-    { id: "tc", label: "T.C. Kimlik No" }
+    { id: "tc", label: "T.C. Kimlik No" },
+    { id: "islem", label: "İşlem" }
   ];
 
   var STATUS = {
@@ -185,8 +246,43 @@
 
   // ---------- storage ----------
   function storageGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
-  function storageSet(key, val) { try { localStorage.setItem(key, val); } catch (e) { /* yoksay */ } }
-  function storageDel(key) { try { localStorage.removeItem(key); } catch (e) { /* yoksay */ } }
+  function storageSet(key, val) { try { localStorage.setItem(key, val); return true; } catch (e) { return false; } }
+
+  // IndexedDB: ikinci kalıcı kopya ve kayıt dosyası bağlantısı
+  var dbPromise = null;
+  function idb() {
+    if (!dbPromise) {
+      dbPromise = new Promise(function (resolve, reject) {
+        if (!window.indexedDB) { reject(new Error("IndexedDB yok")); return; }
+        var req = indexedDB.open("gorevTakip", 1);
+        req.onupgradeneeded = function () { req.result.createObjectStore("kv"); };
+        req.onsuccess = function () { resolve(req.result); };
+        req.onerror = function () { reject(req.error); };
+      });
+    }
+    return dbPromise;
+  }
+  function idbGet(key) {
+    return idb().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var r = db.transaction("kv", "readonly").objectStore("kv").get(key);
+        r.onsuccess = function () { resolve(r.result); };
+        r.onerror = function () { reject(r.error); };
+      });
+    });
+  }
+  function idbSet(key, val) {
+    return idb().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx;
+        try { tx = db.transaction("kv", "readwrite", { durability: "strict" }); } catch (e) { tx = db.transaction("kv", "readwrite"); }
+        tx.objectStore("kv").put(val, key);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { reject(tx.error); };
+        tx.onabort = function () { reject(tx.error); };
+      });
+    });
+  }
 
   function loadSettings() {
     var s = null;
@@ -200,7 +296,7 @@
       rules: Array.isArray(s.rules) ? s.rules : d.rules
     };
   }
-  function saveSettings() { storageSet(SETTINGS_KEY, JSON.stringify(settings)); }
+  function saveSettings() { saveAll(); }
   function num(v, d) { var n = parseInt(v, 10); return isNaN(n) ? d : n; }
 
   // ---------- helpers ----------
@@ -243,7 +339,7 @@
   }
 
   function compute(rec) {
-    var months = monthsFor(rec.gorev);
+    var months = rec.sure != null && rec.sure !== "" ? num(rec.sure, 0) : monthsFor(rec.gorev);
     var out = { months: months, bitis: null, kalan: null, status: "none" };
     if (!rec.baslama || !months) return out;
     out.bitis = new Date(addMonths(rec.baslama, months).getTime());
@@ -329,9 +425,22 @@
           alert("Dosyada uygun bir liste bulunamadı. Başlık satırında 'Adı', 'Başlama Tarih' ve 'Görev' sütunları olmalı.");
           return;
         }
-        records = res.records;
+        var manual = records.filter(function (r) { return r.kaynak === "manuel"; });
+        var oldExcel = records.filter(function (r) { return r.kaynak !== "manuel"; });
+        if (records.length && !confirm("Yeni Excel listesi yüklenecek.\n\nÖnceki Excel kayıtlarının yerini yeni dosya alacak; elle eklediğiniz " +
+            manual.length + " kayıt korunacak. Devam edilsin mi?")) return;
+        // elle eklenen kayıtla aynı olanları tekrar ekleme; önceki Excel kaydına verilen özel süreyi koru
+        var manualKeys = {}, oldSure = {};
+        manual.forEach(function (r) { manualKeys[recKey(r)] = true; });
+        oldExcel.forEach(function (r) { if (r.sure != null && r.sure !== "") oldSure[recKey(r)] = r.sure; });
+        var fresh = res.records.filter(function (r) { return !manualKeys[recKey(r)]; }).map(function (r) {
+          var k = recKey(r);
+          return Object.assign(r, { id: newId("x"), kaynak: "excel", sure: oldSure[k] != null ? oldSure[k] : null });
+        });
+        records = fresh.concat(manual);
         fileName = file.name;
-        persistData(res.sheets);
+        dataInfo = "Yüklenen dosya: " + fileName + " — " + fresh.length + " kişi (" + res.sheets.join(", ") + ") — " + new Date().toLocaleString("tr-TR");
+        saveAll();
         render();
       } catch (err) {
         alert("Dosya okunamadı: " + err.message);
@@ -340,23 +449,259 @@
     reader.readAsArrayBuffer(file);
   }
 
-  function persistData(sheets) {
-    var info = "Yüklenen dosya: " + fileName + " — " + records.length + " kişi (" + sheets.join(", ") + ") — " + new Date().toLocaleString("tr-TR");
-    $("fileInfo").textContent = info;
-    storageSet(DATA_KEY, JSON.stringify({
-      info: info,
+  function recKey(r) { return [r.tc || trLower(r.ad + " " + r.soyad), trLower(r.gorev), trLower(r.kurum), r.baslama ? r.baslama.getTime() : ""].join("|"); }
+  function newId(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+  // ---------- otomatik kayıt ----------
+  var dataInfo = "";
+  var fileHandle = null;      // bağlı kayıt dosyası (File System Access API)
+  var fileWriting = null, fileDirty = false;
+  var canUseFiles = typeof window.showSaveFilePicker === "function";
+
+  function serialize() {
+    return {
+      program: "gorevlendirme-takip",
+      version: 2,
+      savedAt: new Date().toISOString(),
+      info: dataInfo,
+      settings: settings,
       records: records.map(function (r) { return Object.assign({}, r, { baslama: r.baslama ? fmt(r.baslama) : "" }); })
-    }));
+    };
   }
 
+  function applyState(d) {
+    if (!d || typeof d !== "object") return false;
+    if (!Array.isArray(d.records)) return false;
+    records = d.records.map(function (r) {
+      return Object.assign({}, r, {
+        baslama: parseDate(r.baslama),
+        id: r.id || newId("x"),
+        kaynak: r.kaynak || "excel"
+      });
+    });
+    dataInfo = d.info || "";
+    if (d.settings && typeof d.settings === "object") {
+      var def = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+      settings = {
+        warnDays: num(d.settings.warnDays, def.warnDays),
+        soonDays: num(d.settings.soonDays, def.soonDays),
+        defaultMonths: num(d.settings.defaultMonths, def.defaultMonths),
+        rules: Array.isArray(d.settings.rules) ? d.settings.rules : def.rules
+      };
+    }
+    lastSavedAt = d.savedAt || "";
+    return true;
+  }
+  var lastSavedAt = "";
+
+  function saveAll() {
+    var state = serialize();
+    var json = JSON.stringify(state);
+    lastSavedAt = state.savedAt;
+    var okLocal = storageSet(DATA_KEY, json);
+    storageSet(SETTINGS_KEY, JSON.stringify(settings));
+    var time = new Date(state.savedAt).toLocaleTimeString("tr-TR");
+    setStatus(okLocal ? "ok" : "warn", (okLocal ? "✔ Kaydedildi " : "Kaydediliyor… ") + time);
+    idbSet("state", state).then(function () {
+      setStatus("ok", "✔ Kaydedildi " + time + " (" + records.length + " kayıt)");
+    }).catch(function () {
+      if (!okLocal) setStatus("err", "✖ Tarayıcı hafızasına kaydedilemedi! Lütfen 'Yedek indir' ile yedek alın.");
+    });
+    writeFile(json);
+  }
+
+  function setStatus(kind, text) {
+    var el = $("saveStatus");
+    el.className = kind === "ok" ? "" : kind;
+    el.textContent = text;
+  }
+
+  function writeFile(json) {
+    if (!fileHandle) return;
+    if (fileWriting) { fileDirty = true; return; }
+    fileWriting = fileHandle.queryPermission({ mode: "readwrite" }).then(function (p) {
+      if (p !== "granted") throw new Error("izin yok");
+      return fileHandle.createWritable();
+    }).then(function (w) {
+      return w.write(json).then(function () { return w.close(); });
+    }).then(function () {
+      $("fileSaveInfo").textContent = "Kayıt dosyası: " + fileHandle.name + " — son yazma " + new Date().toLocaleTimeString("tr-TR");
+      $("reconnectBtn").style.display = "none";
+    }).catch(function () {
+      $("fileSaveInfo").textContent = "Kayıt dosyası " + fileHandle.name + " şu an yazılamıyor — 'Yeniden bağlan' düğmesine basın.";
+      $("reconnectBtn").style.display = "";
+    }).then(function () {
+      fileWriting = null;
+      if (fileDirty) { fileDirty = false; writeFile(JSON.stringify(serialize())); }
+    });
+  }
+
+  function bindFile(handle, writeNow) {
+    fileHandle = handle;
+    idbSet("fileHandle", handle).catch(function () { /* saklanamazsa sadece bu oturumda geçerli */ });
+    $("fileSaveInfo").textContent = "Kayıt dosyası: " + handle.name;
+    if (writeNow) writeFile(JSON.stringify(serialize()));
+  }
+
+  function createSaveFile() {
+    window.showSaveFilePicker({
+      suggestedName: "gorevlendirme_kayit.json",
+      types: [{ description: "Görevlendirme kayıt dosyası", accept: { "application/json": [".json"] } }]
+    }).then(function (h) { bindFile(h, true); }).catch(function () { /* vazgeçildi */ });
+  }
+
+  function openSaveFile() {
+    window.showOpenFilePicker({
+      types: [{ description: "Görevlendirme kayıt dosyası", accept: { "application/json": [".json"] } }]
+    }).then(function (hs) {
+      var h = hs[0];
+      return h.getFile().then(function (f) { return f.text(); }).then(function (text) {
+        var d = JSON.parse(text);
+        if (!applyState(d)) throw new Error("Geçersiz kayıt dosyası");
+        renderSettings(); render();
+        return h.requestPermission({ mode: "readwrite" }).then(function (p) {
+          bindFile(h, false);
+          if (p === "granted") saveAll();
+        });
+      });
+    }).catch(function (e) { if (e && e.name !== "AbortError") alert("Kayıt dosyası açılamadı: " + e.message); });
+  }
+
+  function reconnectFile() {
+    if (!fileHandle) return;
+    fileHandle.requestPermission({ mode: "readwrite" }).then(function (p) {
+      if (p === "granted") { $("reconnectBtn").style.display = "none"; writeFile(JSON.stringify(serialize())); }
+    });
+  }
+
+  function downloadBackup() {
+    var blob = new Blob([JSON.stringify(serialize(), null, 1)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "gorevlendirme_yedek_" + fmt(today()).replace(/\./g, "-") + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  }
+
+  function restoreBackup(file) {
+    if (!file) return;
+    file.text().then(function (text) {
+      var d = JSON.parse(text);
+      if (!Array.isArray(d.records)) throw new Error("Bu dosya bir görevlendirme yedeği değil");
+      if (records.length && !confirm("Mevcut liste (" + records.length + " kayıt) yedekteki " + d.records.length + " kayıtla değiştirilsin mi?")) return;
+      applyState(d);
+      renderSettings(); saveAll(); render();
+    }).catch(function (e) { alert("Yedek yüklenemedi: " + e.message); });
+  }
+
+  // Açılışta: tarayıcı hafızası ve IndexedDB'den en yeni kopyayı al, kayıt dosyasına yeniden bağlan
   function restoreData() {
-    var raw = storageGet(DATA_KEY);
-    if (!raw) return;
-    try {
-      var d = JSON.parse(raw);
-      records = (d.records || []).map(function (r) { return Object.assign({}, r, { baslama: parseDate(r.baslama) }); });
-      $("fileInfo").textContent = (d.info || "") + " (kayıtlı liste)";
-    } catch (e) { records = []; }
+    var raw = storageGet(DATA_KEY), local = null;
+    try { local = raw ? JSON.parse(raw) : null; } catch (e) { local = null; }
+    if (local) applyState(local);
+    return Promise.all([
+      idbGet("state").catch(function () { return null; }),
+      idbGet("fileHandle").catch(function () { return null; })
+    ]).then(function (res) {
+      var stored = res[0], handle = res[1];
+      if (stored && Array.isArray(stored.records) && (!local || (stored.savedAt || "") > (local.savedAt || ""))) {
+        applyState(stored);
+        storageSet(DATA_KEY, JSON.stringify(stored));
+      }
+      if (handle && canUseFiles) {
+        fileHandle = handle;
+        return handle.queryPermission({ mode: "readwrite" }).then(function (p) {
+          if (p === "granted") {
+            $("fileSaveInfo").textContent = "Kayıt dosyası: " + handle.name;
+            return handle.getFile().then(function (f) { return f.text(); }).then(function (text) {
+              var d = JSON.parse(text);
+              if (d && (d.savedAt || "") > (lastSavedAt || "")) { applyState(d); saveAll(); }
+            }).catch(function () { /* dosya okunamadı */ });
+          }
+          $("fileSaveInfo").textContent = "Kayıt dosyası: " + handle.name + " (bağlantı için düğmeye basın)";
+          $("reconnectBtn").style.display = "";
+        });
+      }
+    }).catch(function () { /* yoksay */ });
+  }
+
+  function updateSaveInfo() {
+    $("fileInfo").textContent = records.length ? (dataInfo || "Elle oluşturulan liste") : "Henüz dosya yüklenmedi.";
+    if (records.length && lastSavedAt && $("saveStatus").textContent === "Kaydedilecek veri yok") {
+      setStatus("ok", "✔ Kayıtlı veri yüklendi (son kayıt " + new Date(lastSavedAt).toLocaleString("tr-TR") + ")");
+    }
+  }
+
+  // ---------- elle ekleme / düzenleme ----------
+  var editingId = null;
+  var KNOWN_ROLES = ["Müdür", "Müdür Yardımcısı", "Müdür Yetkili Öğretmen", "Şube Müdürü", "MEBBİS İlçe Yöneticisi", "MEBBİS Koordinatörü", "Öğretmen"];
+
+  function fillDatalists() {
+    function uniq(field, extra) {
+      var s = {};
+      (extra || []).forEach(function (v) { s[v] = true; });
+      records.forEach(function (r) { if (r[field]) s[r[field]] = true; });
+      return Object.keys(s).sort(function (a, b) { return a.localeCompare(b, "tr"); })
+        .map(function (v) { return '<option value="' + esc(v) + '">'; }).join("");
+    }
+    $("gorevList").innerHTML = uniq("gorev", KNOWN_ROLES);
+    $("bransList").innerHTML = uniq("brans");
+    $("kurumList").innerHTML = uniq("kurum");
+  }
+
+  function isoDate(d) { return d ? d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0") : ""; }
+
+  function openRecord(id) {
+    var f = $("recForm");
+    f.reset();
+    $("formErr").textContent = "";
+    fillDatalists();
+    editingId = id || null;
+    var r = id ? records.filter(function (x) { return x.id === id; })[0] : null;
+    $("recTitle").textContent = r ? "Kaydı düzenle" : "Öğretmen ekle";
+    if (r) {
+      ["ad", "soyad", "tc", "gorev", "brans", "kurum"].forEach(function (k) { f.elements[k].value = r[k] || ""; });
+      f.elements.baslama.value = isoDate(r.baslama);
+      f.elements.sure.value = r.sure != null && r.sure !== "" ? r.sure : "";
+    }
+    $("recDialog").showModal();
+    f.elements.ad.focus();
+  }
+
+  function saveRecord(e) {
+    e.preventDefault();
+    var f = $("recForm"), v = {};
+    ["ad", "soyad", "tc", "gorev", "brans", "kurum"].forEach(function (k) { v[k] = clean(f.elements[k].value); });
+    v.ad = v.ad.toLocaleUpperCase("tr-TR");
+    v.soyad = v.soyad.toLocaleUpperCase("tr-TR");
+    var baslama = parseDate(f.elements.baslama.value);
+    var sureRaw = f.elements.sure.value.trim();
+    var err = "";
+    if (!v.ad || !v.soyad) err = "Adı ve soyadı zorunludur.";
+    else if (!v.gorev) err = "Görev zorunludur.";
+    else if (!baslama) err = "Başlama tarihi zorunludur.";
+    else if (v.tc && !/^\d{11}$/.test(v.tc)) err = "T.C. Kimlik No 11 haneli olmalıdır.";
+    else if (sureRaw && (isNaN(+sureRaw) || +sureRaw < 0)) err = "Süre geçerli bir ay sayısı olmalıdır.";
+    if (err) { $("formErr").textContent = err; return; }
+    var rec = Object.assign(v, { baslama: baslama, sure: sureRaw === "" ? null : num(sureRaw, 0) });
+    if (editingId) {
+      records = records.map(function (r) { return r.id === editingId ? Object.assign({}, r, rec) : r; });
+    } else {
+      var dup = records.filter(function (r) { return recKey(r) === recKey(rec); })[0];
+      if (dup) { $("formErr").textContent = "Bu kişi aynı görev, kurum ve tarihle zaten listede var."; return; }
+      records.push(Object.assign(rec, { id: newId("m"), kaynak: "manuel" }));
+    }
+    $("recDialog").close();
+    saveAll();
+    render();
+  }
+
+  function deleteRecord(id) {
+    var r = records.filter(function (x) { return x.id === id; })[0];
+    if (!r || !confirm(r.ad + " " + r.soyad + " (" + r.gorev + ") listeden silinsin mi?")) return;
+    records = records.filter(function (x) { return x.id !== id; });
+    saveAll();
+    render();
   }
 
   // ---------- görüntüleme ----------
@@ -367,7 +712,8 @@
   function render() {
     var list = enriched();
     var has = records.length > 0;
-    ["exportBtn", "printBtn", "clearBtn"].forEach(function (id) { $(id).disabled = !has; });
+    ["exportBtn", "printBtn", "clearBtn", "backupBtn"].forEach(function (id) { $(id).disabled = !has; });
+    updateSaveInfo();
 
     // görev filtresi seçenekleri
     var roles = {};
@@ -449,19 +795,22 @@
   function renderTable(rows) {
     $("thead").innerHTML = COLUMNS.map(function (c) {
       var arrow = sortCol === c.id ? (sortDir === 1 ? "▲" : "▼") : "";
+      if (c.id === "islem") return '<th class="islem">' + esc(c.label) + "</th>";
       return '<th data-col="' + c.id + '">' + esc(c.label) + ' <span class="arrow">' + arrow + "</span></th>";
     }).join("");
     $("empty").style.display = rows.length ? "none" : "block";
-    $("empty").textContent = records.length ? "Filtreye uyan kayıt yok." : "Listeyi görmek için Excel dosyasını yükleyin.";
+    $("empty").textContent = records.length ? "Filtreye uyan kayıt yok." : "Listeyi görmek için Excel dosyasını yükleyin veya '+ Öğretmen ekle' ile elle ekleyin.";
     $("tbody").innerHTML = rows.map(function (r) {
       var kalan = r.kalan == null ? "—" : (r.kalan < 0 ? r.kalan + " (doldu)" : (r.kalan === 0 ? "0 (bugün)" : r.kalan));
       var dur = r.status === "none" && r.baslama ? "Süre tanımsız" : (r.baslama ? STATUS[r.status].label : "Tarih yok");
       return '<tr class="' + r.status + '">' +
-        "<td>" + esc(r.ad) + "</td><td>" + esc(r.soyad) + "</td><td>" + esc(r.gorev) +
-        (r.months ? ' <span class="muted">(' + r.months + " ay)</span>" : "") +
+        "<td>" + esc(r.ad) + (r.kaynak === "manuel" ? '<span class="tag" title="Elle eklendi">elle</span>' : "") +
+        "</td><td>" + esc(r.soyad) + "</td><td>" + esc(r.gorev) +
+        (r.months ? ' <span class="muted">(' + r.months + " ay" + (r.sure != null && r.sure !== "" ? ", özel" : "") + ")</span>" : "") +
         "</td><td>" + fmt(r.baslama) + "</td><td>" + fmt(r.bitis) + '</td><td class="kalan">' + kalan +
         '</td><td><span class="badge ' + r.status + '">' + dur + "</span></td><td>" + esc(r.kurum) +
-        "</td><td>" + esc(r.brans) + "</td><td>" + esc(r.tc) + "</td></tr>";
+        "</td><td>" + esc(r.brans) + "</td><td>" + esc(r.tc) +
+        '</td><td class="islem"><button data-edit="' + esc(r.id) + '">Düzenle</button> <button data-del="' + esc(r.id) + '">Sil</button></td></tr>';
     }).join("");
   }
 
@@ -482,12 +831,12 @@
   // ---------- dışa aktarma ----------
   function exportExcel() {
     var list = enriched().sort(function (a, b) { return sortValue(a, "durum") - sortValue(b, "durum"); });
-    var data = [["T.C. Kimlik No", "Adı", "Soyadı", "Görev", "Branş", "Görevlendirildiği Kurum", "Başlama Tarihi", "Süre (ay)", "Bitiş Tarihi", "Kalan Gün", "Durum"]];
+    var data = [["T.C. Kimlik No", "Adı", "Soyadı", "Görev", "Branş", "Görevlendirildiği Kurum", "Başlama Tarihi", "Süre (ay)", "Bitiş Tarihi", "Kalan Gün", "Durum", "Kaynak"]];
     list.forEach(function (r) {
-      data.push([r.tc, r.ad, r.soyad, r.gorev, r.brans, r.kurum, fmt(r.baslama), r.months || "", fmt(r.bitis), r.kalan == null ? "" : r.kalan, STATUS[r.status].label]);
+      data.push([r.tc, r.ad, r.soyad, r.gorev, r.brans, r.kurum, fmt(r.baslama), r.months || "", fmt(r.bitis), r.kalan == null ? "" : r.kalan, STATUS[r.status].label, r.kaynak === "manuel" ? "Elle eklendi" : "Excel"]);
     });
     var ws = XLSX.utils.aoa_to_sheet(data);
-    ws["!cols"] = [14, 14, 16, 30, 20, 40, 12, 9, 12, 10, 14].map(function (w) { return { wch: w }; });
+    ws["!cols"] = [14, 14, 16, 30, 20, 40, 12, 9, 12, 10, 14, 12].map(function (w) { return { wch: w }; });
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Görevlendirme Takip");
     XLSX.writeFile(wb, "gorevlendirme_takip_" + fmt(today()).replace(/\./g, "-") + ".xlsx");
@@ -509,7 +858,7 @@
     render();
   });
   $("thead").addEventListener("click", function (e) {
-    var th = e.target.closest("th");
+    var th = e.target.closest("th[data-col]");
     if (!th) return;
     var col = th.getAttribute("data-col");
     if (sortCol === col) sortDir = -sortDir; else { sortCol = col; sortDir = 1; }
@@ -518,11 +867,34 @@
   $("exportBtn").addEventListener("click", exportExcel);
   $("printBtn").addEventListener("click", function () { window.print(); });
   $("clearBtn").addEventListener("click", function () {
-    if (!confirm("Yüklenen liste bu tarayıcıdan silinsin mi?")) return;
-    records = []; fileName = ""; storageDel(DATA_KEY);
-    $("fileInfo").textContent = "Henüz dosya yüklenmedi.";
+    if (!confirm("Tüm liste (elle eklenenler dahil " + records.length + " kayıt) silinsin mi?\n\nÖnce 'Yedek indir' ile yedek almanız önerilir.")) return;
+    records = []; fileName = ""; dataInfo = "";
+    saveAll();
     render();
   });
+
+  $("addBtn").addEventListener("click", function () { openRecord(null); });
+  $("recForm").addEventListener("submit", saveRecord);
+  $("cancelRec").addEventListener("click", function () { $("recDialog").close(); });
+  $("tbody").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.hasAttribute("data-edit")) openRecord(b.getAttribute("data-edit"));
+    else if (b.hasAttribute("data-del")) deleteRecord(b.getAttribute("data-del"));
+  });
+
+  $("bindFileBtn").addEventListener("click", createSaveFile);
+  $("openFileBtn").addEventListener("click", openSaveFile);
+  $("reconnectBtn").addEventListener("click", reconnectFile);
+  $("backupBtn").addEventListener("click", downloadBackup);
+  $("restoreBtn").addEventListener("click", function () { $("restoreFile").click(); });
+  $("restoreFile").addEventListener("change", function (e) { restoreBackup(e.target.files[0]); e.target.value = ""; });
+  if (!canUseFiles) {
+    $("bindFileBtn").style.display = "none";
+    $("openFileBtn").style.display = "none";
+  }
+  // tarayıcının verileri kendiliğinden silmemesi için kalıcı depolama iste
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
 
   $("warnDays").addEventListener("change", function () { settings.warnDays = Math.max(1, num(this.value, 10)); settingsChanged(); });
   $("soonDays").addEventListener("change", function () { settings.soonDays = Math.max(1, num(this.value, 30)); settingsChanged(); });
@@ -548,8 +920,8 @@
     renderSettings(); settingsChanged();
   });
 
+  restoreData().then(function () { renderSettings(); render(); });
   renderSettings();
-  restoreData();
   render();
   // gün değişince (sayfa açık kalırsa) kalan günleri güncelle
   setInterval(render, 60 * 60 * 1000);
