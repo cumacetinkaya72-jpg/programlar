@@ -16,7 +16,7 @@ PDF yalnızca tarayıcınızda okunur, hiçbir yere gönderilmez.
 **Veriler saklanır:** yüklenen devamsızlık kayıtları o bilgisayardaki tarayıcıda (IndexedDB) saklanır;
 program kapatılıp açıldığında yerinde durur. Her gün yeni raporu yüklemeniz yeterlidir: yeni rapor,
 kapsadığı şube ve tarih aralığı için esas alınır (e-Okul'da düzeltilen kayıtlar da güncellenir),
-diğer kayıtlar korunur. **Kayıtlı verileri sil** düğmesi (iki kez basılır) tüm verileri siler.
+diğer kayıtlar korunur. Üst çubuktaki **Verileri temizle** düğmesi (onay penceresiyle) tüm verileri siler.
 Veriler tarayıcıya bağlıdır: başka tarayıcıda, gizli pencerede ya da tarayıcı verileri
 temizlendiğinde görünmez.
 

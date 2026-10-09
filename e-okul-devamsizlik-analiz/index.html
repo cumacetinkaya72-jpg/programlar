@@ -66,6 +66,8 @@ header.top .meta { display: grid; gap: 4px; min-width: 0; }
 button, .btn { font: inherit; font-weight: 700; border-radius: 6px; border: 1px solid var(--line); background: var(--sheet); color: var(--ink); padding: 7px 14px; cursor: pointer; }
 button:hover, .btn:hover { border-color: var(--accent); }
 button.primary, .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--sheet); }
+button.danger { color: var(--crit); border-color: var(--crit); }
+button.danger.solid { background: var(--crit); color: var(--sheet); }
 button.link { border: none; background: none; padding: 0; color: var(--accent); font-weight: 700; text-align: left; }
 button.link:hover { text-decoration: underline; }
 button:focus-visible, input:focus-visible, select:focus-visible, .btn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -214,6 +216,7 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
     </div>
     <div class="topacts">
       <span class="small" id="storeMini"></span>
+      <button type="button" class="danger" id="clearTop" hidden>Verileri temizle</button>
       <label class="btn primary" for="fileInput">Rapor yükle (PDF)</label>
     </div>
   </header>
@@ -349,7 +352,7 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <label class="btn primary" for="fileInput">PDF seç</label>
         <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple>
-        <button id="clearBtn" type="button">Kayıtlı verileri sil</button>
+        <button id="clearBtn" type="button" class="danger">Verileri temizle</button>
       </div>
     </section>
     <div class="panel" id="settingsBox">
@@ -374,6 +377,17 @@ button.day { border: none; background: none; padding: 0; font: inherit; color: v
 </div>
 
 <dialog id="dlg"><div class="dbody" id="dlgBody"></div></dialog>
+<dialog id="clearDlg" aria-labelledby="clearTitle">
+  <div class="dbody">
+    <h2 id="clearTitle">Veriler temizlensin mi?</h2>
+    <p id="clearText"></p>
+    <p class="muted small">Bu işlem geri alınamaz. Verileri yeniden görmek için e-Okul raporunu tekrar yüklemeniz gerekir. Devamsızlık sınırı ayarlarınız silinmez.</p>
+    <div class="dayctl" style="justify-content:flex-end">
+      <button type="button" id="clearCancel">Vazgeç</button>
+      <button type="button" class="danger solid" id="clearOk">Evet, verileri temizle</button>
+    </div>
+  </div>
+</dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
@@ -650,6 +664,7 @@ function render() {
   renderDay();
   renderStoreInfo();
   $("#sampleBanner").hidden = !state.sample;
+  $("#clearTop").hidden = state.sample;
   $("#bUyari").textContent = studentsAll.filter(s => s.level === 2).length || "";
 }
 
@@ -1303,19 +1318,23 @@ document.addEventListener("click", e => {
 });
 $("#dlg").addEventListener("click", e => { if (e.target.id === "dlg") e.target.close(); });
 $("#fileInput").addEventListener("change", e => { handleFiles(e.target.files); e.target.value = ""; });
-let clearArmed = 0;
-$("#clearBtn").addEventListener("click", async e => {
-  const btn = e.currentTarget;
-  if (!state.sample && Date.now() - clearArmed > 4000) {
-    clearArmed = Date.now(); btn.textContent = "Emin misiniz? Silmek için tekrar basın";
-    setTimeout(() => { if (Date.now() - clearArmed >= 4000) btn.textContent = "Kayıtlı verileri sil"; }, 4100);
-    return;
-  }
-  clearArmed = 0; btn.textContent = "Kayıtlı verileri sil";
+function askClear() {
+  if (state.sample) { toast("Silinecek veri yok; şu an örnek veri gösteriliyor"); return; }
+  const nCls = new Set(state.records.map(r => r.cls)).size;
+  $("#clearText").innerHTML = `${state.meta.school ? `<b>${esc(state.meta.school)}</b> için y` : "Y"}üklenen <b>${state.records.length}</b> devamsızlık kaydı (${nCls} şube) bu bilgisayardan silinecek.`;
+  $("#clearDlg").showModal();
+}
+async function clearData() {
   try { await storePut(undefined); } catch (err) {}
   Object.assign(state, { records: sampleData(), files: [], sample: true, meta: { school: "", year: "", term: "", stamp: "2026-10-09" }, day: "" });
-  render(); toast("Kayıtlı veriler silindi");
-});
+  Object.assign(state.f, { from: "", to: "", classes: [], students: [], type: "", view: "list" });
+  saveReportPrefs();
+  render(); toast("Veriler temizlendi");
+}
+$("#clearTop").addEventListener("click", askClear);
+$("#clearBtn").addEventListener("click", askClear);
+$("#clearCancel").addEventListener("click", () => $("#clearDlg").close());
+$("#clearOk").addEventListener("click", async () => { $("#clearDlg").close(); await clearData(); });
 const drop = $("#drop");
 ["dragenter", "dragover"].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave", "drop"].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); if (ev === "drop" || !e.relatedTarget) drop.classList.remove("over"); }));
