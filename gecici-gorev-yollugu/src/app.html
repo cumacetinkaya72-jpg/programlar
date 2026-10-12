@@ -6,359 +6,477 @@
 <title>Geçici Görev Yolluğu</title>
 <meta name="theme-color" content="#4f46e5">
 <style>
-/* Düzen: üst başlık + solda sekme menüsü + sağda kartlar (Okul Yönetim Araçları arayüzüyle aynı yapı) */
+/* Düzen: tek sütun, adım adım sihirbaz; altta sabit Geri/İleri çubuğu. Büyük yazı, büyük düğmeler, sade dil. */
 :root{
-  --primary:#4f46e5;--primary-d:#4338ca;--primary-soft:#eef2ff;
-  --bg:#f4f6fb;--card:#ffffff;--fg:#1f2937;--muted:#6b7280;--line:#e5e7eb;--input:#ffffff;--input-line:#d1d5db;
-  --ok:#047857;--ok-soft:#ecfdf5;--warn:#b45309;--warn-soft:#fffbeb;--bad:#b42318;--bad-soft:#fef3f2;
-  --help:#f0f4ff;--help-line:#c7d2fe;
-  --radius:12px;--font:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --primary:#4f46e5;--primary-d:#3730a3;--primary-soft:#eef2ff;--on-primary:#ffffff;
+  --bg:#f3f5fb;--card:#ffffff;--fg:#111827;--muted:#4b5563;--line:#d7dbe6;--input:#ffffff;--input-line:#9ca3af;
+  --ok:#047857;--ok-soft:#ecfdf5;--warn:#92400e;--warn-soft:#fffbeb;--warn-line:#f59e0b;--bad:#b42318;--bad-soft:#fef3f2;
+  --help:#f0f4ff;--help-line:#c7d2fe;--sel:#eef2ff;
+  --radius:14px;--font:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --primary:#818cf8;--primary-d:#6366f1;--primary-soft:#1e1b4b;
-  --bg:#0f1220;--card:#171a2b;--fg:#e5e7eb;--muted:#9ca3af;--line:#2a2f45;--input:#0f1220;--input-line:#374151;
-  --ok:#34d399;--ok-soft:#052e24;--warn:#fbbf24;--warn-soft:#2b2108;--bad:#f87171;--bad-soft:#2d1212;
-  --help:#1a1d38;--help-line:#3730a3;color-scheme:dark}}
+  --primary:#818cf8;--primary-d:#a5b4fc;--primary-soft:#1e1b4b;--on-primary:#0b0d1a;
+  --bg:#0f1220;--card:#171a2b;--fg:#f3f4f6;--muted:#c0c4cf;--line:#2f3550;--input:#0f1220;--input-line:#4b5563;
+  --ok:#34d399;--ok-soft:#052e24;--warn:#fcd34d;--warn-soft:#2b2108;--warn-line:#b45309;--bad:#f87171;--bad-soft:#2d1212;
+  --help:#1a1d38;--help-line:#3730a3;--sel:#22264a;color-scheme:dark}}
 :root[data-theme="dark"]{
-  --primary:#818cf8;--primary-d:#6366f1;--primary-soft:#1e1b4b;
-  --bg:#0f1220;--card:#171a2b;--fg:#e5e7eb;--muted:#9ca3af;--line:#2a2f45;--input:#0f1220;--input-line:#374151;
-  --ok:#34d399;--ok-soft:#052e24;--warn:#fbbf24;--warn-soft:#2b2108;--bad:#f87171;--bad-soft:#2d1212;
-  --help:#1a1d38;--help-line:#3730a3;color-scheme:dark}
+  --primary:#818cf8;--primary-d:#a5b4fc;--primary-soft:#1e1b4b;--on-primary:#0b0d1a;
+  --bg:#0f1220;--card:#171a2b;--fg:#f3f4f6;--muted:#c0c4cf;--line:#2f3550;--input:#0f1220;--input-line:#4b5563;
+  --ok:#34d399;--ok-soft:#052e24;--warn:#fcd34d;--warn-soft:#2b2108;--warn-line:#b45309;--bad:#f87171;--bad-soft:#2d1212;
+  --help:#1a1d38;--help-line:#3730a3;--sel:#22264a;color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--font)}
+body{background:var(--bg);color:var(--fg);font:17px/1.55 var(--font)}
 [hidden]{display:none!important}
-.app-header{background:linear-gradient(135deg,#4f46e5,#6d28d9);color:#fff}
-.app-header-inner{max-width:1280px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.app-logo{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:24px;flex:none}
-.app-title{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:.2px}
-.app-tagline{margin:0;font-size:.82rem;opacity:.85}
-.app-head-text{flex:1;min-width:0}
-.app-head-actions{display:flex;gap:8px;flex-wrap:wrap}
-.acc-btn{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.12);color:#fff;padding:7px 12px;border-radius:9px;font:600 .85rem var(--font);cursor:pointer}
-.acc-btn:hover{background:rgba(255,255,255,.22)}
-.app-main{max-width:1280px;margin:0 auto;padding-block:18px 40px;padding-inline:16px}
-.app-layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px;align-items:start}
-.side-tabs{display:flex;flex-direction:column;gap:6px;position:sticky;top:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px}
-.side-tab{display:block;text-align:left;border:0;background:transparent;color:var(--fg);padding:10px 12px;border-radius:9px;font:600 .92rem var(--font);cursor:pointer}
-.side-tab:hover{background:var(--primary-soft)}
-.side-tab.active{background:var(--primary);color:#fff}
-.side-tab:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--help-line);outline-offset:1px}
-.mobile-tabs{display:none}
-.tab-panel{display:none;min-width:0}
-.tab-panel.active{display:block}
-.help{background:var(--help);border:1px solid var(--help-line);padding:12px 14px;border-radius:10px;margin-bottom:14px;font-size:.92rem}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:0 2px 10px rgba(17,24,39,.04)}
-.section-title{margin:0 0 12px;font-size:1.08rem;color:var(--primary-d)}
-:root[data-theme="dark"] .section-title{color:var(--primary)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .section-title{color:var(--primary)}}
-.section-sub{margin:6px 0 10px;color:var(--muted);font-size:.86rem}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;min-width:0}
-.field label{font-size:.84rem;font-weight:600;color:var(--muted)}
-.field input,.field select,.field textarea{width:100%;padding:9px 11px;border:1px solid var(--input-line);border-radius:8px;background:var(--input);color:var(--fg);font:inherit;font-size:.95rem}
-.field textarea{resize:vertical}
-.chk{display:flex;gap:8px;align-items:flex-start;font-size:.9rem;margin:4px 0 10px}
-.chk input{margin-top:4px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;background:var(--primary);color:#fff;padding:10px 16px;border-radius:9px;font:700 .95rem var(--font);cursor:pointer;text-decoration:none}
-.btn:hover{background:var(--primary-d)}
-.btn-secondary{background:var(--card);color:var(--primary-d);border:1px solid var(--help-line)}
-.btn-secondary:hover{background:var(--primary-soft)}
-.btn-danger{background:var(--bad)}
-.btn-sm{padding:6px 10px;font-size:.82rem}
-.btn-block{width:100%;padding:13px;font-size:1.02rem}
-.btn-row{display:flex;gap:10px;flex-wrap:wrap}
-.status{min-height:22px;margin-top:10px;font-weight:600;font-size:.92rem}
-.status.ok{color:var(--ok)}.status.bad{color:var(--bad)}
-.tbl-wrap{overflow-x:auto}
-table.data{width:100%;border-collapse:collapse;font-size:.9rem;font-variant-numeric:tabular-nums}
-table.data th,table.data td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
-table.data th{background:var(--primary-soft);font-weight:700}
-table.data td.num,table.data th.num{text-align:right;white-space:nowrap}
-table.data tfoot td{font-weight:800;background:var(--primary-soft)}
-table.data input{width:130px;padding:6px 8px;border:1px solid var(--input-line);border-radius:6px;background:var(--input);color:var(--fg);font:inherit;text-align:right}
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.kpi{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg)}
-.kpi span{display:block;font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-.kpi b{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums}
-.kpi.main{background:var(--primary);border-color:var(--primary)}
-.kpi.main span,.kpi.main b{color:#fff}
-.note{padding:10px 12px;border-radius:9px;font-size:.88rem;margin:8px 0}
-.note.warn{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}
-.note.info{background:var(--help);border:1px solid var(--help-line)}
-.hist-item{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;flex-wrap:wrap}
-.hist-item .meta{min-width:0;flex:1}
-.hist-item .meta b{display:block}
-.hist-item .meta small{color:var(--muted)}
-.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:.75rem;font-weight:700;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}
-.guide h3{margin:16px 0 6px;font-size:1rem}
-.guide p,.guide li{font-size:.92rem}
-details.card>summary{cursor:pointer;font-weight:700;font-size:1.05rem}
-footer.app-foot{text-align:center;color:var(--muted);font-size:.8rem;padding:10px 16px 30px}
-@media (max-width:900px){
-  .app-layout{grid-template-columns:minmax(0,1fr)}
-  .side-tabs{display:none}
-  .mobile-tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 16px;background:var(--card);border-bottom:1px solid var(--line)}
-  .mobile-tabs .side-tab{white-space:nowrap;flex:none}
-  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+
+/* Üst başlık ve menü */
+.ust{background:linear-gradient(135deg,#4f46e5,#6d28d9);color:#fff}
+.ust-ic{max-width:860px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:26px;flex:none}
+.ust h1{margin:0;font-size:1.25rem;line-height:1.2}
+.ust p{margin:2px 0 0;font-size:.85rem;opacity:.9}
+.ust-yazi{flex:1;min-width:0}
+.menu{max-width:860px;margin:0 auto;padding:0 16px;display:flex;gap:6px;flex-wrap:wrap}
+.menu button{border:0;background:rgba(255,255,255,.14);color:#fff;padding:9px 14px;border-radius:10px 10px 0 0;font-weight:700;font-size:.95rem;cursor:pointer}
+.menu button.aktif{background:var(--bg);color:var(--fg)}
+.sayfa{max-width:860px;margin:0 auto;padding-block:18px 130px;padding-inline:16px}
+.bolum{display:none}.bolum.aktif{display:block}
+
+/* Adım göstergesi */
+.adimlar{display:flex;gap:6px;margin:0 0 16px;padding:0;list-style:none}
+.adimlar li{flex:1;min-width:0;text-align:center;font-size:.78rem;font-weight:700;color:var(--muted)}
+.adimlar li::before{content:attr(data-no);display:grid;place-items:center;width:34px;height:34px;margin:0 auto 4px;border-radius:50%;border:2px solid var(--line);background:var(--card);font-size:.95rem}
+.adimlar li.bitti{color:var(--ok)}
+.adimlar li.bitti::before{content:"✓";background:var(--ok);border-color:var(--ok);color:#fff}
+.adimlar li.simdi{color:var(--primary-d)}
+.adimlar li.simdi::before{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.adimlar li span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Kart ve sorular */
+.kart{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.kart h2{margin:0 0 4px;font-size:1.35rem;line-height:1.3;text-wrap:balance}
+.kart>.alt{margin:0 0 16px;color:var(--muted)}
+.soru{margin:0 0 22px}
+.soru:last-child{margin-bottom:0}
+.soru>label,.soru>.etiket{display:block;font-weight:700;font-size:1.05rem;margin-bottom:6px}
+.ipucu{display:block;color:var(--muted);font-size:.92rem;margin:-2px 0 8px}
+.soru input[type=text],.soru input[type=date],.soru input[type=time],.soru input[type=number],.soru select,.soru textarea{
+  width:100%;min-height:52px;padding:10px 14px;border:2px solid var(--input-line);border-radius:10px;background:var(--input);font-size:1.08rem}
+.soru input:focus,.soru select:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px var(--primary-soft)}
+.soru.hatali input,.soru.hatali select,.soru.hatali .secenekler{border-color:var(--bad)!important}
+.hata{display:none;color:var(--bad);font-weight:700;font-size:.95rem;margin-top:6px}
+.soru.hatali .hata{display:block}
+.iki{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.para{position:relative}
+.para input{padding-right:48px!important}
+.para::after{content:"TL";position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--muted)}
+
+/* Büyük seçim kartları */
+.secenekler{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;border-radius:12px;border:2px solid transparent}
+.secenekler.genis{grid-template-columns:1fr}
+.secenekler.ikili{grid-template-columns:1fr 1fr}
+.secim{position:relative;padding-right:40px!important;display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;padding:14px 16px;border:2px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;min-height:58px}
+.secim:hover{border-color:var(--primary)}
+.secim .ikon{font-size:1.6rem;line-height:1;flex:none}
+.secim b{display:block;font-size:1.02rem}
+.secim small{display:block;color:var(--muted);font-size:.88rem;margin-top:2px}
+.secim[aria-pressed="true"]{border-color:var(--primary);background:var(--sel);box-shadow:0 0 0 2px var(--primary) inset}
+.secim[aria-pressed="true"]::after{content:"✓";position:absolute;right:14px;top:12px;font-weight:900;color:var(--primary-d);font-size:1.2rem}
+.cipler{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.cip{border:2px solid var(--line);background:var(--card);border-radius:99px;padding:6px 14px;cursor:pointer;font-weight:600;font-size:.95rem}
+.cip[aria-pressed="true"]{border-color:var(--primary);background:var(--sel)}
+
+/* Bilgi kutuları */
+details.nedir{margin-top:8px;border:1px solid var(--help-line);background:var(--help);border-radius:10px;padding:8px 12px;font-size:.95rem}
+details.nedir summary{cursor:pointer;font-weight:700;color:var(--primary-d)}
+details.nedir p{margin:8px 0 2px}
+.bilgi{padding:12px 14px;border-radius:10px;margin:10px 0;font-size:.98rem;border:1px solid var(--help-line);background:var(--help)}
+.bilgi.iyi{background:var(--ok-soft);border-color:var(--ok);color:var(--fg)}
+.bilgi.dikkat{background:var(--warn-soft);border-color:var(--warn-line);color:var(--fg)}
+.bilgi b.tutar{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.ozet-satir{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.ozet-satir span{min-width:0}
+.ozet-satir b{white-space:nowrap;font-variant-numeric:tabular-nums}
+.ozet-satir small{display:block;color:var(--muted)}
+
+/* Sonuç */
+.buyuk-toplam{text-align:center;padding:22px 16px;border-radius:var(--radius);background:linear-gradient(135deg,#4f46e5,#6d28d9);color:#fff;margin-bottom:16px}
+.buyuk-toplam span{display:block;font-weight:700;opacity:.9}
+.buyuk-toplam b{display:block;font-size:2.4rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.buyuk-toplam small{display:block;opacity:.9;margin-top:4px}
+.dugmeler{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;background:var(--primary);color:var(--on-primary);padding:14px 18px;border-radius:12px;font-weight:800;font-size:1.05rem;cursor:pointer;min-height:56px;text-align:center}
+.btn:hover{filter:brightness(1.07)}
+.btn.ikincil{background:var(--card);color:var(--primary-d);border:2px solid var(--primary)}
+.btn.tehlike{background:var(--bad);color:#fff}
+.btn.kucuk{min-height:42px;padding:8px 14px;font-size:.95rem}
+.kontrol-listesi{list-style:none;padding:0;margin:0}
+.kontrol-listesi li{padding:8px 0 8px 34px;position:relative;border-bottom:1px solid var(--line)}
+.kontrol-listesi li::before{content:"☐";position:absolute;left:4px;top:6px;font-size:1.25rem;color:var(--primary-d)}
+.durum{min-height:24px;margin-top:10px;font-weight:700}
+.durum.ok{color:var(--ok)}.durum.bad{color:var(--bad)}
+
+/* Alt sabit çubuk */
+.alt-cubuk{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(0,0,0,.08);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));z-index:5}
+.alt-ic{max-width:860px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.alt-ic .ara-toplam{flex:1;min-width:0;font-size:.9rem;color:var(--muted);text-align:center}
+.alt-ic .ara-toplam b{display:block;color:var(--fg);font-size:1.15rem;font-variant-numeric:tabular-nums}
+.alt-ic .btn{min-width:130px}
+
+/* Kayıtlar / ayarlar */
+.kayit{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;flex-wrap:wrap}
+.kayit .bilgiler{min-width:0;flex:1}
+.kayit small{display:block;color:var(--muted)}
+.kayit .islem{display:flex;gap:8px;flex-wrap:wrap}
+.tbl-kap{overflow-x:auto}
+table.veri{width:100%;border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums}
+table.veri th,table.veri td{border:1px solid var(--line);padding:7px 9px;text-align:left}
+table.veri th{background:var(--primary-soft)}
+table.veri td.say{text-align:right;white-space:nowrap}
+table.veri input{width:130px;min-height:40px;padding:6px 8px;border:2px solid var(--input-line);border-radius:8px;background:var(--input);text-align:right}
+.rozet{display:inline-block;padding:1px 8px;border-radius:99px;font-size:.78rem;font-weight:700;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn-line)}
+.sss h3{margin:18px 0 4px;font-size:1.05rem}
+.sss p{margin:0 0 6px}
+@media (max-width:620px){
+  body{font-size:16px}
+  .iki,.dugmeler,.secenekler.ikili{grid-template-columns:1fr}
+  .adimlar li span{display:none}
+  .adimlar li.simdi span{display:block;overflow:visible;white-space:nowrap}
+  .alt-ic .btn{min-width:0;flex:1}
+  .alt-ic .ara-toplam{display:none}
+  .buyuk-toplam b{font-size:2rem}
 }
-@media (max-width:560px){.row2,.row3{grid-template-columns:1fr}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 
-<header class="app-header">
-  <div class="app-header-inner">
-    <div class="app-logo" aria-hidden="true">🧳</div>
-    <div class="app-head-text">
-      <h1 class="app-title">Okul Yönetim Araçları · Geçici Görev Yolluğu</h1>
-      <p class="app-tagline">6245 sayılı Harcırah Kanunu · M.Y.H.B.Y. Örnek No: 27 · Tüm işlemler bu tarayıcıda yapılır</p>
-    </div>
-    <div class="app-head-actions">
-      <button type="button" class="acc-btn" id="theme-toggle" title="Açık/koyu tema">🌓 Tema</button>
-      <button type="button" class="acc-btn" id="yedek-al" title="Ayarları ve geçmişi dosyaya yedekle">💾 Yedek Al</button>
-      <label class="acc-btn" for="yedek-yukle" title="Yedek dosyasını geri yükle" style="display:inline-flex;align-items:center">📂 Yedek Yükle</label>
-      <input type="file" id="yedek-yukle" accept=".json,application/json" hidden>
+<header class="ust">
+  <div class="ust-ic">
+    <div class="logo" aria-hidden="true">🧳</div>
+    <div class="ust-yazi">
+      <h1>Geçici Görev Yolluğu Hesaplama</h1>
+      <p>Soruları sırayla cevaplayın; yolluk bildirim formunuz (Örnek 27) hazır olsun.</p>
     </div>
   </div>
+  <nav class="menu" aria-label="Menü">
+    <button type="button" data-sayfa="sihirbaz" class="aktif">🧮 Yolluk Hesapla</button>
+    <button type="button" data-sayfa="kayitlar">📁 Kayıtlarım</button>
+    <button type="button" data-sayfa="ayarlar">⚙️ Okul Bilgileri</button>
+    <button type="button" data-sayfa="yardim">❓ Yardım</button>
+  </nav>
 </header>
 
-<nav class="mobile-tabs" role="tablist" aria-label="Menü">
-  <button class="side-tab active" data-tab="gyolluk" role="tab">🧳 Hesaplama</button>
-  <button class="side-tab" data-tab="gecmis" role="tab">📜 Geçmiş</button>
-  <button class="side-tab" data-tab="ayarlar" role="tab">⚙️ Ayarlar</button>
-  <button class="side-tab" data-tab="kilavuz" role="tab">📘 Kılavuz</button>
-</nav>
+<main class="sayfa">
 
-<main class="app-main">
-<div class="app-layout">
-  <nav class="side-tabs" role="tablist" aria-label="Menü">
-    <button class="side-tab active" data-tab="gyolluk" role="tab">🧳 Geçici Görev Yolluğu</button>
-    <button class="side-tab" data-tab="gecmis" role="tab">📜 Geçmiş Hesaplamalar</button>
-    <button class="side-tab" data-tab="ayarlar" role="tab">⚙️ Ayarlar &amp; Gündelikler</button>
-    <button class="side-tab" data-tab="kilavuz" role="tab">📘 Kılavuz / Mevzuat</button>
-  </nav>
+<!-- ===================== SİHİRBAZ ===================== -->
+<section class="bolum aktif" id="b-sihirbaz">
+  <ol class="adimlar" id="adimlar">
+    <li data-no="1"><span>Kişi</span></li>
+    <li data-no="2"><span>Görev</span></li>
+    <li data-no="3"><span>Yolculuk</span></li>
+    <li data-no="4"><span>Konaklama</span></li>
+    <li data-no="5"><span>Sonuç</span></li>
+  </ol>
 
-  <div class="app-content">
-  <!-- ============ HESAPLAMA ============ -->
-  <section id="tab-gyolluk" class="tab-panel active" role="tabpanel">
-    <div class="help">🧳 <b>Geçici Görev Yolluğu</b> (tek kişilik) hesaplar; resmî <b>Yurtiçi Geçici Görev Yolluğu Bildirimi (Örnek 27)</b> formunu Excel olarak indirir veya yazdırılabilir/PDF olarak açar.</div>
-
-    <div class="card">
-      <h2 class="section-title">Personel Bilgileri</h2>
-      <div class="row2">
-        <div class="field"><label for="gy_ad">Personel Adı Soyadı</label><input type="text" id="gy_ad" placeholder="Ad Soyad"></div>
-        <div class="field"><label for="gy_tc">T.C. Kimlik No</label><input type="text" id="gy_tc" inputmode="numeric" maxlength="11" placeholder="11 haneli"></div>
-      </div>
-      <div class="row2">
-        <div class="field"><label for="gy_unvan">Unvanı</label><input type="text" id="gy_unvan" placeholder="Öğretmen, Memur…"></div>
-        <div class="field"><label for="gy_iban">IBAN (isteğe bağlı)</label><input type="text" id="gy_iban" placeholder="TR.." style="text-transform:uppercase"></div>
-      </div>
-      <div class="row2">
-        <div class="field"><label for="gy_donem">Bütçe Dönemi</label><select id="gy_donem"></select></div>
-        <div class="field"><label for="gy_tier">Ek Gösterge Kademesi</label>
-          <select id="gy_tier">
-            <option value="0">8000 ve Daha Üstü</option>
-            <option value="1">6400 (Dahil) - 8000 (Hariç) Arası</option>
-            <option value="2">3600 (Dahil) - 6400 (Hariç) Arası</option>
-            <option value="3" selected>3600 Altı</option>
-          </select>
+  <!-- ADIM 1: KİŞİ -->
+  <div class="adim" data-adim="1">
+    <div class="kart" id="okul-kart">
+      <h2>🏫 Önce okulunuzun bilgileri</h2>
+      <p class="alt">Bu bilgiler forma yazılır. Bir kez girmeniz yeterli, sonraki hesaplarda hatırlanır.</p>
+      <div id="okul-ozet" class="bilgi" hidden></div>
+      <div id="okul-form">
+        <div class="soru" data-soru="kurum"><label for="o_kurum">Okulunuzun / kurumunuzun adı</label>
+          <input type="text" id="o_kurum" data-ayar="kurum" placeholder="Örnek: Atatürk Ortaokulu" autocomplete="organization">
+          <div class="hata">Okulunuzun adını yazın.</div></div>
+        <div class="iki">
+          <div class="soru"><label for="o_il">İl</label><input type="text" id="o_il" data-ayar="il" placeholder="Örnek: Konya"></div>
+          <div class="soru"><label for="o_ilce">İlçe</label><input type="text" id="o_ilce" data-ayar="ilce" placeholder="Örnek: Selçuklu"></div>
+        </div>
+        <div class="iki">
+          <div class="soru"><label for="o_mudur">Okul müdürünün adı soyadı</label><span class="ipucu">Formu imzalayacak amir</span><input type="text" id="o_mudur" data-ayar="onay_ad" placeholder="Örnek: Mehmet DEMİR"></div>
+          <div class="soru"><label for="o_mudurunvan">Müdürün unvanı</label><span class="ipucu">Genelde “Okul Müdürü”</span><input type="text" id="o_mudurunvan" data-ayar="onay_unvan" placeholder="Okul Müdürü"></div>
         </div>
       </div>
-      <div class="row3">
-        <div class="field"><label for="gy_kadro">Aylık Kadro Derecesi</label><select id="gy_kadro"></select></div>
-        <div class="field"><label for="gy_kademe">Kademe (isteğe bağlı)</label><input type="number" id="gy_kademe" min="1" max="9" placeholder="örn. 3"></div>
-        <div class="field"><label for="gy_ekgos">Ek Gösterge (rakam, isteğe bağlı)</label><input type="text" id="gy_ekgos" inputmode="numeric" placeholder="örn. 3600"></div>
-      </div>
-      <p class="section-sub">Ek gösterge rakamını yazarsanız kademe otomatik seçilir. Formdaki “Aylık Kadro Derecesi ve Ek Göstergesi” satırına yazılır.</p>
     </div>
 
-    <div class="card">
-      <h2 class="section-title">Görev Bilgileri</h2>
-      <div class="row2">
-        <div class="field"><label for="gy_nereden">Hareket Yeri (İkamet / Sürekli Görev Yeri)</label><input type="text" id="gy_nereden" placeholder="örn. Konya / Selçuklu"></div>
-        <div class="field"><label for="gy_yer">Gidilen Yer (Görev Yeri)</label><input type="text" id="gy_yer" placeholder="örn. Antalya / Muratpaşa"></div>
+    <div class="kart">
+      <h2>👤 Görevlendirilen kişi</h2>
+      <p class="alt">Yolluğu kim için hazırlıyorsunuz?</p>
+      <div class="soru" data-soru="ad"><label for="w_ad">Adı Soyadı</label>
+        <input type="text" id="w_ad" data-k="ad" placeholder="Örnek: Ayşe YILMAZ" autocomplete="name">
+        <div class="hata">Adı soyadı yazılmalı.</div></div>
+      <div class="soru" data-soru="unvan"><span class="etiket">Unvanı</span>
+        <div class="cipler" data-cip="unvan">
+          <button type="button" class="cip" data-val="Öğretmen">Öğretmen</button>
+          <button type="button" class="cip" data-val="Müdür Yardımcısı">Müdür Yardımcısı</button>
+          <button type="button" class="cip" data-val="Okul Müdürü">Okul Müdürü</button>
+          <button type="button" class="cip" data-val="Memur">Memur</button>
+          <button type="button" class="cip" data-val="Hizmetli">Hizmetli</button>
+        </div>
+        <input type="text" id="w_unvan" data-k="unvan" placeholder="Listede yoksa buraya yazın" aria-label="Unvanı">
+        <div class="hata">Unvanı seçin veya yazın.</div></div>
+
+      <div class="soru" data-soru="tier"><span class="etiket">Ek göstergesi kaç?</span>
+        <span class="ipucu">Maaş bordronuzda “Ek Gösterge” satırında yazar. Bilmiyorsanız okul müdürlüğüne veya muhasebeye sorun.</span>
+        <div class="secenekler ikili" data-secim="tier">
+          <button type="button" class="secim" data-val="3"><span class="ikon">①</span><span><b>3600'den az</b><small>Ek göstergesi yok veya 3600'ün altında</small></span></button>
+          <button type="button" class="secim" data-val="2"><span class="ikon">②</span><span><b>3600 – 6399 arası</b><small>3600 dahil</small></span></button>
+          <button type="button" class="secim" data-val="1"><span class="ikon">③</span><span><b>6400 – 7999 arası</b><small>6400 dahil</small></span></button>
+          <button type="button" class="secim" data-val="0"><span class="ikon">④</span><span><b>8000 ve üzeri</b><small>Üst düzey kadrolar</small></span></button>
+        </div>
+        <div class="hata">Ek gösterge aralığını seçin.</div></div>
+
+      <div class="iki">
+        <div class="soru" data-soru="kadro"><label for="w_kadro">Kadro derecesi</label>
+          <span class="ipucu">Bordroda “Derece/Kademe” yazar. Örneğin <b>1/4</b> ise derece <b>1</b>’dir.</span>
+          <select id="w_kadro" data-k="kadro"></select>
+          <div class="hata">Kadro derecesini seçin.</div></div>
+        <div class="soru"><label for="w_kademe">Kademe <small>(isterseniz)</small></label>
+          <span class="ipucu">Örnekte <b>1/4</b> ise kademe <b>4</b>’tür.</span>
+          <select id="w_kademe" data-k="kademe"></select></div>
       </div>
-      <div class="field"><label for="gy_neden">Görevin Nedeni (isteğe bağlı)</label><input type="text" id="gy_neden" placeholder="Seminer, kurs, toplantı…"></div>
-      <div class="row2">
-        <div class="field"><label for="gy_tbas">Görev Başlangıç Tarihi</label><input type="date" id="gy_tbas"></div>
-        <div class="field"><label for="gy_sbas">Başlangıç Saati (gidiş hareket)</label><input type="time" id="gy_sbas"></div>
+      <div id="yevmiye-bilgi"></div>
+
+      <details class="nedir"><summary>➕ T.C. kimlik no ve IBAN eklemek isterseniz</summary>
+        <div class="iki" style="margin-top:10px">
+          <div class="soru" data-soru="tc"><label for="w_tc">T.C. Kimlik No</label><input type="text" id="w_tc" data-k="tc" inputmode="numeric" maxlength="11" placeholder="11 haneli">
+            <div class="hata">T.C. kimlik numarası 11 rakam olmalı.</div></div>
+          <div class="soru"><label for="w_iban">IBAN</label><input type="text" id="w_iban" data-k="iban" placeholder="TR.." style="text-transform:uppercase"></div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ADIM 2: GÖREV -->
+  <div class="adim" data-adim="2" hidden>
+    <div class="kart">
+      <h2>📍 Görev nerede ve ne zaman?</h2>
+      <p class="alt">Görevlendirme yazınızdaki (olur) bilgileri yazın.</p>
+      <div class="iki">
+        <div class="soru" data-soru="nereden"><label for="w_nereden">Nereden gittiniz?</label><span class="ipucu">Çalıştığınız / oturduğunuz yer</span>
+          <input type="text" id="w_nereden" data-k="nereden" placeholder="Örnek: Konya / Selçuklu">
+          <div class="hata">Nereden gittiğinizi yazın.</div></div>
+        <div class="soru" data-soru="yer"><label for="w_yer">Nereye gittiniz?</label><span class="ipucu">Görevin yapıldığı il / ilçe</span>
+          <input type="text" id="w_yer" data-k="yer" placeholder="Örnek: Antalya / Muratpaşa">
+          <div class="hata">Görev yerini yazın.</div></div>
       </div>
-      <div class="row2">
-        <div class="field"><label for="gy_tbit">Görev Bitiş Tarihi</label><input type="date" id="gy_tbit"></div>
-        <div class="field"><label for="gy_sbit">Bitiş Saati (dönüş hareket)</label><input type="time" id="gy_sbit"></div>
+      <div class="soru"><label for="w_neden">Görevin konusu <small>(isterseniz)</small></label>
+        <input type="text" id="w_neden" data-k="neden" placeholder="Örnek: Seminer, kurs, toplantı, sınav görevi"></div>
+      <div class="iki">
+        <div class="soru" data-soru="tbas"><label for="w_tbas">Görev hangi gün başladı?</label>
+          <input type="date" id="w_tbas" data-k="tbas"><div class="hata">Başlangıç tarihini seçin.</div></div>
+        <div class="soru" data-soru="tbit"><label for="w_tbit">Görev hangi gün bitti?</label><span class="ipucu">Tek günlükse aynı tarih</span>
+          <input type="date" id="w_tbit" data-k="tbit"><div class="hata">Bitiş tarihi, başlangıçtan önce olamaz.</div></div>
       </div>
-      <div class="row2">
-        <div class="field"><label for="gy_cikis">Yola Çıkış Tarihi (boşsa görev başlangıcı)</label><input type="date" id="gy_cikis"></div>
-        <div class="field"><label for="gy_donustarih">Dönüş (Varış) Tarihi (boşsa görev bitişi)</label><input type="date" id="gy_donustarih"></div>
+      <div id="gun-bilgi"></div>
+    </div>
+
+    <div class="kart">
+      <h2>🌙 Görev yerinde geceyi geçirdiniz mi?</h2>
+      <p class="alt">Aynı gün gidip döndüyseniz “Hayır” seçin.</p>
+      <div class="soru" data-soru="yatili">
+        <div class="secenekler ikili" data-secim="yatili">
+          <button type="button" class="secim" data-val="evet"><span class="ikon">🛏️</span><span><b>Evet, gece kaldım</b><small>Görev birden fazla gün sürdü veya gece orada kaldım</small></span></button>
+          <button type="button" class="secim" data-val="hayir"><span class="ikon">🔁</span><span><b>Hayır, aynı gün döndüm</b><small>Günübirlik görev</small></span></button>
+        </div>
+        <div class="hata">Lütfen birini seçin.</div></div>
+
+      <div data-goster="yatili=hayir">
+        <div class="bilgi">Günübirlik görevde yevmiye, <b>öğle (13.00)</b> ve <b>akşam (19.00)</b> yemek saatlerini görevde geçirip geçirmediğinize göre ödenir. Bunu saatlerden program hesaplar.</div>
       </div>
-      <div class="row2">
-        <div class="field"><label for="gy_gorevgun">Görev Gün Sayısı</label><input type="number" id="gy_gorevgun" min="0" value="1"></div>
-        <div class="field"><label for="gy_yoldahil">Yol Süresi Durumu</label>
-          <select id="gy_yoldahil">
-            <option value="0">Yol süresi dışında (görev + yol günü)</option>
-            <option value="1">Yol süresi içinde (görev günü yola dahil)</option>
-          </select>
+      <div class="iki">
+        <div class="soru" data-soru="sbas"><label for="w_sbas">Yola çıkış saatiniz</label><span class="ipucu">Gidiş için hareket saati</span>
+          <input type="time" id="w_sbas" data-k="sbas"><div class="hata">Yola çıkış saatini yazın.</div></div>
+        <div class="soru" data-soru="sbit"><label for="w_sbit">Dönüş saatiniz</label><span class="ipucu">Dönüş için hareket saati</span>
+          <input type="time" id="w_sbit" data-k="sbit"><div class="hata">Dönüş saatini yazın.</div></div>
+      </div>
+      <div id="ogun-bilgi"></div>
+
+      <div data-goster="yatili=evet">
+        <div class="soru" data-soru="yolek"><span class="etiket">Yolculuk için görev günleri dışında ayrıca gün harcadınız mı?</span>
+          <span class="ipucu">Örnek: Görev pazartesi başladı ama siz pazar günü yola çıktınız.</span>
+          <div class="secenekler genis" data-secim="yolek">
+            <button type="button" class="secim" data-val="yok"><span class="ikon">✖️</span><span><b>Hayır</b><small>Görevin ilk günü yola çıktım, son günü döndüm</small></span></button>
+            <button type="button" class="secim" data-val="once"><span class="ikon">⬅️</span><span><b>Gitmek için 1 gün önce yola çıktım</b><small>Dönüş görevin son günü</small></span></button>
+            <button type="button" class="secim" data-val="sonra"><span class="ikon">➡️</span><span><b>Dönüşte 1 gün sonra eve vardım</b><small>Gidiş görevin ilk günü</small></span></button>
+            <button type="button" class="secim" data-val="ikisi"><span class="ikon">↔️</span><span><b>İkisi de</b><small>1 gün önce gittim, 1 gün sonra döndüm</small></span></button>
+          </div>
+          <div class="hata">Lütfen birini seçin.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADIM 3: YOLCULUK -->
+  <div class="adim" data-adim="3" hidden>
+    <div class="kart">
+      <h2>🚌 Neyle gittiniz?</h2>
+      <p class="alt">Gidiş ve dönüşte kullandığınız taşıt.</p>
+      <div class="soru" data-soru="tasit">
+        <div class="secenekler" data-secim="tasit">
+          <button type="button" class="secim" data-val="Otobüs"><span class="ikon">🚌</span><span><b>Otobüs</b></span></button>
+          <button type="button" class="secim" data-val="Uçak"><span class="ikon">✈️</span><span><b>Uçak</b></span></button>
+          <button type="button" class="secim" data-val="Tren"><span class="ikon">🚆</span><span><b>Tren</b></span></button>
+          <button type="button" class="secim" data-val="Özel Araç"><span class="ikon">🚗</span><span><b>Kendi aracım</b></span></button>
+          <button type="button" class="secim" data-val="Resmî Araç"><span class="ikon">🚐</span><span><b>Kurum aracı</b><small>Ücret ödemedim</small></span></button>
+        </div>
+        <div class="hata">Taşıtı seçin.</div></div>
+      <div data-goster="tasit=Özel Araç"><div class="bilgi dikkat">🚗 Kendi aracınızla gittiyseniz genelde aynı güzergâhın <b>otobüs bileti ücreti</b> kadar ödeme yapılır. Aşağıya otobüs bilet ücretini yazın.</div></div>
+      <div data-goster="tasit=Uçak"><div class="bilgi dikkat">✈️ Uçakla gidiş için görevlendirme onayınızda uçak izni olmalıdır. Biletinizi saklayın.</div></div>
+      <div class="iki" data-gizle="tasit=Resmî Araç">
+        <div class="soru" data-soru="gidis"><label for="w_gidis">Gidiş bileti kaç lira?</label><div class="para"><input type="text" id="w_gidis" data-k="gidis" inputmode="decimal" placeholder="Örnek: 1100"></div>
+          <div class="hata">Gidiş ücretini yazın (yoksa 0).</div></div>
+        <div class="soru" data-soru="donus"><label for="w_donus">Dönüş bileti kaç lira?</label><div class="para"><input type="text" id="w_donus" data-k="donus" inputmode="decimal" placeholder="Örnek: 1100"></div>
+          <div class="hata">Dönüş ücretini yazın (yoksa 0).</div></div>
+      </div>
+    </div>
+
+    <div class="kart">
+      <h2>🚕 Şehir içinde yol masrafınız oldu mu?</h2>
+      <p class="alt">Evden otogara, otogardan görev yerine giderken ödediğiniz taksi, dolmuş, otobüs ücretleri. <b>Gidiş ve dönüş toplamını</b> yazın. Yoksa boş bırakın.</p>
+      <div class="iki">
+        <div class="soru"><label for="w_sehir_a">Ev ↔ otogar / gar / havalimanı</label><div class="para"><input type="text" id="w_sehir_a" data-k="sehir_a" inputmode="decimal" placeholder="Yoksa boş bırakın"></div></div>
+        <div class="soru"><label for="w_sehir_b">Otogar / gar ↔ görev yeri</label><div class="para"><input type="text" id="w_sehir_b" data-k="sehir_b" inputmode="decimal" placeholder="Yoksa boş bırakın"></div></div>
+      </div>
+      <details class="nedir"><summary>➕ Başka zorunlu masraf (köprü, otoyol geçişi vb.)</summary>
+        <div class="iki" style="margin-top:10px">
+          <div class="soru"><label for="w_diger">Tutar</label><div class="para"><input type="text" id="w_diger" data-k="diger" inputmode="decimal" placeholder="Yoksa boş bırakın"></div></div>
+          <div class="soru"><label for="w_diger_ad">Ne masrafı?</label><input type="text" id="w_diger_ad" data-k="diger_ad" placeholder="Örnek: Otoyol geçiş ücreti"></div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ADIM 4: KONAKLAMA -->
+  <div class="adim" data-adim="4" hidden>
+    <div class="kart">
+      <h2>🏨 Nerede kaldınız?</h2>
+      <div data-goster="yatili=hayir"><div class="bilgi iyi">Günübirlik görevde konaklama olmaz. Bu adımı geçebilirsiniz; <b>İleri</b>’ye basın.</div></div>
+      <div data-goster="yatili=evet">
+        <p class="alt">Görev sırasında gecelediğiniz yer.</p>
+        <div class="soru" data-soru="konak">
+          <div class="secenekler genis" data-secim="konak">
+            <button type="button" class="secim" data-val="otel"><span class="ikon">🧾</span><span><b>Otel / pansiyonda kaldım, faturam var</b><small>Fatura tutarı (sınırı aşmamak üzere) ödenir</small></span></button>
+            <button type="button" class="secim" data-val="faturasiz"><span class="ikon">🏠</span><span><b>Kendim ayarladım ama faturam yok</b><small>Akraba yanı vb. — her gece için yevmiyenin yarısı ödenir</small></span></button>
+            <button type="button" class="secim" data-val="ucretsiz"><span class="ikon">🏫</span><span><b>Ücretsiz yer verildi</b><small>Misafirhane, öğretmenevi (ücretsiz), yurt vb. — ödeme yapılmaz</small></span></button>
+          </div>
+          <div class="hata">Lütfen birini seçin.</div></div>
+        <div data-gizle="konak=ucretsiz">
+          <div class="iki">
+            <div class="soru" data-soru="konakgun"><label for="w_konakgun">Kaç gece kaldınız?</label><span class="ipucu">Program sizin için tahmin etti; gerekirse değiştirin.</span>
+              <input type="number" id="w_konakgun" data-k="konakgun" min="0" inputmode="numeric"><div class="hata">Gece sayısını yazın.</div></div>
+            <div class="soru" data-soru="konakucret" data-goster="konak=otel"><label for="w_konakucret">Bir gecesi kaç lira?</label><span class="ipucu">Faturadaki toplamı gece sayısına bölün</span>
+              <div class="para"><input type="text" id="w_konakucret" data-k="konakucret" inputmode="decimal" placeholder="Örnek: 1200"></div><div class="hata">Gecelik ücreti yazın.</div></div>
+          </div>
+          <div id="konak-bilgi"></div>
         </div>
       </div>
-      <div class="row2">
-        <div class="field"><label for="gy_yolgun">Yol Günü Sayısı</label>
-          <select id="gy_yolgun">
-            <option value="2">2 gün (gidiş + dönüş)</option>
-            <option value="1">1 gün</option>
-            <option value="0">0 gün</option>
-          </select>
-        </div>
-        <div class="field"><label for="gy_oranpay">Gündelik Oranı (Harcırah K. m.39)</label>
-          <select id="gy_oranpay">
-            <option value="3">Tam gündelik (3/3) — Yatılı kaldı / geceyi geçirdi</option>
-            <option value="2">2/3 gündelik — İki öğün (öğle + akşam) — günübirlik</option>
-            <option value="1">1/3 gündelik — Bir öğün — günübirlik</option>
-          </select>
-        </div>
-      </div>
-      <label class="chk"><input type="checkbox" id="gy_kural90" checked> <span><b>m.33 süre sınırı uygula:</b> ilk 90 gün tam, sonraki 90 gün 2/3 gündelik; 180 günü aşan süreye gündelik ödenmez.</span></label>
-      <p class="section-sub"><b>m.39:</b> Günübirlik görevde öğle (13.00) veya akşam (19.00) yemek zamanlarından birini geçirene 1/3, ikisini geçirene 2/3, geceyi de geçirene (yatılı) tam gündelik ödenir. Görev gün sayısı tarihlerden otomatik doldurulur; elle değiştirebilirsiniz.</p>
-      <p class="section-sub"><b>Yol süresi dışında:</b> Gündelik günü = Görev günü + Yol günü. &nbsp;<b>Yol süresi içinde:</b> Gündelik günü = Görev günü (yol ayrıca eklenmez).</p>
-      <div id="gy_saat_uyari"></div>
     </div>
+  </div>
 
-    <div class="card">
-      <h2 class="section-title">Yol, Şehiriçi &amp; Konaklama</h2>
-      <div class="row3">
-        <div class="field"><label for="gy_tasit">Taşıt Çeşidi</label>
-          <select id="gy_tasit">
-            <option>Otobüs</option><option>Uçak</option><option>Tren</option><option>Gemi / Feribot</option><option>Özel Araç</option><option>Resmî Araç</option>
-          </select>
-        </div>
-        <div class="field"><label for="gy_gidis">Gidiş Bilet / Taşıt Ücreti (TL)</label><input type="text" id="gy_gidis" inputmode="decimal" placeholder="örn. 1100"></div>
-        <div class="field"><label for="gy_donus">Dönüş Bilet / Taşıt Ücreti (TL)</label><input type="text" id="gy_donus" inputmode="decimal" placeholder="örn. 1100"></div>
-      </div>
-      <p class="section-sub">Şehiriçi ulaşım iki ayrı kalem olarak girilir; formda ayrı satırlarda gösterilir:</p>
-      <div class="row2">
-        <div class="field"><label for="gy_sehir_a">A) İkamet - Otogar/Gar/Havalimanı arası (TL)</label><input type="text" id="gy_sehir_a" inputmode="decimal" placeholder="örn. 150"></div>
-        <div class="field"><label for="gy_sehir_b">B) Otogar/Gar/Havalimanı - Görev yeri (TL)</label><input type="text" id="gy_sehir_b" inputmode="decimal" placeholder="örn. 250"></div>
-      </div>
-      <div class="row3">
-        <div class="field"><label for="gy_konakgun">Konaklama Gün (Gece) Sayısı</label><input type="number" id="gy_konakgun" min="0" value="0"></div>
-        <div class="field"><label for="gy_konakucret">Gecelik Konaklama Ücreti (TL, belge bedeli)</label><input type="text" id="gy_konakucret" inputmode="decimal" placeholder="örn. 1500"></div>
-        <div class="field"><label for="gy_konaktip">Konaklama Belgesi</label>
-          <select id="gy_konaktip">
-            <option value="belgeli">Belgeli (fatura / makbuz var)</option>
-            <option value="belgesiz">Belgesiz (gündeliğin %50'si ödenir)</option>
-            <option value="ucretsiz">Ücretsiz konakladı (ödeme yok)</option>
-          </select>
-        </div>
-      </div>
-      <label class="chk"><input type="checkbox" id="gy_konaktavan" checked> <span><b>Konaklama tavanı uygula:</b> gecelik tutar, gündeliğin Ayarlar'daki katı (varsayılan %50 artırımlı = ×1,5) ile sınırlanır.</span></label>
-      <div class="field"><label for="gy_diger">Diğer Zorunlu Giderler (TL, isteğe bağlı)</label><input type="text" id="gy_diger" inputmode="decimal" placeholder="örn. otoyol / köprü ücreti"></div>
-      <div class="field"><label for="gy_diger_ad">Diğer Gider Açıklaması</label><input type="text" id="gy_diger_ad" placeholder="örn. Otoyol ve köprü geçiş ücreti"></div>
-      <div class="field" style="max-width:280px"><label for="gy_bildirimtarih">Bildirim Tarihi (formdaki imza tarihi)</label><input type="date" id="gy_bildirimtarih"></div>
-    </div>
+  <!-- ADIM 5: SONUÇ -->
+  <div class="adim" data-adim="5" hidden>
+    <div id="sonuc"></div>
+  </div>
+</section>
 
-    <div class="btn-row">
-      <button class="btn btn-block" id="gy_hesapla" type="button">Hesapla</button>
+<!-- ===================== KAYITLAR ===================== -->
+<section class="bolum" id="b-kayitlar">
+  <div class="kart">
+    <h2>📁 Kayıtlarım</h2>
+    <p class="alt">Hesapladığınız yolluklar bu bilgisayarda saklanır. “Aç” ile tekrar görüntüleyip formu yeniden alabilirsiniz.</p>
+    <div class="soru"><label for="kayit_ara">Ara</label><input type="text" id="kayit_ara" placeholder="Ad, yer veya tarih yazın"></div>
+    <div id="kayit-liste"></div>
+    <div class="durum" id="kayit-durum" role="status"></div>
+  </div>
+  <div class="kart">
+    <h2>💾 Yedekleme</h2>
+    <p class="alt">Başka bilgisayara geçerken kayıtlarınızı ve okul bilgilerinizi dosyaya alıp orada geri yükleyebilirsiniz.</p>
+    <div class="dugmeler">
+      <button type="button" class="btn ikincil" id="yedek-al">💾 Yedek dosyası indir</button>
+      <label class="btn ikincil" for="yedek-yukle">📂 Yedek dosyası yükle</label>
     </div>
-    <div class="btn-row" style="margin-top:10px">
-      <button class="btn btn-secondary" id="gy_temizle" type="button">Formu Temizle</button>
-      <button class="btn btn-secondary" id="gy_ornek" type="button">Örnek Verilerle Doldur</button>
+    <input type="file" id="yedek-yukle" accept=".json,application/json" hidden>
+    <div class="dugmeler" style="margin-top:12px">
+      <button type="button" class="btn ikincil" id="kayit-csv">📊 Kayıt listesini Excel'de aç (CSV)</button>
+      <button type="button" class="btn tehlike" id="kayit-sil-hepsi">🗑️ Tüm kayıtları sil</button>
     </div>
-    <div class="status" id="gy_status" role="status"></div>
-    <div id="gy_sonuc" style="margin-top:16px"></div>
-  </section>
+    <div class="durum" id="yedek-durum" role="status"></div>
+  </div>
+</section>
 
-  <!-- ============ GEÇMİŞ ============ -->
-  <section id="tab-gecmis" class="tab-panel" role="tabpanel">
-    <div class="card">
-      <h2 class="section-title">📜 Geçmiş Hesaplamalar</h2>
-      <p class="section-sub">Her “Hesapla” işlemi bu cihazda (tarayıcı belleğinde) saklanır. Kaydı açıp düzenleyebilir, formu ve Excel’i yeniden üretebilirsiniz.</p>
-      <div class="field" style="max-width:360px"><label for="gecmis_ara">Ara (ad, yer, tarih)</label><input type="search" id="gecmis_ara" placeholder="Ara…"></div>
-      <div id="gy_gecmis"></div>
-      <div class="btn-row" style="margin-top:10px">
-        <button class="btn btn-secondary" id="gecmis_csv" type="button">⬇️ Listeyi CSV İndir</button>
-        <button class="btn btn-danger" id="gecmis_sil" type="button">Tüm Geçmişi Sil</button>
-      </div>
-      <div class="status" id="gecmis_status" role="status"></div>
+<!-- ===================== AYARLAR ===================== -->
+<section class="bolum" id="b-ayarlar">
+  <div class="kart">
+    <h2>🏫 Okul bilgileri</h2>
+    <p class="alt">Bildirim formunda “Dairesi” ve imza bölümüne yazılır.</p>
+    <div class="soru"><label for="gset_kurum">Okul / kurum adı</label><input type="text" id="gset_kurum"></div>
+    <div class="iki">
+      <div class="soru"><label for="gset_il">İl</label><input type="text" id="gset_il"></div>
+      <div class="soru"><label for="gset_ilce">İlçe</label><input type="text" id="gset_ilce"></div>
     </div>
-  </section>
+    <div class="iki">
+      <div class="soru"><label for="gset_onay_ad">Okul müdürü (imza yetkilisi) adı soyadı</label><input type="text" id="gset_onay_ad"></div>
+      <div class="soru"><label for="gset_onay_unvan">Unvanı</label><input type="text" id="gset_onay_unvan" placeholder="Okul Müdürü"></div>
+    </div>
+    <details class="nedir"><summary>🔧 Uzman ayarları (genelde değiştirmeniz gerekmez)</summary>
+      <div class="iki" style="margin-top:10px">
+        <div class="soru"><label for="gset_damga">Damga vergisi (binde)</label><span class="ipucu">Yevmiye üzerinden, bilgi amaçlı. İstemiyorsanız 0.</span><input type="text" id="gset_damga" inputmode="decimal" placeholder="7,59"></div>
+        <div class="soru"><label for="gset_konakkat">Otel ücreti sınırı (yevmiyenin kaç katı)</label><span class="ipucu">Mevzuat: %50 fazlası = 1,5</span><input type="text" id="gset_konakkat" inputmode="decimal" placeholder="1,5"></div>
+      </div>
+      <div class="iki">
+        <div class="soru"><label for="gset_belgesiz">Faturasız konaklama (yevmiyenin kaç katı)</label><span class="ipucu">Mevzuat: yarısı = 0,5</span><input type="text" id="gset_belgesiz" inputmode="decimal" placeholder="0,5"></div>
+        <div class="soru"><label for="gset_altnot">Form alt notu</label><input type="text" id="gset_altnot"></div>
+      </div>
+      <h3 style="margin:14px 0 4px">Yevmiye (gündelik) tutarları</h3>
+      <p class="ipucu">Her yıl Bütçe Kanunu’ndaki (H) cetveliyle belirlenir. Program, görev tarihine göre doğru yılı kendisi seçer. <span class="rozet">⚠ kontrol</span> işaretli değerler tahminidir.</p>
+      <div class="soru"><label for="gset_donem">Yıl</label><select id="gset_donem"></select></div>
+      <div id="gset_rates" class="tbl-kap"></div>
+    </details>
+    <div class="dugmeler" style="margin-top:14px">
+      <button class="btn" id="gset_save" type="button">✔ Kaydet</button>
+      <button class="btn ikincil" id="gset_reset_rates" type="button">Bu yılın yevmiyelerini sıfırla</button>
+    </div>
+    <div class="durum" id="gset_status" role="status"></div>
+    <div style="margin-top:10px"><button type="button" class="btn ikincil kucuk" id="tema">🌓 Açık / koyu görünüm</button></div>
+  </div>
+</section>
 
-  <!-- ============ AYARLAR ============ -->
-  <section id="tab-ayarlar" class="tab-panel" role="tabpanel">
-    <div class="card">
-      <h2 class="section-title">⚙️ Kurum Bilgileri</h2>
-      <div class="row2">
-        <div class="field"><label for="gset_kurum">Kurum / Daire Adı (formdaki “Dairesi”)</label><input type="text" id="gset_kurum" placeholder="örn. Atatürk Ortaokulu"></div>
-        <div class="field"><label for="gset_il">İl</label><input type="text" id="gset_il"></div>
-      </div>
-      <div class="row2">
-        <div class="field"><label for="gset_ilce">İlçe</label><input type="text" id="gset_ilce"></div>
-        <div class="field"><label for="gset_onay_ad">Birim Yetkilisi Ad Soyad</label><input type="text" id="gset_onay_ad"></div>
-      </div>
-      <div class="row2">
-        <div class="field"><label for="gset_onay_unvan">Birim Yetkilisi Unvanı</label><input type="text" id="gset_onay_unvan" placeholder="Okul Müdürü"></div>
-        <div class="field"><label for="gset_damga">Damga Vergisi Oranı (binde, gündelik üzerinden)</label><input type="text" id="gset_damga" inputmode="decimal" placeholder="7,59"></div>
-      </div>
-      <div class="row2">
-        <div class="field"><label for="gset_konakkat">Konaklama Tavanı (gündeliğin katı)</label><input type="text" id="gset_konakkat" inputmode="decimal" placeholder="1,5"></div>
-        <div class="field"><label for="gset_belgesiz">Belgesiz Konaklama Oranı (gündeliğin katı)</label><input type="text" id="gset_belgesiz" inputmode="decimal" placeholder="0,5"></div>
-      </div>
-      <div class="field"><label for="gset_altnot">Form Alt Notu (isteğe bağlı)</label><textarea id="gset_altnot" rows="2"></textarea></div>
-    </div>
+<!-- ===================== YARDIM ===================== -->
+<section class="bolum" id="b-yardim">
+  <div class="kart sss">
+    <h2>❓ Sık sorulan sorular</h2>
+    <h3>Geçici görev yolluğu nedir?</h3>
+    <p>Okulunuz dışında bir yerde (seminer, kurs, toplantı, sınav görevi vb.) görevlendirildiğinizde devletin ödediği paradır. Üç kısımdan oluşur: <b>yevmiye</b> (her gün için sabit para), <b>yol parası</b> (bilet ve şehir içi ulaşım) ve <b>konaklama</b> (otel).</p>
+    <h3>Yevmiye (gündelik) ne kadar?</h3>
+    <p>Her yıl Bütçe Kanunu ile belirlenir; ek göstergenize ve kadro derecenize göre değişir. Program görev tarihine bakıp doğru tutarı kendisi bulur.</p>
+    <h3>Aynı gün gidip döndüm, ne alırım?</h3>
+    <p>Öğle (13.00) veya akşam (19.00) yemek saatlerinden birini görevde geçirdiyseniz yevmiyenin <b>üçte biri</b>, ikisini de geçirdiyseniz <b>üçte ikisi</b> ödenir. Program bunu yola çıkış ve dönüş saatlerinizden hesaplar. Yol parası her durumda ödenir.</p>
+    <h3>Otel parasının tamamı ödenir mi?</h3>
+    <p>Faturalı otel ücreti, bir gecelik yevmiyenin <b>1,5 katına</b> kadar ödenir. Daha pahalıysa fazlası ödenmez. Faturanız yoksa her gece için yevmiyenin <b>yarısı</b> ödenir.</p>
+    <h3>Çok uzun görevlerde?</h3>
+    <p>İlk 90 gün tam, sonraki 90 gün üçte iki yevmiye ödenir. Program bunu kendisi uygular.</p>
+    <h3>Formu aldıktan sonra ne yapmalıyım?</h3>
+    <p>Formu yazdırıp siz ve okul müdürü imzalar. Görevlendirme yazısı (olur), biletler ve otel faturası ile birlikte okul muhasebesine (MYS üzerinden yolluk işlemleri için) teslim edilir.</p>
+    <h3>Bilgilerim nereye gidiyor?</h3>
+    <p>Hiçbir yere. Program tamamen bu bilgisayarda çalışır; internete bilgi gönderilmez.</p>
+    <div class="bilgi dikkat">Bu program bir hesaplama yardımcısıdır. Ödeme öncesinde tutarları okul muhasebesi / mutemet ile kontrol ediniz.</div>
+  </div>
+</section>
+</main>
 
-    <div class="card">
-      <h2 class="section-title">Gündelik Oranları (H Cetveli)</h2>
-      <p class="section-sub">Seçili bütçe döneminin yurtiçi gündelik değerleri. Yeni yıllar ve değişiklikler için değiştirip kaydedebilir veya varsayılana dönebilirsiniz. <span class="pill">⚠</span> işaretli değerleri ilgili yılın Bütçe Kanunu (H) cetvelinden kontrol ediniz.</p>
-      <div class="field" style="max-width:360px"><label for="gset_donem">Dönem</label><select id="gset_donem"></select></div>
-      <div id="gset_rates" class="tbl-wrap"></div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn" id="gset_save" type="button">Ayarları Kaydet</button>
-        <button class="btn btn-secondary" id="gset_reset_rates" type="button">Bu Dönemin Oranlarını Varsayılana Döndür</button>
-      </div>
-      <div class="status" id="gset_status" role="status"></div>
-    </div>
-  </section>
-
-  <!-- ============ KILAVUZ ============ -->
-  <section id="tab-kilavuz" class="tab-panel" role="tabpanel">
-    <div class="card guide">
-      <h2 class="section-title">📘 Kılavuz ve Mevzuat Özeti</h2>
-      <h3>Kullanım</h3>
-      <ol>
-        <li><b>Ayarlar</b> sekmesinden kurum adı, il/ilçe ve birim yetkilisini bir kez girip kaydedin.</li>
-        <li>Personel ve görev bilgilerini doldurun, <b>Hesapla</b>’ya basın.</li>
-        <li><b>Excel (Örnek 27) İndir</b> ile resmî şablon biçiminde .xlsx dosyası alın veya <b>Bildirim Formunu Aç</b> ile formu yazdırın / PDF olarak kaydedin.</li>
-        <li>Hesaplama otomatik olarak <b>Geçmiş</b>’e kaydedilir. <b>💾 Yedek Al</b> ile ayarları ve geçmişi dosyaya alıp başka bilgisayara taşıyabilirsiniz.</li>
-      </ol>
-      <h3>Gündelik (6245 s. Harcırah Kanunu m.33, m.39)</h3>
-      <ul>
-        <li>Gündelik tutarları her yıl Merkezi Yönetim Bütçe Kanunu’na ekli <b>(H) cetveli</b> ile belirlenir; ek gösterge ve kadro derecesine göre kademelidir.</li>
-        <li>Geçici görevde gündelik; ilk <b>90 gün tam</b>, sonraki <b>90 gün 2/3</b> oranında ödenir. 180 günü aşan süre için gündelik ödenmez.</li>
-        <li>Günübirlik görevlerde öğle (13.00) veya akşam (19.00) yemek saatlerinden birini geçirene <b>1/3</b>, ikisini geçirene <b>2/3</b>, geceyi geçirene <b>tam</b> gündelik ödenir (m.39).</li>
-      </ul>
-      <h3>Konaklama (m.33/d)</h3>
-      <ul>
-        <li>Belgelendirilen konaklama gideri, gündeliğin <b>%50 artırımlı tutarını</b> (×1,5) aşmamak üzere ödenir.</li>
-        <li>Konaklama giderini belgeleyemeyenlere her gece için gündeliğin <b>%50’si</b> ödenir.</li>
-        <li>Ücretsiz konaklama sağlanmışsa konaklama ödemesi yapılmaz.</li>
-      </ul>
-      <h3>Yol ve zorunlu giderler (m.34, m.45)</h3>
-      <ul>
-        <li>Taşıt ücreti olarak bilet bedeli; şehiriçi ulaşım (ikamet–otogar, otogar–görev yeri) ve otoyol/köprü gibi zorunlu giderler ayrı satırlarda gösterilir.</li>
-        <li>Formdaki “Toplam Tutar” sütunu her satırda <b>Gündelik Tutarı + Taşıt ve Zorunlu Gider Tutarı</b> toplamıdır (Excel’de formül olarak yer alır).</li>
-      </ul>
-      <h3>Damga vergisi</h3>
-      <p>Ekranda gösterilen damga vergisi, Ayarlar’daki oran (varsayılan binde 7,59) ile gündelik toplamı üzerinden hesaplanan bilgilendirme amaçlı kesintidir; Örnek 27 formuna yazılmaz. Gerekmiyorsa oranı 0 yapın.</p>
-      <div class="note warn">Bu program hesaplama yardımcısıdır. Ödeme öncesinde tutarları güncel mevzuat ve ilgili yılın (H) cetveli ile kontrol ediniz.</div>
-    </div>
-  </section>
+<div class="alt-cubuk" id="alt-cubuk">
+  <div class="alt-ic">
+    <button type="button" class="btn ikincil" id="geri">← Geri</button>
+    <div class="ara-toplam" id="ara-toplam" aria-live="polite"></div>
+    <button type="button" class="btn" id="ileri">İleri →</button>
   </div>
 </div>
-</main>
-<footer class="app-foot">Geçici Görev Yolluğu · Veriler yalnızca bu tarayıcıda saklanır, hiçbir sunucuya gönderilmez.</footer>
 
 <script>
+"use strict";
 "use strict";
 /* Örnek 27 Excel şablonunun parçaları (tools/build.py tarafından gömülür) */
 const SABLON = /*@@SABLON@@*/null;
@@ -409,7 +527,7 @@ const store = {
   get(k, def){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch(e){ return def; } },
   set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } }
 };
-function setStatus(id, msg, ok){ const el = $(id); el.textContent = msg; el.className = "status " + (ok ? "ok" : "bad"); }
+function setStatus(id, msg, ok){ const el = $(id); el.textContent = msg; el.className = "durum " + (ok ? "ok" : "bad"); }
 function downloadBlob(blob, name){
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob); a.download = name;
@@ -464,9 +582,9 @@ function ayarFormDoldur(){
 }
 function oranTablosu(){
   const id = $("gset_donem").value, d = donemBul(id), o = donemOranlari(id);
-  const rows = KADEME_ADLARI.map((ad, i) => `<tr><td>${esc(ad)} ${d.kontrol && d.kontrol.includes(i) && !oranlar[id] ? '<span class="pill" title="Varsayılan değer tahminidir; H cetvelinden kontrol ediniz">⚠ kontrol</span>' : ""}</td>
-    <td class="num"><input type="text" inputmode="decimal" data-rate="${i}" value="${fmt(o[i])}" aria-label="${esc(ad)} gündeliği"></td></tr>`).join("");
-  $("gset_rates").innerHTML = `<table class="data"><thead><tr><th>Kademe</th><th class="num">Gündelik (TL)</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const rows = KADEME_ADLARI.map((ad, i) => `<tr><td>${esc(ad)} ${d.kontrol && d.kontrol.includes(i) && !oranlar[id] ? '<span class="rozet" title="Varsayılan değer tahminidir; H cetvelinden kontrol ediniz">⚠ kontrol</span>' : ""}</td>
+    <td class="say"><input type="text" inputmode="decimal" data-rate="${i}" value="${fmt(o[i])}" aria-label="${esc(ad)} gündeliği"></td></tr>`).join("");
+  $("gset_rates").innerHTML = `<table class="veri"><thead><tr><th>Kademe</th><th class="say">Yevmiye (TL)</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 function ayarKaydet(){
   for (const k of Object.keys(AYAR_VARSAYILAN)) ayar[k] = $("gset_" + k).value.trim();
@@ -480,24 +598,6 @@ function ayarKaydet(){
   setStatus("gset_status", ok ? "Ayarlar kaydedildi." : "Ayarlar bu oturumda geçerli; tarayıcı belleğine yazılamadı.", ok);
 }
 
-/* ------------------------------------------------------------------ */
-/* Form verisi                                                          */
-/* ------------------------------------------------------------------ */
-const ALANLAR = ["ad","tc","unvan","iban","donem","tier","kadro","kademe","ekgos","nereden","yer","neden","tbas","sbas","tbit","sbit","cikis","donustarih",
-  "gorevgun","yoldahil","yolgun","oranpay","kural90","tasit","gidis","donus","sehir_a","sehir_b","konakgun","konakucret","konaktip","konaktavan","diger","diger_ad","bildirimtarih"];
-function formOku(){
-  const f = {};
-  for (const k of ALANLAR){ const el = $("gy_" + k); f[k] = el.type === "checkbox" ? el.checked : el.value.trim(); }
-  return f;
-}
-function formYaz(f){
-  for (const k of ALANLAR){
-    if (!(k in f)) continue;
-    const el = $("gy_" + k);
-    if (el.type === "checkbox") el.checked = !!f[k]; else el.value = f[k];
-  }
-  gorevGunElle = true;
-}
 
 /* ------------------------------------------------------------------ */
 /* Hesaplama                                                            */
@@ -517,7 +617,7 @@ function hesapla(f){
   const kadro = parseInt(f.kadro, 10) || 1, tier = parseInt(f.tier, 10) || 0;
   const kIdx = tier < 3 ? tier : (kadro <= 4 ? 3 : 4);
   const gundelik = o[kIdx];
-  const pay = parseInt(f.oranpay, 10) || 3;
+  const pay = f.oranpay === "0" ? 0 : (parseInt(f.oranpay, 10) || 3);
   const uygGundelik = r2(gundelik * pay / 3);
   const yolGun = parseInt(f.yolgun, 10) || 0;
   const gunSayisi = f.yoldahil === "1" ? gorevGun : gorevGun + yolGun;
@@ -528,9 +628,9 @@ function hesapla(f){
     gSatir.push({gun:90, oran:uygGundelik, aciklama:"İlk 90 gün (tam)"});
     const kalan = Math.min(gunSayisi - 90, 90);
     gSatir.push({gun:kalan, oran:r2(uygGundelik * 2 / 3), aciklama:"91-180. günler (2/3)"});
-    if (gunSayisi > 180) uyarilar.push(`Gündelik süresi ${gunSayisi} gün; 180 günü aşan ${gunSayisi - 180} gün için gündelik hesaplanmadı (m.33).`);
+    if (gunSayisi > 180) uyarilar.push(`Göreviniz ${gunSayisi} gün sürüyor. Kanuna göre 180 günden sonraki ${gunSayisi - 180} gün için yevmiye ödenmez.`);
   } else {
-    gSatir.push({gun:gunSayisi, oran:uygGundelik, aciklama: pay === 3 ? "Tam gündelik" : `${pay}/3 gündelik`});
+    gSatir.push({gun:gunSayisi, oran:uygGundelik, aciklama: pay === 3 ? "Tam gündelik" : pay === 0 ? "Gündelik ödenmez (m.39)" : `${pay}/3 gündelik`});
   }
   gSatir.forEach(s => s.tutar = r2(s.gun * s.oran));
   const gundelikToplam = r2(gSatir.reduce((a, s) => a + s.tutar, 0));
@@ -546,10 +646,10 @@ function hesapla(f){
       konakGecelik = kucret;
       const tavan = r2(gundelik * tavanKat);
       if (f.konaktavan && kucret > tavan){
-        uyarilar.push(`Gecelik konaklama ücreti (${fmtTL(kucret)}) tavanı (${fmtTL(tavan)} = gündelik × ${String(tavanKat).replace(".", ",")}) aştığı için tavan uygulandı.`);
+        uyarilar.push(`Otel ücretiniz (gecelik ${fmtTL(kucret)}) ödenebilecek en yüksek tutarı (gecelik ${fmtTL(tavan)}) aşıyor. Bu yüzden her gece için ${fmtTL(tavan)} hesaplandı; aradaki fark ödenmez.`);
         konakGecelik = tavan;
       }
-      if (!kucret) uyarilar.push("Konaklama gün sayısı girildi ancak gecelik ücret boş.");
+      if (!kucret) uyarilar.push("Otelde kaldığınız gece sayısını yazdınız ama gecelik ücreti yazmadınız.");
       konakAciklama = `Konaklama (${konakGun} gece × ${fmtTL(konakGecelik)})`;
     }
   }
@@ -599,60 +699,6 @@ function hesapla(f){
     konakGun, konakGecelik, konakToplam, konakAciklama, gidis, donus, sa, sb, diger, tasitToplam, genel, damga, damgaOran, net, satirlar, uyarilar, nereden};
 }
 
-/* ------------------------------------------------------------------ */
-/* Sonuç ekranı                                                         */
-/* ------------------------------------------------------------------ */
-let sonHesap = null;
-function sonucGoster(h){
-  const f = h.f;
-  const kalem = [];
-  h.gSatir.forEach(s => kalem.push([`Gündelik — ${s.aciklama}`, `${s.gun} gün × ${fmtTL(s.oran)}`, s.tutar]));
-  if (h.gidis) kalem.push([`Gidiş (${f.tasit})`, "Bilet / taşıt ücreti", h.gidis]);
-  if (h.donus) kalem.push([`Dönüş (${f.tasit})`, "Bilet / taşıt ücreti", h.donus]);
-  if (h.sa) kalem.push(["Şehiriçi A", "İkamet - Otogar/Gar arası", h.sa]);
-  if (h.sb) kalem.push(["Şehiriçi B", "Otogar/Gar - Görev yeri arası", h.sb]);
-  if (h.konakToplam) kalem.push(["Konaklama", h.konakAciklama, h.konakToplam]);
-  if (h.diger) kalem.push(["Diğer zorunlu gider", f.diger_ad || "", h.diger]);
-
-  $("gy_sonuc").innerHTML = `
-  <div class="card">
-    <h2 class="section-title">Hesap Sonucu — ${esc(f.ad)}</h2>
-    <div class="kpis">
-      <div class="kpi"><span>Gündelik</span><b>${fmtTL(h.gundelikToplam)}</b></div>
-      <div class="kpi"><span>Yol + Konaklama</span><b>${fmtTL(h.tasitToplam)}</b></div>
-      <div class="kpi"><span>Damga V. (binde ${fmt(h.damgaOran*1000)})</span><b>${fmtTL(h.damga)}</b></div>
-      <div class="kpi main"><span>Genel Toplam</span><b>${fmtTL(h.genel)}</b></div>
-    </div>
-    ${h.uyarilar.map(u => `<div class="note warn">⚠ ${esc(u)}</div>`).join("")}
-    <div class="note info">Dönem: <b>${esc(h.donem.ad)}</b> · Kademe: <b>${esc(KADEME_ADLARI[h.kIdx])}</b> · H cetveli gündeliği: <b>${fmtTL(h.gundelik)}</b>${h.pay < 3 ? ` · Uygulanan (${h.pay}/3): <b>${fmtTL(h.uygGundelik)}</b>` : ""} · Gündelik gün: <b>${h.gunSayisi}</b> (görev ${h.gorevGun}${f.yoldahil === "1" ? ", yol dahil" : ` + yol ${h.yolGun}`})</div>
-    <div class="tbl-wrap"><table class="data">
-      <thead><tr><th>Kalem</th><th>Açıklama</th><th class="num">Tutar</th></tr></thead>
-      <tbody>${kalem.map(k => `<tr><td>${esc(k[0])}</td><td>${esc(k[1])}</td><td class="num">${fmtTL(k[2])}</td></tr>`).join("")}</tbody>
-      <tfoot>
-        <tr><td colspan="2">Genel Toplam (Örnek 27)</td><td class="num">${fmtTL(h.genel)}</td></tr>
-        <tr><td colspan="2">Damga Vergisi Kesintisi (bilgi)</td><td class="num">− ${fmtTL(h.damga)}</td></tr>
-        <tr><td colspan="2">Ödenecek Net Tutar</td><td class="num">${fmtTL(h.net)}</td></tr>
-      </tfoot>
-    </table></div>
-    <p class="section-sub">Yazıyla: <b>${esc(tutarYazi(h.genel))}</b></p>
-    <div class="btn-row" style="margin-top:6px">
-      <button class="btn" type="button" id="btn_excel">📊 Excel (Örnek 27) İndir</button>
-      <button class="btn" type="button" id="btn_form">📄 Bildirim Formunu Aç (Yazdır / PDF)</button>
-    </div>
-  </div>
-  <div class="card">
-    <h2 class="section-title">Form Önizleme (Örnek 27 satırları)</h2>
-    <div class="tbl-wrap"><table class="data">
-      <thead><tr><th>Tarih</th><th>Nereden Nereye / Nerede</th><th>Gidiş</th><th>Dönüş</th><th class="num">Gün</th><th class="num">Bir Günlüğü</th><th class="num">Gündelik Tutarı</th><th>Taşıt / Gider Çeşidi</th><th class="num">Tutarı</th><th class="num">Toplam</th></tr></thead>
-      <tbody>${h.satirlar.map(s => `<tr><td>${esc(s.tarih)}</td><td>${esc(s.yer)}</td><td>${esc(s.gidis || "")}</td><td>${esc(s.donus || "")}</td>
-        <td class="num">${s.gun || ""}</td><td class="num">${s.bir ? fmt(s.bir) : ""}</td><td class="num">${s.gtutar ? fmt(s.gtutar) : ""}</td>
-        <td>${esc(s.cesit || "")}</td><td class="num">${s.ttutar ? fmt(s.ttutar) : ""}</td><td class="num">${fmt(s.toplam)}</td></tr>`).join("")}</tbody>
-      <tfoot><tr><td colspan="4">GENEL TOPLAM</td><td></td><td class="num">${fmt(h.gSatir.reduce((a,s)=>a+s.oran,0))}</td><td class="num">${fmt(h.gundelikToplam)}</td><td></td><td class="num">${fmt(h.tasitToplam)}</td><td class="num">${fmt(h.genel)}</td></tr></tfoot>
-    </table></div>
-  </div>`;
-  $("btn_excel").onclick = () => excelIndir(h);
-  $("btn_form").onclick = () => formAc(h);
-}
 
 /* ------------------------------------------------------------------ */
 /* Excel (Örnek 27) üretimi — orijinal şablon üzerinde                  */
@@ -910,66 +956,373 @@ function formAc(h){
   else { downloadBlob(new Blob([html], {type:"text/html"}), `Ornek27_${safeName(h.f.ad)}.html`); setStatus("gy_status", "Açılır pencere engellendi; form HTML dosyası olarak indirildi.", true); }
 }
 
+
 /* ------------------------------------------------------------------ */
-/* Geçmiş                                                               */
+/* Sihirbaz arayüzü                                                     */
 /* ------------------------------------------------------------------ */
-let gecmis = store.get("ggy_gecmis", []);
+const ADIM_SAYISI = 5;
+const BOS_TASLAK = {ad:"", unvan:"", tier:"", kadro:"", kademe:"", tc:"", iban:"", nereden:"", yer:"", neden:"", tbas:"", tbit:"",
+  yatili:"", sbas:"", sbit:"", yolek:"", tasit:"", gidis:"", donus:"", sehir_a:"", sehir_b:"", diger:"", diger_ad:"",
+  konak:"", konakgun:"", konakgunElle:false, konakucret:"", bildirimtarih:""};
+let w = Object.assign({}, BOS_TASLAK, store.get("ggy_taslak", {}));
+let adim = Math.min(Math.max(+store.get("ggy_adim", 1) || 1, 1), ADIM_SAYISI);
+let sonHesap = null;
+
+function taslakKaydet(){ store.set("ggy_taslak", w); store.set("ggy_adim", adim); }
+function addDays(iso, n){ const d = isoDate(iso); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+function dakika(t){ if (!t) return null; const [h, m] = t.split(":").map(Number); return h*60 + m; }
+
+/* Görev tarihine göre bütçe dönemi */
+function donemTarihten(iso){
+  if (!iso) return DONEMLER[0].id;
+  const y = +iso.slice(0, 4);
+  if (y === 2022) return iso < "2022-07-07" ? "2022a" : "2022b";
+  const d = DONEMLER.find(x => x.yil === y);
+  if (d) return d.id;
+  return y > DONEMLER[0].yil ? DONEMLER[0].id : DONEMLER[DONEMLER.length - 1].id;
+}
+/* Günübirlik: kaç yemek saati görevde geçti (m.39) */
+function ogunSayisi(){
+  const a = dakika(w.sbas), b = dakika(w.sbit);
+  if (a == null || b == null) return null;
+  const ogle = a <= 13*60 && b >= 13*60, aksam = a <= 19*60 && b >= 19*60;
+  return {ogle, aksam, n:(ogle ? 1 : 0) + (aksam ? 1 : 0)};
+}
+function gorevGunu(){ return (w.tbas && w.tbit && dayDiff(w.tbas, w.tbit) >= 0) ? dayDiff(w.tbas, w.tbit) + 1 : 0; }
+function tahminiGece(){
+  const ek = {once:1, sonra:1, ikisi:2}[w.yolek] || 0;
+  return Math.max(0, gorevGunu() + ek - 1);
+}
+
+/* Taslağı hesap motorunun beklediği biçime çevir */
+function motorVerisi(){
+  const yatili = w.yatili === "evet";
+  let oranpay = "3", yoldahil = "1", yolgun = "0", cikis = "", donustarih = "";
+  if (!yatili){
+    const o = ogunSayisi(); oranpay = String(o ? o.n : 3);
+  } else if (w.yolek && w.yolek !== "yok"){
+    yoldahil = "0";
+    yolgun = w.yolek === "ikisi" ? "2" : "1";
+    if (w.tbas && (w.yolek === "once" || w.yolek === "ikisi")) cikis = addDays(w.tbas, -1);
+    if (w.tbit && (w.yolek === "sonra" || w.yolek === "ikisi")) donustarih = addDays(w.tbit, 1);
+  }
+  const resmi = w.tasit === "Resmî Araç";
+  const konaktip = !yatili ? "ucretsiz" : ({otel:"belgeli", faturasiz:"belgesiz", ucretsiz:"ucretsiz"}[w.konak] || "ucretsiz");
+  return {ad:w.ad, tc:w.tc, unvan:w.unvan, iban:w.iban, donem:donemTarihten(w.tbas), tier:w.tier || "3", kadro:w.kadro || "1", kademe:w.kademe, ekgos:"",
+    nereden:w.nereden, yer:w.yer, neden:w.neden, tbas:w.tbas, sbas:w.sbas, tbit:w.tbit, sbit:w.sbit, cikis, donustarih,
+    gorevgun:String(gorevGunu()), yoldahil, yolgun, oranpay, kural90:true, tasit:w.tasit || "Otobüs",
+    gidis: resmi ? "" : w.gidis, donus: resmi ? "" : w.donus, sehir_a:w.sehir_a, sehir_b:w.sehir_b,
+    konakgun: konaktip === "ucretsiz" ? "0" : String(w.konakgun || 0), konakucret:w.konakucret, konaktip, konaktavan:true,
+    diger:w.diger, diger_ad:w.diger_ad, bildirimtarih:w.bildirimtarih || todayIso()};
+}
+function yevmiye(){
+  if (!w.tier || !w.kadro) return null;
+  const o = donemOranlari(donemTarihten(w.tbas || todayIso()));
+  const t = +w.tier, k = +w.kadro;
+  return o[t < 3 ? t : (k <= 4 ? 3 : 4)];
+}
+
+/* ---------------- Doğrulama ---------------- */
+function hataGoster(alan, var_){ const el = document.querySelector(`[data-soru="${alan}"]`); if (el) el.classList.toggle("hatali", var_); return var_; }
+function dogrula(n){
+  const hatalar = [];
+  const kontrol = (alan, kosul) => { if (hataGoster(alan, kosul)) hatalar.push(alan); };
+  if (n === 1){
+    kontrol("kurum", !ayar.kurum);
+    kontrol("ad", !w.ad.trim());
+    kontrol("unvan", !w.unvan.trim());
+    kontrol("tier", !w.tier);
+    kontrol("kadro", !w.kadro);
+    kontrol("tc", !!w.tc && !/^\d{11}$/.test(w.tc));
+  }
+  if (n === 2){
+    kontrol("nereden", !w.nereden.trim());
+    kontrol("yer", !w.yer.trim());
+    kontrol("tbas", !w.tbas);
+    kontrol("tbit", !w.tbit || (w.tbas && dayDiff(w.tbas, w.tbit) < 0));
+    kontrol("yatili", !w.yatili);
+    kontrol("sbas", !w.sbas);
+    kontrol("sbit", !w.sbit);
+    kontrol("yolek", w.yatili === "evet" && !w.yolek);
+  }
+  if (n === 3){
+    kontrol("tasit", !w.tasit);
+    const resmi = w.tasit === "Resmî Araç";
+    kontrol("gidis", !resmi && w.gidis === "");
+    kontrol("donus", !resmi && w.donus === "");
+  }
+  if (n === 4 && w.yatili === "evet"){
+    kontrol("konak", !w.konak);
+    kontrol("konakgun", w.konak && w.konak !== "ucretsiz" && !(+w.konakgun > 0));
+    kontrol("konakucret", w.konak === "otel" && !(parseNum(w.konakucret) > 0));
+  }
+  if (hatalar.length){
+    const ilk = document.querySelector(`[data-soru="${hatalar[0]}"]`);
+    if (ilk){ ilk.scrollIntoView({block:"center", behavior:"smooth"}); const i = ilk.querySelector("input,select,button"); if (i) i.focus({preventScroll:true}); }
+  }
+  return !hatalar.length;
+}
+
+/* ---------------- Ekranı tazele ---------------- */
+function kosul(ifade){ const [k, v] = ifade.split("="); return (w[k] || "") === v; }
+function tazele(){
+  /* Alanlara değer yaz */
+  document.querySelectorAll("[data-k]").forEach(el => { if (document.activeElement !== el) el.value = w[el.dataset.k] ?? ""; });
+  document.querySelectorAll("[data-ayar]").forEach(el => { if (document.activeElement !== el) el.value = ayar[el.dataset.ayar] ?? ""; });
+  document.querySelectorAll("[data-secim]").forEach(g => g.querySelectorAll(".secim").forEach(b => b.setAttribute("aria-pressed", w[g.dataset.secim] === b.dataset.val)));
+  document.querySelectorAll("[data-cip]").forEach(g => g.querySelectorAll(".cip").forEach(b => b.setAttribute("aria-pressed", w[g.dataset.cip] === b.dataset.val)));
+  document.querySelectorAll("[data-goster]").forEach(el => el.hidden = !kosul(el.dataset.goster));
+  document.querySelectorAll("[data-gizle]").forEach(el => el.hidden = kosul(el.dataset.gizle));
+
+  /* Okul kartı: bilgiler girilmişse kısa özet */
+  const okulTamam = !!ayar.kurum && !okulDuzenle;
+  $("okul-form").hidden = okulTamam;
+  $("okul-ozet").hidden = !okulTamam;
+  if (okulTamam) $("okul-ozet").innerHTML = `🏫 <b>${esc(ayar.kurum)}</b>${ayar.ilce || ayar.il ? " · " + esc([ayar.ilce, ayar.il].filter(Boolean).join(" / ")) : ""}${ayar.onay_ad ? " · İmza: " + esc(ayar.onay_ad) : ""} &nbsp; <button type="button" class="btn ikincil kucuk" id="okul-degistir">Değiştir</button>`;
+  $("okul-kart").querySelector("h2").textContent = okulTamam ? "🏫 Okul" : "🏫 Önce okulunuzun bilgileri";
+
+  /* Yevmiye bilgisi */
+  const y = yevmiye();
+  const donem = donemBul(donemTarihten(w.tbas || todayIso()));
+  $("yevmiye-bilgi").innerHTML = y ? `<div class="bilgi iyi">💰 Bir günlük yevmiyeniz (gündelik): <b class="tutar">${fmtTL(y)}</b> <small>(${esc(donem.ad.split(" ")[0])} yılı tutarı${w.tbas ? "" : "; görev tarihini girince o yılın tutarı kullanılır"})</small></div>` : "";
+
+  /* Gün bilgisi */
+  const g = gorevGunu();
+  $("gun-bilgi").innerHTML = (w.tbas && w.tbit && dayDiff(w.tbas, w.tbit) < 0) ? "" :
+    g ? `<div class="bilgi">📅 Göreviniz <b>${g} gün</b> sürmüş (${isoToTr(w.tbas)}${g > 1 ? " – " + isoToTr(w.tbit) : ""}).${g > 1 && !w.yatili ? " Birden fazla gün sürdüyse genelde aşağıdan “Evet, gece kaldım” seçilir." : ""}</div>` : "";
+
+  /* Öğün bilgisi (günübirlik) */
+  const o = ogunSayisi();
+  if (w.yatili === "hayir" && o && y){
+    const pay = o.n, tutar = r2(y * pay / 3);
+    const yazi = pay === 2 ? "üçte ikisi (2/3)" : pay === 1 ? "üçte biri (1/3)" : "";
+    $("ogun-bilgi").innerHTML = `<div class="bilgi ${pay ? "iyi" : "dikkat"}">
+      Öğle yemeği saati (13.00): <b>${o.ogle ? "✔ görevdeydiniz" : "✖ görevde değildiniz"}</b><br>
+      Akşam yemeği saati (19.00): <b>${o.aksam ? "✔ görevdeydiniz" : "✖ görevde değildiniz"}</b><br>
+      ${pay ? `➜ Her gün için yevmiyenin <b>${yazi}</b> ödenir: <b class="tutar">${fmtTL(tutar)}</b>` : "➜ Bu saatlere göre <b>yevmiye ödenmez</b>; yalnızca yol masraflarınız ödenir."}</div>`;
+  } else $("ogun-bilgi").innerHTML = "";
+
+  /* Konaklama bilgisi */
+  if (w.yatili === "evet" && y && w.konak && w.konak !== "ucretsiz"){
+    if (!w.konakgunElle && w.konakgun === "") w.konakgun = String(tahminiGece());
+    const gece = +w.konakgun || 0;
+    if (w.konak === "otel"){
+      const ucret = parseNum(w.konakucret), tavan = r2(y * (parseNum(ayar.konakkat) || 1.5));
+      $("konak-bilgi").innerHTML = ucret ? (ucret > tavan
+        ? `<div class="bilgi dikkat">Gecelik ücret sınırı <b>${fmtTL(tavan)}</b>. Faturanız daha yüksek olduğu için gece başına <b>${fmtTL(tavan)}</b> ödenir. Toplam: <b class="tutar">${fmtTL(r2(gece * tavan))}</b></div>`
+        : `<div class="bilgi iyi">${gece} gece × ${fmtTL(ucret)} = <b class="tutar">${fmtTL(r2(gece * ucret))}</b> (sınır: gecelik ${fmtTL(tavan)})</div>`)
+        : `<div class="bilgi">Bir gecelik ücret en fazla <b>${fmtTL(tavan)}</b> olarak ödenir.</div>`;
+    } else {
+      const g1 = r2(y * (parseNum(ayar.belgesiz) || 0.5));
+      $("konak-bilgi").innerHTML = `<div class="bilgi iyi">${gece} gece × ${fmtTL(g1)} = <b class="tutar">${fmtTL(r2(gece * g1))}</b></div>`;
+    }
+  } else $("konak-bilgi").innerHTML = "";
+  if (document.activeElement !== $("w_konakgun")) $("w_konakgun").value = w.konakgun;
+
+  /* Adımlar */
+  document.querySelectorAll(".adim").forEach(a => a.hidden = +a.dataset.adim !== adim);
+  document.querySelectorAll("#adimlar li").forEach((li, i) => { li.className = i + 1 < adim ? "bitti" : i + 1 === adim ? "simdi" : ""; if (i + 1 === adim) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current"); });
+  $("geri").style.visibility = adim > 1 ? "visible" : "hidden";
+  $("ileri").textContent = adim === 4 ? "Hesapla ✔" : adim === ADIM_SAYISI ? "🆕 Yeni hesap" : "İleri →";
+
+  /* Ara toplam */
+  let ara = "";
+  if (adim >= 2 && w.ad && w.tbas && w.tbit && w.yatili){
+    const h = hesapla(motorVerisi());
+    if (!h.hatalar) ara = `${adim === ADIM_SAYISI ? "Toplam" : "Şu ana kadar"}<b>${fmtTL(h.genel)}</b>`;
+  }
+  $("ara-toplam").innerHTML = ara || `Adım ${adim} / ${ADIM_SAYISI}`;
+  taslakKaydet();
+}
+let okulDuzenle = !ayar.kurum;
+
+/* ---------------- Adım geçişleri ---------------- */
+function adimaGit(n){
+  adim = n; tazele();
+  if (adim === ADIM_SAYISI) sonucGoster();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+$("ileri").onclick = () => {
+  if (adim === ADIM_SAYISI){ yeniHesap(); return; }
+  if (!dogrula(adim)) return;
+  if (adim === 1 && ayar.kurum) okulDuzenle = false;
+  adimaGit(adim + 1);
+};
+$("geri").onclick = () => { if (adim > 1) adimaGit(adim - 1); };
+document.querySelectorAll("#adimlar li").forEach((li, i) => li.addEventListener("click", () => {
+  const hedef = i + 1;
+  if (hedef < adim) { adimaGit(hedef); return; }
+  for (let n = adim; n < hedef; n++) if (!dogrula(n)) { adimaGit(n); dogrula(n); return; }
+  adimaGit(hedef);
+}));
+
+/* ---------------- Girişler ---------------- */
+document.addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset.k){
+    w[el.dataset.k] = el.value;
+    if (el.dataset.k === "konakgun") w.konakgunElle = true;
+    const soru = el.closest("[data-soru]"); if (soru) soru.classList.remove("hatali");
+    if (el.dataset.k === "unvan") document.querySelectorAll('[data-cip="unvan"] .cip').forEach(b => b.setAttribute("aria-pressed", b.dataset.val === el.value));
+    tazeleGecikmeli();
+  }
+  if (el.dataset.ayar){
+    ayar[el.dataset.ayar] = el.value.trim(); store.set("ggy_ayar", ayar);
+    const soru = el.closest("[data-soru]"); if (soru) soru.classList.remove("hatali");
+  }
+});
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (el.dataset.k){
+    w[el.dataset.k] = el.value;
+    if (el.dataset.k === "tbas" && w.tbas && (!w.tbit || dayDiff(w.tbas, w.tbit) < 0)) w.tbit = w.tbas;
+    if (["tbas", "tbit"].includes(el.dataset.k) && !w.konakgunElle) w.konakgun = "";
+    tazele();
+  }
+});
+let zamanlayici = null;
+function tazeleGecikmeli(){ clearTimeout(zamanlayici); zamanlayici = setTimeout(tazele, 250); }
+document.addEventListener("click", e => {
+  const b = e.target.closest(".secim, .cip");
+  if (b){
+    const g = b.closest("[data-secim],[data-cip]");
+    const alan = g.dataset.secim || g.dataset.cip;
+    w[alan] = b.dataset.val;
+    if (alan === "yolek" || alan === "yatili") { if (!w.konakgunElle) w.konakgun = ""; }
+    if (alan === "yatili" && w.yatili === "hayir") { w.yolek = ""; w.konak = ""; }
+    const soru = b.closest("[data-soru]"); if (soru) soru.classList.remove("hatali");
+    tazele();
+    return;
+  }
+  if (e.target.id === "okul-degistir"){ okulDuzenle = true; tazele(); $("o_kurum").focus(); }
+});
+
+/* ---------------- Sonuç ---------------- */
+function sonucGoster(){
+  const f = motorVerisi();
+  const h = hesapla(f);
+  if (h.hatalar){ $("sonuc").innerHTML = `<div class="kart"><div class="bilgi dikkat">${h.hatalar.map(esc).join("<br>")}</div></div>`; return; }
+  sonHesap = h;
+  gecmisKaydet(h);
+  const satir = (ad, acik, tutar) => `<div class="ozet-satir"><span>${ad}${acik ? `<small>${acik}</small>` : ""}</span><b>${fmtTL(tutar)}</b></div>`;
+  const kalem = [];
+  h.gSatir.forEach(s => kalem.push(satir("💰 Yevmiye (gündelik)", `${s.gun} gün × ${fmtTL(s.oran)}${h.pay < 3 ? ` (yevmiyenin ${h.pay}/3'ü)` : ""}${h.gSatir.length > 1 ? " — " + esc(s.aciklama) : ""}`, s.tutar)));
+  if (h.gidis) kalem.push(satir(`🎫 Gidiş bileti`, esc(f.tasit), h.gidis));
+  if (h.donus) kalem.push(satir(`🎫 Dönüş bileti`, esc(f.tasit), h.donus));
+  if (h.sa) kalem.push(satir("🚕 Şehir içi ulaşım", "Ev ↔ otogar / gar", h.sa));
+  if (h.sb) kalem.push(satir("🚕 Şehir içi ulaşım", "Otogar / gar ↔ görev yeri", h.sb));
+  if (h.konakToplam) kalem.push(satir("🏨 Konaklama", esc(h.konakAciklama), h.konakToplam));
+  if (h.diger) kalem.push(satir("➕ Diğer masraf", esc(f.diger_ad || ""), h.diger));
+  const belgeler = ["Görevlendirme yazısı (olur) — okul / ilçe müdürlüğünden",
+    f.tasit === "Resmî Araç" ? null : (f.tasit === "Özel Araç" ? "Özel araç kullanımına dair onay (görevlendirme yazısında belirtilmiş olmalı)" : "Gidiş ve dönüş biletleri (e-bilet çıktısı da olur)"),
+    h.konakToplam && f.konaktip === "belgeli" ? "Otel / pansiyon faturası" : null,
+    "Bu bildirim formu — siz ve okul müdürü imzalayacak",
+    "Varsa kurs / seminer katılım belgesi"].filter(Boolean);
+
+  $("sonuc").innerHTML = `
+  <div class="buyuk-toplam"><span>Alacağınız toplam yolluk</span><b>${fmtTL(h.genel)}</b><small>${esc(tutarYazi(h.genel))}</small></div>
+  ${h.uyarilar.map(u => `<div class="bilgi dikkat">⚠ ${esc(u)}</div>`).join("")}
+  <div class="kart">
+    <h2>📄 Formunuzu alın</h2>
+    <p class="alt">Resmî “Geçici Görev Yolluğu Bildirimi” (Örnek 27) bilgilerinizle dolduruldu.</p>
+    <div class="dugmeler">
+      <button class="btn" type="button" id="btn_form">🖨️ Formu yazdır</button>
+      <button class="btn ikincil" type="button" id="btn_excel">📊 Excel dosyası olarak indir</button>
+    </div>
+    <div class="durum" id="gy_status" role="status"></div>
+    <div class="soru" style="margin-top:14px;max-width:320px"><label for="w_bildirimtarih">Formdaki imza tarihi</label><input type="date" id="w_bildirimtarih" value="${esc(f.bildirimtarih)}"></div>
+  </div>
+  <div class="kart">
+    <h2>🧾 Hesabın dökümü</h2>
+    <p class="alt">${esc(f.ad)} · ${esc(f.yer)} · ${isoToTr(f.tbas)}${f.tbas !== f.tbit ? " – " + isoToTr(f.tbit) : ""}</p>
+    ${kalem.join("")}
+    <div class="ozet-satir" style="border-bottom:0;font-size:1.1rem"><span><b>Toplam</b></span><b>${fmtTL(h.genel)}</b></div>
+    ${h.damga ? `<p class="ipucu" style="margin-top:8px">Bilgi: Yevmiye üzerinden yaklaşık ${fmtTL(h.damga)} damga vergisi kesilebilir; elinize geçecek tutar yaklaşık ${fmtTL(h.net)} olur.</p>` : ""}
+    <details class="nedir"><summary>Hangi yılın yevmiyesi kullanıldı?</summary><p>${esc(h.donem.ad)} · ${esc(KADEME_ADLARI[h.kIdx])} · Bir günlük yevmiye: ${fmtTL(h.gundelik)}</p></details>
+  </div>
+  <div class="kart">
+    <h2>✅ Muhasebeye teslim edilecekler</h2>
+    <ul class="kontrol-listesi">${belgeler.map(b => `<li>${esc(b)}</li>`).join("")}</ul>
+  </div>
+  <div class="dugmeler"><button class="btn ikincil" type="button" id="btn_duzenle">✏️ Bilgileri düzelt</button><button class="btn ikincil" type="button" id="btn_yeni">🆕 Yeni hesap başlat</button></div>`;
+  $("btn_excel").onclick = () => excelIndir(sonHesap);
+  $("btn_form").onclick = () => formAc(sonHesap);
+  $("btn_duzenle").onclick = () => adimaGit(1);
+  $("btn_yeni").onclick = yeniHesap;
+  $("w_bildirimtarih").onchange = e => { w.bildirimtarih = e.target.value; taslakKaydet(); sonHesap = hesapla(motorVerisi()); };
+}
+let yeniOnay = false;
+function yeniHesap(){
+  const btn = $("ileri");
+  if (!yeniOnay && w.ad){
+    yeniOnay = true; btn.textContent = "Emin misiniz? Tekrar basın";
+    const b2 = $("btn_yeni"); if (b2) b2.textContent = "Emin misiniz? Tekrar basın";
+    setTimeout(() => { yeniOnay = false; tazele(); const b3 = $("btn_yeni"); if (b3) b3.textContent = "🆕 Yeni hesap başlat"; }, 4000);
+    return;
+  }
+  yeniOnay = false;
+  /* Kişi bilgilerini koru; görev bilgilerini temizle (aynı kişi için sık kullanılır) */
+  const kisi = {ad:w.ad, unvan:w.unvan, tier:w.tier, kadro:w.kadro, kademe:w.kademe, tc:w.tc, iban:w.iban, nereden:w.nereden};
+  w = Object.assign({}, BOS_TASLAK, kisi);
+  document.querySelectorAll(".hatali").forEach(e => e.classList.remove("hatali"));
+  adimaGit(1);
+}
+
+/* ---------------- Kayıtlar ---------------- */
+let gecmis = store.get("ggy_gecmis", []).filter(k => k && k.w);
 function gecmisKaydet(h){
-  const kayit = {id: Date.now().toString(36), ts: new Date().toISOString(), f: h.f, genel: h.genel};
-  const ayni = gecmis.findIndex(k => JSON.stringify(k.f) === JSON.stringify(h.f));
-  if (ayni >= 0) gecmis.splice(ayni, 1);
+  const kayit = {id: Date.now().toString(36), ts: new Date().toISOString(), w: Object.assign({}, w), genel: h.genel};
+  const anahtar = JSON.stringify(Object.assign({}, w, {bildirimtarih:""}));
+  gecmis = gecmis.filter(k => JSON.stringify(Object.assign({}, k.w, {bildirimtarih:""})) !== anahtar);
   gecmis.unshift(kayit);
   gecmis = gecmis.slice(0, 300);
   store.set("ggy_gecmis", gecmis);
-  gecmisCiz();
+  kayitlariCiz();
 }
-function gecmisCiz(){
-  const q = $("gecmis_ara").value.trim().toLocaleLowerCase("tr");
-  const liste = gecmis.filter(k => !q || [k.f.ad, k.f.yer, k.f.unvan, isoToTr(k.f.tbas)].join(" ").toLocaleLowerCase("tr").includes(q));
-  if (!gecmis.length){ $("gy_gecmis").innerHTML = `<div style="color:var(--muted);font-size:.9rem">Henüz kayıt yok. Hesaplama sekmesinde “Hesapla”ya bastığınızda kayıtlar burada listelenir.</div>`; return; }
-  if (!liste.length){ $("gy_gecmis").innerHTML = `<div style="color:var(--muted);font-size:.9rem">Aramaya uyan kayıt yok.</div>`; return; }
-  $("gy_gecmis").innerHTML = liste.map(k => `<div class="hist-item">
-    <div class="meta"><b>${esc(k.f.ad)} — ${esc(k.f.yer)}</b>
-    <small>${isoToTr(k.f.tbas)} - ${isoToTr(k.f.tbit)} · ${esc(donemBul(k.f.donem).ad)} · Kayıt: ${new Date(k.ts).toLocaleString("tr-TR")}</small></div>
-    <b style="font-variant-numeric:tabular-nums">${fmtTL(k.genel)}</b>
-    <div class="btn-row"><button class="btn btn-sm" data-ac="${k.id}" type="button">Aç</button>
-    <button class="btn btn-sm btn-secondary" data-xl="${k.id}" type="button">Excel</button>
-    <button class="btn btn-sm btn-danger" data-sil="${k.id}" type="button">Sil</button></div></div>`).join("");
+function kayitlariCiz(){
+  const q = $("kayit_ara").value.trim().toLocaleLowerCase("tr");
+  const liste = gecmis.filter(k => !q || [k.w.ad, k.w.yer, k.w.unvan, isoToTr(k.w.tbas)].join(" ").toLocaleLowerCase("tr").includes(q));
+  $("kayit-liste").innerHTML = !gecmis.length ? `<div class="bilgi">Henüz kayıt yok. “Yolluk Hesapla” bölümünde hesap yaptığınızda burada görünür.</div>`
+    : !liste.length ? `<div class="bilgi">Aramanıza uyan kayıt yok.</div>`
+    : liste.map(k => `<div class="kayit"><div class="bilgiler"><b>${esc(k.w.ad)} — ${esc(k.w.yer)}</b>
+      <small>${isoToTr(k.w.tbas)}${k.w.tbit && k.w.tbit !== k.w.tbas ? " – " + isoToTr(k.w.tbit) : ""} · Toplam ${fmtTL(k.genel)}</small></div>
+      <div class="islem"><button type="button" class="btn kucuk" data-ac="${k.id}">Aç</button>
+      <button type="button" class="btn ikincil kucuk" data-yazdir="${k.id}">🖨️ Yazdır</button>
+      <button type="button" class="btn ikincil kucuk" data-sil="${k.id}">Sil</button></div></div>`).join("");
 }
-$("gy_gecmis").addEventListener("click", e => {
+$("kayit_ara").oninput = kayitlariCiz;
+const silOnaylari = {};
+$("kayit-liste").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
-  const id = b.dataset.ac || b.dataset.xl || b.dataset.sil;
+  const id = b.dataset.ac || b.dataset.yazdir || b.dataset.sil;
   const k = gecmis.find(x => x.id === id); if (!k) return;
-  if (b.dataset.sil){ gecmis = gecmis.filter(x => x.id !== id); store.set("ggy_gecmis", gecmis); gecmisCiz(); return; }
-  const h = hesapla(k.f);
-  if (h.hatalar){ setStatus("gecmis_status", h.hatalar.join(" "), false); return; }
-  if (b.dataset.xl){ excelIndir(h); setStatus("gecmis_status", "Excel indirildi.", true); return; }
-  formYaz(k.f); sonHesap = h; sonucGoster(h); sekme("gyolluk");
-  setStatus("gy_status", "Kayıt yüklendi.", true);
+  if (b.dataset.sil){
+    if (!silOnaylari[id]){ silOnaylari[id] = true; b.textContent = "Silinsin mi?"; setTimeout(() => { delete silOnaylari[id]; kayitlariCiz(); }, 4000); return; }
+    gecmis = gecmis.filter(x => x.id !== id); store.set("ggy_gecmis", gecmis); kayitlariCiz();
+    $("kayit-durum").textContent = "Kayıt silindi."; $("kayit-durum").className = "durum ok"; return;
+  }
+  w = Object.assign({}, BOS_TASLAK, k.w);
+  if (b.dataset.yazdir){ const h = hesapla(motorVerisi()); if (!h.hatalar) formAc(h); return; }
+  sayfa("sihirbaz"); adimaGit(ADIM_SAYISI);
 });
-let silOnay = false;
-$("gecmis_sil").onclick = () => {
+let hepsiOnay = false;
+$("kayit-sil-hepsi").onclick = () => {
   if (!gecmis.length) return;
-  if (!silOnay){ silOnay = true; $("gecmis_sil").textContent = "Emin misiniz? Tekrar basın"; setTimeout(() => { silOnay = false; $("gecmis_sil").textContent = "Tüm Geçmişi Sil"; }, 4000); return; }
-  silOnay = false; gecmis = []; store.set("ggy_gecmis", gecmis); gecmisCiz();
-  $("gecmis_sil").textContent = "Tüm Geçmişi Sil"; setStatus("gecmis_status", "Geçmiş silindi.", true);
+  if (!hepsiOnay){ hepsiOnay = true; $("kayit-sil-hepsi").textContent = "Emin misiniz? Tekrar basın"; setTimeout(() => { hepsiOnay = false; $("kayit-sil-hepsi").textContent = "🗑️ Tüm kayıtları sil"; }, 4000); return; }
+  hepsiOnay = false; gecmis = []; store.set("ggy_gecmis", gecmis); kayitlariCiz();
+  $("kayit-sil-hepsi").textContent = "🗑️ Tüm kayıtları sil"; setStatus("yedek-durum", "Tüm kayıtlar silindi.", true);
 };
-$("gecmis_ara").oninput = gecmisCiz;
-$("gecmis_csv").onclick = () => {
-  if (!gecmis.length){ setStatus("gecmis_status", "İndirilecek kayıt yok.", false); return; }
-  const bas = ["Ad Soyad","TC","Unvan","Görev Yeri","Başlangıç","Bitiş","Dönem","Gündelik Toplam","Yol+Konaklama","Genel Toplam"];
-  const sat = gecmis.map(k => { const h = hesapla(k.f); return [k.f.ad, k.f.tc, k.f.unvan, k.f.yer, isoToTr(k.f.tbas), isoToTr(k.f.tbit), donemBul(k.f.donem).ad,
-    h.hatalar ? "" : fmt(h.gundelikToplam), h.hatalar ? "" : fmt(h.tasitToplam), h.hatalar ? "" : fmt(h.genel)]; });
+$("kayit-csv").onclick = () => {
+  if (!gecmis.length){ setStatus("yedek-durum", "Henüz kayıt yok.", false); return; }
+  const bas = ["Ad Soyad","Unvan","Nereden","Görev Yeri","Başlangıç","Bitiş","Toplam (TL)"];
+  const sat = gecmis.map(k => [k.w.ad, k.w.unvan, k.w.nereden, k.w.yer, isoToTr(k.w.tbas), isoToTr(k.w.tbit), fmt(k.genel)]);
   const csv = "﻿" + [bas, ...sat].map(r => r.map(c => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";")).join("\r\n");
-  downloadBlob(new Blob([csv], {type:"text/csv;charset=utf-8"}), "gecici_gorev_yollugu_gecmis.csv");
+  downloadBlob(new Blob([csv], {type:"text/csv;charset=utf-8"}), "yolluk_kayitlari.csv");
 };
-
-/* ------------------------------------------------------------------ */
-/* Yedek                                                                */
-/* ------------------------------------------------------------------ */
 $("yedek-al").onclick = () => {
-  const veri = {uygulama:"gecici-gorev-yollugu", surum:1, tarih:new Date().toISOString(), ayar, oranlar, gecmis};
-  downloadBlob(new Blob([JSON.stringify(veri, null, 2)], {type:"application/json"}), `ggy_yedek_${todayIso()}.json`);
+  const veri = {uygulama:"gecici-gorev-yollugu", surum:2, tarih:new Date().toISOString(), ayar, oranlar, gecmis};
+  downloadBlob(new Blob([JSON.stringify(veri, null, 2)], {type:"application/json"}), `yolluk_yedek_${todayIso()}.json`);
+  setStatus("yedek-durum", "Yedek dosyası indirildi (İndirilenler klasörüne bakın).", true);
 };
 $("yedek-yukle").onchange = e => {
   const file = e.target.files[0]; if (!file) return;
@@ -980,91 +1333,46 @@ $("yedek-yukle").onchange = e => {
       if (v.uygulama !== "gecici-gorev-yollugu") throw new Error("Bu dosya bu programın yedeği değil.");
       ayar = Object.assign({}, AYAR_VARSAYILAN, v.ayar || {}); oranlar = v.oranlar || {};
       const ids = new Set(gecmis.map(k => k.id));
-      gecmis = [...(v.gecmis || []).filter(k => !ids.has(k.id)), ...gecmis].sort((a, b) => b.ts.localeCompare(a.ts));
+      gecmis = [...(v.gecmis || []).filter(k => k && k.w && !ids.has(k.id)), ...gecmis].sort((a, b) => b.ts.localeCompare(a.ts));
       store.set("ggy_ayar", ayar); store.set("ggy_oranlar", oranlar); store.set("ggy_gecmis", gecmis);
-      ayarFormDoldur(); gecmisCiz();
-      setStatus("gy_status", "Yedek yüklendi: ayarlar ve " + (v.gecmis || []).length + " geçmiş kaydı.", true);
-    } catch (err){ setStatus("gy_status", "Yedek okunamadı: " + err.message, false); }
+      ayarFormDoldur(); kayitlariCiz(); tazele();
+      setStatus("yedek-durum", "Yedek yüklendi.", true);
+    } catch (err){ setStatus("yedek-durum", "Yedek okunamadı: " + err.message, false); }
     e.target.value = "";
   };
   rd.readAsText(file);
 };
 
-/* ------------------------------------------------------------------ */
-/* Sekmeler, tema, olaylar                                              */
-/* ------------------------------------------------------------------ */
-function sekme(ad){
-  document.querySelectorAll(".side-tab").forEach(b => { const a = b.dataset.tab === ad; b.classList.toggle("active", a); b.setAttribute("aria-selected", a); });
-  document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "tab-" + ad));
-  try { sessionStorage.setItem("ggy_sekme", ad); } catch(e){}
+/* ---------------- Menü, ayarlar, tema ---------------- */
+function sayfa(ad){
+  document.querySelectorAll(".menu button").forEach(b => b.classList.toggle("aktif", b.dataset.sayfa === ad));
+  document.querySelectorAll(".bolum").forEach(s => s.classList.toggle("aktif", s.id === "b-" + ad));
+  $("alt-cubuk").hidden = ad !== "sihirbaz";
+  if (ad === "ayarlar") ayarFormDoldur();
+  if (ad === "kayitlar") kayitlariCiz();
+  if (ad === "sihirbaz") tazele();
   window.scrollTo({top:0});
 }
-document.querySelectorAll(".side-tab").forEach(b => b.addEventListener("click", () => sekme(b.dataset.tab)));
-$("theme-toggle").onclick = () => {
-  const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-  r.dataset.theme = dark ? "light" : "dark"; store.set("ggy_tema", r.dataset.theme);
+document.querySelectorAll(".menu button").forEach(b => b.addEventListener("click", () => sayfa(b.dataset.sayfa)));
+$("gset_donem").innerHTML = DONEMLER.map(d => `<option value="${d.id}">${esc(d.ad)}</option>`).join("");
+$("gset_donem").onchange = oranTablosu;
+$("gset_save").onclick = () => { ayarKaydet(); tazele(); };
+$("gset_reset_rates").onclick = () => { delete oranlar[$("gset_donem").value]; store.set("ggy_oranlar", oranlar); oranTablosu(); setStatus("gset_status", "Bu yılın yevmiyeleri varsayılana döndü.", true); };
+$("tema").onclick = () => {
+  const r = document.documentElement, koyu = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = koyu ? "light" : "dark"; store.set("ggy_tema", r.dataset.theme);
 };
 (() => { const t = store.get("ggy_tema", null); if (t) document.documentElement.dataset.theme = t; })();
 
 /* Seçim kutuları */
-$("gy_donem").innerHTML = DONEMLER.map(d => `<option value="${d.id}">${esc(d.ad)}</option>`).join("");
-$("gset_donem").innerHTML = $("gy_donem").innerHTML;
-$("gy_kadro").innerHTML = Array.from({length:15}, (_, i) => `<option value="${i+1}">${i+1}. Derece</option>`).join("");
-$("gy_kadro").value = "5";
-$("gset_donem").onchange = oranTablosu;
-$("gy_donem").onchange = () => { $("gset_donem").value = $("gy_donem").value; oranTablosu(); };
-
-/* Ek gösterge -> kademe */
-$("gy_ekgos").addEventListener("input", () => {
-  const v = parseNum($("gy_ekgos").value); if (!v && $("gy_ekgos").value.trim() !== "0") return;
-  $("gy_tier").value = v >= 8000 ? "0" : v >= 6400 ? "1" : v >= 3600 ? "2" : "3";
-});
-/* Tarihlerden görev günü */
-let gorevGunElle = false;
-$("gy_gorevgun").addEventListener("input", () => gorevGunElle = true);
-function gunOtomatik(){
-  const a = $("gy_tbas").value, b = $("gy_tbit").value;
-  if (a && !b) $("gy_tbit").value = a;
-  const bb = $("gy_tbit").value;
-  if (a && bb && !gorevGunElle){ const d = dayDiff(a, bb) + 1; if (d > 0) $("gy_gorevgun").value = d; }
-}
-["gy_tbas","gy_tbit"].forEach(id => $(id).addEventListener("change", () => { gorevGunElle = false; gunOtomatik(); }));
-/* Günübirlik görevde yol günü / oran ipucu */
-$("gy_oranpay").addEventListener("change", () => {
-  if ($("gy_oranpay").value !== "3"){ $("gy_yoldahil").value = "1"; $("gy_konakgun").value = "0"; }
-});
-
-$("gy_hesapla").onclick = () => {
-  const f = formOku();
-  const h = hesapla(f);
-  if (h.hatalar){ setStatus("gy_status", h.hatalar.join(" "), false); $("gy_sonuc").innerHTML = ""; return; }
-  sonHesap = h; sonucGoster(h); gecmisKaydet(h);
-  setStatus("gy_status", "Hesaplandı ve geçmişe kaydedildi.", true);
-  $("gy_sonuc").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
-};
-$("gy_temizle").onclick = () => {
-  for (const k of ALANLAR){ const el = $("gy_" + k); if (el.type === "checkbox") el.checked = true; else if (el.tagName === "SELECT") el.selectedIndex = 0; else el.value = ""; }
-  $("gy_tier").value = "3"; $("gy_kadro").value = "5"; $("gy_gorevgun").value = "1"; $("gy_konakgun").value = "0";
-  $("gy_nereden").value = [ayar.ilce, ayar.il].filter(Boolean).join(" / ");
-  $("gy_bildirimtarih").value = todayIso();
-  gorevGunElle = false; $("gy_sonuc").innerHTML = ""; setStatus("gy_status", "Form temizlendi.", true);
-};
-$("gy_ornek").onclick = () => {
-  formYaz({ad:"Ayşe YILMAZ (örnek)", tc:"", unvan:"Öğretmen", iban:"", donem:"2026", tier:"3", kadro:"5", kademe:"3", ekgos:"",
-    nereden:"Konya / Selçuklu", yer:"Antalya / Muratpaşa", neden:"Mesleki gelişim semineri", tbas:"2026-05-05", sbas:"08:30", tbit:"2026-05-08", sbit:"17:00",
-    cikis:"", donustarih:"", gorevgun:"4", yoldahil:"0", yolgun:"2", oranpay:"3", kural90:true, tasit:"Otobüs", gidis:"1100", donus:"1100",
-    sehir_a:"150", sehir_b:"250", konakgun:"4", konakucret:"1200", konaktip:"belgeli", konaktavan:true, diger:"", diger_ad:"", bildirimtarih:todayIso()});
-  setStatus("gy_status", "Örnek veriler dolduruldu (gerçek kişi değildir). “Hesapla”ya basın.", true);
-};
-$("gset_save").onclick = ayarKaydet;
-$("gset_reset_rates").onclick = () => { delete oranlar[$("gset_donem").value]; store.set("ggy_oranlar", oranlar); oranTablosu(); setStatus("gset_status", "Bu dönemin oranları varsayılana döndürüldü.", true); };
+$("w_kadro").innerHTML = `<option value="">Seçin…</option>` + Array.from({length:15}, (_, i) => `<option value="${i+1}">${i+1}. derece</option>`).join("");
+$("w_kademe").innerHTML = `<option value="">Bilmiyorum / boş</option>` + Array.from({length:9}, (_, i) => `<option value="${i+1}">${i+1}. kademe</option>`).join("");
 
 /* Açılış */
-ayarFormDoldur();
-gecmisCiz();
-$("gy_bildirimtarih").value = todayIso();
-$("gy_nereden").value = [ayar.ilce, ayar.il].filter(Boolean).join(" / ");
-try { const s = sessionStorage.getItem("ggy_sekme"); if (s && $("tab-" + s)) sekme(s); } catch(e){}
+if (!w.nereden && (ayar.ilce || ayar.il)) w.nereden = [ayar.ilce, ayar.il].filter(Boolean).join(" / ");
+kayitlariCiz();
+tazele();
+if (adim === ADIM_SAYISI) sonucGoster();
 </script>
 </body>
 </html>

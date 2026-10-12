@@ -6,15 +6,18 @@ Sonucu resmî **M.Y.H.B.Y. Örnek No: 27 – Yurtiçi/Yurtdışı Geçici Görev
 ## Kullanım
 
 1. `gecici-gorev-yollugu.html` dosyasını indirip tarayıcıda (Chrome, Edge, Firefox) açın.
-2. **Ayarlar** sekmesinde kurum adı, il/ilçe ve birim yetkilisini girip kaydedin.
-3. Personel ve görev bilgilerini doldurup **Hesapla**’ya basın.
-4. **📊 Excel (Örnek 27) İndir** → orijinal şablonun biçimiyle (birleştirilmiş hücreler, kenarlıklar, formüller) doldurulmuş `.xlsx`.
-   **📄 Bildirim Formunu Aç** → yazdırılabilir / PDF olarak kaydedilebilir form.
+2. Program 5 adımda sade sorular sorar: **Kişi → Görev → Yolculuk → Konaklama → Sonuç**.
+   Her soruda ipucu ve “Bu ne demek?” açıklamaları vardır; eksik cevaplar kırmızıyla gösterilir.
+3. Sonuç ekranında **🖨️ Formu yazdır** veya **📊 Excel dosyası olarak indir** ile Örnek 27 formunu alın.
+   Muhasebeye teslim edilecek belgelerin listesi de gösterilir.
+
+Yarım kalan hesap otomatik saklanır; sayfa kapansa bile kaldığınız yerden devam edersiniz.
 
 ## Özellikler
 
-- Bütçe dönemleri 2021–2026, ek gösterge kademesi ve kadro derecesine göre (H cetveli) gündelik
-- Yol süresi içinde/dışında, yol günü, m.39 günübirlik 1/3 – 2/3 – tam gündelik oranı
+- Görev tarihine göre bütçe yılını kendisi seçer (2021–2026); ek gösterge ve kadro derecesine göre yevmiye
+- Günübirlik görevde 1/3 – 2/3 oranını yola çıkış/dönüş saatlerinden kendisi hesaplar (m.39)
+- Görev günleri dışında yolda geçen gün (önce gitme / sonra dönme) desteği
 - m.33 süre sınırı: ilk 90 gün tam, sonraki 90 gün 2/3
 - Gidiş/dönüş bileti, iki ayrı şehiriçi kalem, diğer zorunlu giderler
 - Konaklama: belgeli (gündelik ×1,5 tavanı), belgesiz (gündeliğin %50'si), ücretsiz
