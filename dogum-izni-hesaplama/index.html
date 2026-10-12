@@ -81,6 +81,12 @@
         .choice input:checked + span { border-color: var(--brand); background: #fff1eb; box-shadow: 0 0 0 3px rgba(180, 83, 53, 0.15); }
         .choice input:focus-visible + span { outline: 3px solid var(--brand); outline-offset: 2px; }
 
+        .choices.three { grid-template-columns: repeat(3, 1fr); }
+        .choices.three span { min-height: 96px; }
+
+        .info-pill { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; font-size: 0.88rem; display: none; }
+        .info-pill.open { display: block; }
+
         .reveal { margin-top: 12px; display: none; }
         .reveal.open { display: block; }
         .reveal label { display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; color: #374151; }
@@ -123,6 +129,16 @@
 
         .sentence { background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; padding: 13px 15px; font-size: 0.98rem; color: #334155; margin-bottom: 14px; }
 
+        .agenda { list-style: none; margin: 0 0 14px; padding: 0; position: relative; }
+        .agenda::before { content: ""; position: absolute; left: 15px; top: 14px; bottom: 14px; width: 2px; background: var(--soft-line); }
+        .agenda li { position: relative; display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+        .agenda .dot { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; background: #fff; border: 2px solid var(--soft-line); z-index: 1; }
+        .agenda span { display: block; font-size: 0.78rem; color: var(--muted); }
+        .agenda strong { display: block; font-size: 0.98rem; color: var(--brand-ink); }
+
+        .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: #065f46; color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 700; opacity: 0; pointer-events: none; transition: 0.25s; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
         .timeline { margin-bottom: 14px; }
         .timeline-title { font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
         .bar { display: flex; height: 30px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
@@ -161,6 +177,10 @@
             .howto { grid-template-columns: 1fr; }
             .law-grid { grid-template-columns: 1fr; }
         }
+        @media (max-width: 560px) {
+            .choices.three { grid-template-columns: 1fr; }
+            .choices.three span { min-height: 64px; }
+        }
         @media (max-width: 480px) {
             body { padding: 12px 0 30px; }
             .shell { border-radius: 0; padding: 14px 16px; }
@@ -176,7 +196,7 @@
         @media print {
             body { background: #fff !important; padding: 0; }
             .shell { box-shadow: none; background: #fff; padding: 0; }
-            .no-print, .hero, .howto, .form-col { display: none !important; }
+            .no-print, .hero, .howto, .form-col, .toast { display: none !important; }
             .layout { display: block; }
             .result-col { position: static; }
             .card, .law { break-inside: avoid; border: 1px solid #ccc !important; }
@@ -199,9 +219,9 @@
     </header>
 
     <div class="howto no-print">
-        <div><b>1️⃣</b><span>Doktor raporundaki <strong>beklenen doğum tarihini</strong> seçin.</span></div>
+        <div><b>1️⃣</b><span>Personelin <strong>statüsünü</strong> ve raporundaki <strong>beklenen doğum tarihini</strong> seçin.</span></div>
         <div><b>2️⃣</b><span>Diğer soruları <strong>tek dokunuşla</strong> işaretleyin.</span></div>
-        <div><b>3️⃣</b><span>Sonuç <strong>sağ tarafta / aşağıda</strong> hemen görünür. İsterseniz yazdırın.</span></div>
+        <div><b>3️⃣</b><span>Sonuç <strong>sağ tarafta / aşağıda</strong> hemen görünür. Yazdırın veya kopyalayın.</span></div>
     </div>
 
     <div class="layout">
@@ -213,6 +233,19 @@
                 <div class="step">
                     <div class="step-num" id="n1">1</div>
                     <div class="step-body">
+                        <div class="step-q">Personel hangi statüde çalışıyor?</div>
+                        <span class="help">Bilmiyorsanız <strong>"Kadrolu memur"</strong> seçili kalsın; öğretmenlerin çoğu bu gruptadır.</span>
+                        <div class="choices three" role="radiogroup">
+                            <label class="choice"><input type="radio" name="status" value="657" checked><span><em>🏛️</em>Kadrolu memur<small>657 sayılı Kanun</small></span></label>
+                            <label class="choice"><input type="radio" name="status" value="4b"><span><em>📝</em>Sözleşmeli<small>4/B personel</small></span></label>
+                            <label class="choice"><input type="radio" name="status" value="4857"><span><em>🧰</em>İşçi<small>4857 İş Kanunu</small></span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-num" id="n2">2</div>
+                    <div class="step-body">
                         <label class="step-q" for="expected">Bebeğin doğması beklenen tarih nedir?</label>
                         <span class="help">Doktor raporunda "beklenen / muhtemel doğum tarihi" olarak yazar. Kutuya dokunup takvimden seçin.</span>
                         <input type="date" id="expected">
@@ -220,7 +253,7 @@
                 </div>
 
                 <div class="step">
-                    <div class="step-num" id="n2">2</div>
+                    <div class="step-num" id="n3">3</div>
                     <div class="step-body">
                         <div class="step-q">Kaç bebek bekleniyor?</div>
                         <span class="help">İkiz, üçüz gibi durumlarda doğum öncesi izin 2 hafta daha uzundur.</span>
@@ -232,7 +265,26 @@
                 </div>
 
                 <div class="step">
-                    <div class="step-num" id="n3">3</div>
+                    <div class="step-num" id="n4">4</div>
+                    <div class="step-body">
+                        <div class="step-q">İzne ne zaman çıktı / çıkacak?</div>
+                        <span class="help">Doktor raporuyla bir süre daha çalışıldıysa, <strong>fiilen çalışılan günler doğum sonrasına eklenir</strong>.</span>
+                        <div class="choices three" role="radiogroup">
+                            <label class="choice"><input type="radio" name="startMode" value="normal" checked><span><em>📅</em>Normal zamanında<small id="normalHint">Doğuma 8 hafta kala</small></span></label>
+                            <label class="choice"><input type="radio" name="startMode" value="report"><span><em>🩺</em>Raporla çalıştı<small id="reportHint">Doğuma 2 hafta kalana kadar</small></span></label>
+                            <label class="choice"><input type="radio" name="startMode" value="custom"><span><em>✏️</em>Başka bir tarihte<small>Tarihi ben gireceğim</small></span></label>
+                        </div>
+                        <div class="info-pill" id="reportInfo"></div>
+                        <div class="reveal" id="startBox">
+                            <label for="start">İzne çıktığı (çıkacağı) ilk gün</label>
+                            <input type="date" id="start">
+                            <span class="help" style="margin: 6px 0 0;" id="startHelp">Normal başlangıçtan sonra çalışılan her gün doğum sonrası izne eklenir.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-num" id="n5">5</div>
                     <div class="step-body">
                         <div class="step-q">Doğum gerçekleşti mi?</div>
                         <span class="help">Doğum olduysa tarihini girin; erken doğumda kullanılmayan günler doğum sonrasına eklenir.</span>
@@ -247,44 +299,20 @@
                     </div>
                 </div>
 
-                <div class="step">
-                    <div class="step-num" id="n4">4</div>
-                    <div class="step-body">
-                        <div class="step-q">İzne ne zaman çıktı / çıkacak?</div>
-                        <span class="help">Emin değilseniz <strong>"Normal zamanında"</strong> seçeneğini bırakın.</span>
-                        <div class="choices" role="radiogroup">
-                            <label class="choice"><input type="radio" name="late" value="0" checked><span><em>📅</em>Normal zamanında<small>Program kendisi bulur</small></span></label>
-                            <label class="choice"><input type="radio" name="late" value="1"><span><em>💼</em>Bir süre daha çalıştı<small>Tarihi ben gireceğim</small></span></label>
-                        </div>
-                        <div class="reveal" id="startBox">
-                            <label for="start">İzne çıktığı (çıkacağı) ilk gün</label>
-                            <input type="date" id="start">
-                            <span class="help" style="margin: 6px 0 0;">Geç çıkılan her gün, doğum sonrası izne eklenir.</span>
-                        </div>
-                    </div>
-                </div>
-
                 <details class="extra">
-                    <summary>Ek bilgiler (isteğe bağlı)</summary>
+                    <summary>Personel adı (isteğe bağlı)</summary>
                     <div class="extra-body">
                         <div>
                             <label for="person">Personelin adı soyadı</label>
                             <input type="text" id="person" placeholder="Örn: Ayşe Yılmaz" maxlength="120">
-                            <span class="help" style="margin: 6px 0 0;">Sadece yazdırılan sonuçta görünür.</span>
-                        </div>
-                        <div>
-                            <label for="status">Personel statüsü</label>
-                            <select id="status">
-                                <option value="657">657 kadrolu memur</option>
-                                <option value="4b">4/B sözleşmeli personel</option>
-                                <option value="4857">4857 işçi</option>
-                            </select>
+                            <span class="help" style="margin: 6px 0 0;">Sadece sonuç cümlesinde ve çıktıda görünür.</span>
                         </div>
                     </div>
                 </details>
 
                 <div class="actions no-print">
-                    <button class="btn btn-primary" id="printBtn" type="button">🖨️ Sonucu yazdır</button>
+                    <button class="btn btn-primary" id="printBtn" type="button">🖨️ Yazdır</button>
+                    <button class="btn btn-secondary" id="copyBtn" type="button">📋 Sonucu kopyala</button>
                     <button class="btn btn-secondary" id="resetBtn" type="button">↺ Baştan başla</button>
                 </div>
             </div>
@@ -300,8 +328,10 @@
                 <div class="law-grid">
                     <span><b>1 bebek:</b> doğumdan önce 8 hafta + doğumdan sonra 16 hafta</span>
                     <span><b>İkiz ve üzeri:</b> doğumdan önce 10 hafta + doğumdan sonra 16 hafta</span>
+                    <span><b>Memur / sözleşmeli:</b> doktor raporuyla doğuma 2 hafta kalana kadar çalışabilir</span>
+                    <span><b>İşçi:</b> doktor onayıyla doğuma 3 hafta kalana kadar çalışabilir</span>
+                    <span><b>Raporla çalışma:</b> fiilen çalışılan günler doğum sonrasına eklenir</span>
                     <span><b>Erken doğum:</b> kullanılmayan doğum öncesi günler doğum sonrasına eklenir</span>
-                    <span><b>Geç izne çıkış:</b> geç çıkılan her gün doğum sonrasına eklenir</span>
                 </div>
                 <p>Bu ekran hesaplama ve ön kontrol içindir. İzin başlangıcı, raporlar ve göreve başlama işlemi kurum personel birimince onaylanmalıdır.</p>
             </div>
@@ -309,20 +339,24 @@
     </div>
 </div>
 
+<div class="toast" id="toast" role="status"></div>
+
 <script>
     const DAY = 24 * 60 * 60 * 1000;
     const POST_DAYS = 16 * 7;
     const MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
     const WEEKDAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 
+    // Statüye göre mevzuat ve doktor raporuyla çalışılabilecek son sınır (doğuma kalan gün)
     const STATUS = {
-        '657': '657 sayılı DMK Md. 104/A — kadın memur hesabı',
-        '4b': '4/B sözleşmeli personel — 657 sayılı DMK Md. 104/A hükümleri',
-        '4857': '4857 sayılı İş Kanunu Md. 74 — kadın işçi hesabı'
+        '657':  { law: '657 sayılı DMK Md. 104/A — kadın memur hesabı', who: 'Memurlar', limit: 14 },
+        '4b':   { law: '4/B sözleşmeli personel — 657 sayılı DMK Md. 104/A hükümleri', who: 'Sözleşmeli personel', limit: 14 },
+        '4857': { law: '4857 sayılı İş Kanunu Md. 74 — kadın işçi hesabı', who: 'İşçiler', limit: 21 }
     };
 
     const $ = id => document.getElementById(id);
-    const radio = name => document.querySelector(`input[name="${name}"]:checked`).value === '1';
+    const radioVal = name => document.querySelector(`input[name="${name}"]:checked`).value;
+    let lastSummary = '';
 
     // --- Tarih yardımcıları (saat dilimi kaymalarına karşı öğlen 12:00 kullanılır) ---
     function parseDate(s) {
@@ -344,36 +378,51 @@
     function esc(s) { return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
     function showEmpty(icon, text, isError) {
+        lastSummary = '';
         $('result').innerHTML = `<div class="empty${isError ? ' error' : ''}"><b>${icon}</b>${text}</div>`;
     }
 
-    function markSteps(expected, born, actual, late, start) {
-        $('n1').classList.toggle('done', !!expected);
+    function markSteps(expected, mode, customStart, born, actual) {
+        $('n1').classList.add('done');
         $('n2').classList.toggle('done', !!expected);
-        $('n3').classList.toggle('done', !!expected && (!born || !!actual));
-        $('n4').classList.toggle('done', !!expected && (!late || !!start));
+        $('n3').classList.toggle('done', !!expected);
+        $('n4').classList.toggle('done', !!expected && (mode !== 'custom' || !!customStart));
+        $('n5').classList.toggle('done', !!expected && (!born || !!actual));
     }
 
     // --- ANA HESAPLAMA ---
     function calculate() {
-        const multiple = radio('multiple');
-        const born = radio('born');
-        const late = radio('late');
+        const st = STATUS[radioVal('status')];
+        const multiple = radioVal('multiple') === '1';
+        const born = radioVal('born') === '1';
+        const mode = radioVal('startMode');
+        const preDays = (multiple ? 10 : 8) * 7;
+        const limitWeeks = st.limit / 7;
+
+        $('normalHint').textContent = `Doğuma ${preDays / 7} hafta kala`;
+        $('reportHint').textContent = `Doğuma ${limitWeeks} hafta kalana kadar`;
         $('actualBox').classList.toggle('open', born);
-        $('startBox').classList.toggle('open', late);
+        $('startBox').classList.toggle('open', mode === 'custom');
 
         const expected = parseDate($('expected').value);
         const actual = born ? parseDate($('actual').value) : null;
-        const customStart = late ? parseDate($('start').value) : null;
-        markSteps(expected, born, actual, late, customStart);
+        const customStart = mode === 'custom' ? parseDate($('start').value) : null;
+        markSteps(expected, mode, customStart, born, actual);
 
-        if (!expected) return showEmpty('👈', 'Başlamak için <strong>1. sorudaki</strong> beklenen doğum tarihini seçin.');
-        if (born && !actual) return showEmpty('📅', 'Doğumun olduğu günü seçin. <br>Doğum henüz olmadıysa 3. soruda <strong>"Henüz olmadı"</strong> seçeneğine dokunun.');
-        if (late && !customStart) return showEmpty('📅', 'İzne çıktığı ilk günü seçin. <br>Emin değilseniz 4. soruda <strong>"Normal zamanında"</strong> seçeneğine dokunun.');
+        const legalStart = expected ? addDays(expected, -preDays) : null;
+        const latestStart = expected ? addDays(expected, -st.limit) : null;
 
-        const preDays = (multiple ? 10 : 8) * 7;
-        const legalStart = addDays(expected, -preDays);
-        const notes = [];
+        $('reportInfo').classList.toggle('open', mode === 'report');
+        $('reportInfo').innerHTML = expected
+            ? `🩺 ${st.who} doktor raporuyla doğuma ${limitWeeks} hafta kalana kadar çalışabilir. İzne çıkış: <strong>${fmtLong(latestStart)}</strong>. Çalışılan <strong>${preDays - st.limit} gün</strong> doğum sonrasına eklenir.`
+            : `🩺 ${st.who} doktor raporuyla doğuma ${limitWeeks} hafta kalana kadar çalışabilir. Önce beklenen doğum tarihini seçin.`;
+        $('startHelp').innerHTML = expected
+            ? `En erken <strong>${fmt(legalStart)}</strong>, doktor raporuyla en geç <strong>${fmt(latestStart)}</strong>. Normal başlangıçtan sonra çalışılan her gün doğum sonrasına eklenir.`
+            : 'Normal başlangıçtan sonra çalışılan her gün doğum sonrasına eklenir.';
+
+        if (!expected) return showEmpty('👈', 'Başlamak için <strong>2. sorudaki</strong> beklenen doğum tarihini seçin.');
+        if (mode === 'custom' && !customStart) return showEmpty('📅', 'İzne çıktığı ilk günü seçin. <br>Emin değilseniz 4. soruda <strong>"Normal zamanında"</strong> seçeneğine dokunun.');
+        if (born && !actual) return showEmpty('📅', 'Doğumun olduğu günü seçin. <br>Doğum henüz olmadıysa 5. soruda <strong>"Henüz olmadı"</strong> seçeneğine dokunun.');
 
         if (actual && actual > today()) {
             return showEmpty('⚠️', 'Doğum tarihi bugünden sonra olamaz. Lütfen tarihi kontrol edin.', true);
@@ -384,48 +433,50 @@
         if (customStart && customStart < legalStart) {
             return showEmpty('⚠️', `İzne en erken <strong>${fmt(legalStart)}</strong> tarihinde çıkılabilir. Daha önceki bir tarih girilemez.`, true);
         }
-        if (customStart && !actual && customStart > expected) {
-            return showEmpty('⚠️', 'İzne çıkış tarihi, beklenen doğum tarihinden sonra olamaz. Lütfen tarihi kontrol edin.', true);
+        if (customStart && customStart > latestStart && !(actual && customStart >= actual)) {
+            return showEmpty('⚠️', `${st.who} doktor raporuyla en geç doğuma ${limitWeeks} hafta kalana kadar çalışabilir. İzne en geç <strong>${fmt(latestStart)}</strong> tarihinde çıkılmalıdır.`, true);
         }
 
-        let start = customStart || legalStart;
+        const notes = [];
         const birth = actual || expected;
+        let plannedStart = mode === 'report' ? latestStart : (customStart || legalStart);
+        let start = plannedStart;
 
-        if (customStart && actual && customStart >= actual) {
-            notes.push('Doğum, girilen izne çıkış tarihinden önce gerçekleştiği için izin doğum günü başlatıldı.');
+        // Doğum, izne çıkılmadan önce gerçekleştiyse izin doğum günü başlar
+        if (birth <= start) {
+            if (start > legalStart) notes.push('Doğum, izne çıkılmadan önce gerçekleştiği için izin doğum günü başlatıldı.');
             start = birth;
         }
 
-        // Doğum öncesi fiilen kullanılan gün ve doğum sonrasına aktarılan gün
-        let usedPre = 0;
-        if (birth > start) usedPre = diffDays(birth, start);
-        else start = birth;
-        const transferred = Math.max(0, preDays - usedPre);
+        const usedPre = diffDays(birth, start);                       // doğumdan önce izinde geçen gün
+        const workedDays = Math.max(0, diffDays(start, legalStart));  // raporla fiilen çalışılan gün
+        const earlyDays = Math.min(preDays - workedDays, Math.max(0, diffDays(expected, birth))); // erken doğumla kullanılamayan gün
+        const transferred = workedDays + earlyDays;                   // doğum sonrasına eklenen gün (geç doğum bunu azaltmaz)
         const postDays = POST_DAYS + transferred;
         const lastDay = addDays(birth, postDays - 1);
         const returnDate = addDays(birth, postDays);
         const totalDays = usedPre + postDays;
 
         // Açıklama notları
-        if (!actual) notes.push('Doğum henüz olmadığı için tarihler <strong>beklenen doğum tarihine göre tahminidir</strong>. Doğum olunca 3. soruya gerçek tarihi girin.');
-        const lateStart = customStart && customStart > legalStart && (!actual || customStart < actual);
-        if (lateStart) {
-            notes.push(`İzne kanuni başlangıçtan ${diffDays(customStart, legalStart)} gün geç çıkıldığı için bu süre doğum sonrasına eklendi.`);
+        if (!actual) notes.push('Doğum henüz olmadığı için tarihler <strong>beklenen doğum tarihine göre tahminidir</strong>. Doğum olunca 5. soruya gerçek tarihi girin.');
+        if (workedDays > 0) {
+            notes.push(`Doktor raporuyla fiilen çalışılan <strong>${workedDays} gün</strong> (${weeks(workedDays)}) doğum sonrasına eklendi.`);
+            if (mode === 'custom' || mode === 'report') notes.push('Doğum öncesi 8 haftadan (ikizde 10) sonra çalışmaya devam edebilmek için <strong>doktor raporu</strong> gereklidir; raporu izin dosyasına ekleyin.');
         }
         if (actual && actual < expected) {
-            notes.push(`Doğum, beklenen tarihten ${diffDays(expected, actual)} gün erken oldu.`);
+            notes.push(`Doğum, beklenen tarihten ${diffDays(expected, actual)} gün erken oldu.` + (earlyDays > 0 ? ` Kullanılmayan <strong>${earlyDays} gün</strong> doğum öncesi izin doğum sonrasına eklendi.` : ''));
         }
         if (actual && actual > expected) {
             notes.push(`Doğum, beklenen tarihten ${diffDays(actual, expected)} gün geç oldu. Bu günler doğum öncesi izinde geçer; doğum sonrası 16 hafta kısalmaz.`);
         }
-        if (transferred > 0 && (!lateStart || (actual && actual < expected))) notes.push(`Kullanılmayan <strong>${transferred} gün</strong> doğum öncesi izin, doğum sonrasına eklendi.`);
 
         const wd = returnDate.getDay();
-        let returnHint = 'İzin son gününü izleyen gün';
+        let returnHint = '';
+        let firstWorkday = returnDate;
         if (wd === 0 || wd === 6) {
-            const monday = addDays(returnDate, wd === 6 ? 2 : 1);
-            returnHint = `Hafta sonuna denk geliyor; ilk iş günü ${fmtLong(monday)}`;
-            notes.push(`Göreve başlama tarihi hafta sonuna denk geliyor. Fiilen okula dönüş ilk iş günü olan <strong>${fmtLong(monday)}</strong> günüdür. Resmî tatil olup olmadığını ayrıca kontrol edin.`);
+            firstWorkday = addDays(returnDate, wd === 6 ? 2 : 1);
+            returnHint = `Hafta sonu — fiilen ${fmtLong(firstWorkday)}`;
+            notes.push(`Göreve başlama tarihi hafta sonuna denk geliyor. Fiilen işe dönüş ilk iş günü olan <strong>${fmtLong(firstWorkday)}</strong> günüdür. Resmî tatil olup olmadığını ayrıca kontrol edin.`);
         }
 
         const remaining = diffDays(returnDate, today());
@@ -434,7 +485,7 @@
         const person = $('person').value.trim();
         const who = person ? `<strong>${esc(person)}</strong>` : 'Personel';
 
-        // Zaman çizelgesi oranları
+        // İzin dağılım çubuğu
         const pct = n => (n / totalDays * 100).toFixed(2) + '%';
         const bar = `
             <div class="timeline">
@@ -442,7 +493,7 @@
                 <div class="bar">
                     ${usedPre ? `<div class="seg-pre" style="width:${pct(usedPre)}" title="Doğumdan önce ${usedPre} gün">${usedPre} g</div>` : ''}
                     <div class="seg-post" style="width:${pct(POST_DAYS)}" title="Doğumdan sonra 112 gün">112 g</div>
-                    ${transferred ? `<div class="seg-tr" style="width:${pct(transferred)}" title="Aktarılan ${transferred} gün">${transferred} g</div>` : ''}
+                    ${transferred ? `<div class="seg-tr" style="width:${pct(transferred)}" title="Eklenen ${transferred} gün">${transferred} g</div>` : ''}
                 </div>
                 <div class="legend">
                     ${usedPre ? '<span><i class="seg-pre"></i>Doğumdan önce</span>' : ''}
@@ -456,7 +507,7 @@
                 <div>
                     <span class="res-kicker">${actual ? 'SONUÇ' : 'TAHMİNİ SONUÇ'}</span>
                     <h2>İzin takvimi</h2>
-                    <p>${STATUS[$('status').value]}</p>
+                    <p>${st.law}</p>
                 </div>
                 <div class="badge">${totalDays} gün<small>toplam izin</small></div>
             </div>
@@ -468,7 +519,7 @@
                 </div>
                 <div class="big-date bd-back">
                     <div class="ico">🏫</div>
-                    <div><span>Göreve başlama (okula dönüş)</span><strong>${fmtLong(returnDate)}</strong><small>${remainingText}</small></div>
+                    <div><span>Göreve başlama (işe dönüş)</span><strong>${fmtLong(returnDate)}</strong><small>${returnHint || remainingText}</small></div>
                 </div>
             </div>
 
@@ -476,32 +527,80 @@
                 ${who} <strong>${fmt(start)}</strong> tarihinde izne çıkar, toplam <strong>${totalDays} gün</strong> izinli olur ve <strong>${fmt(returnDate)}</strong> tarihinde göreve başlar.
             </div>
 
+            <ol class="agenda">
+                ${workedDays ? `<li><div class="dot">💼</div><div><span>Normal izin başlangıcı (raporla çalışmaya devam)</span><strong>${fmtLong(legalStart)}</strong></div></li>` : ''}
+                <li><div class="dot">🚪</div><div><span>İzne çıkış</span><strong>${fmtLong(start)}</strong></div></li>
+                <li><div class="dot">🍼</div><div><span>${actual ? 'Doğum' : 'Beklenen doğum'}</span><strong>${fmtLong(birth)}</strong></div></li>
+                <li><div class="dot">📌</div><div><span>İznin son günü</span><strong>${fmtLong(lastDay)}</strong></div></li>
+                <li><div class="dot">🏫</div><div><span>Göreve başlama</span><strong>${fmtLong(returnDate)}</strong></div></li>
+            </ol>
+
             ${bar}
 
             <div class="grid">
-                <div class="metric"><span>Doğum öncesi kanuni başlangıç</span><strong>${fmt(legalStart)}</strong><small>${preDays} gün / ${weeks(preDays)}</small></div>
-                <div class="metric"><span>Doğumdan önce kullanılan</span><strong>${usedPre} gün</strong><small>${usedPre ? weeks(usedPre) : 'Doğum izinden önce oldu'}</small></div>
-                <div class="metric"><span>${actual ? 'Doğum tarihi' : 'Doğum sonrası başlangıç'}</span><strong>${fmt(birth)}</strong><small>${actual ? 'Gerçekleşen doğum' : 'Beklenen doğum tarihi'}</small></div>
-                <div class="metric"><span>Doğum sonrasına aktarılan</span><strong>${transferred} gün</strong><small>${transferred ? weeks(transferred) : 'Aktarım yok'}</small></div>
-                <div class="metric"><span>Doğum sonrası toplam süre</span><strong>${postDays} gün</strong><small>${weeks(postDays)}</small></div>
-                <div class="metric"><span>İznin son günü</span><strong>${fmt(lastDay)}</strong><small>${returnHint}</small></div>
+                <div class="metric"><span>Doğum öncesi izin hakkı</span><strong>${preDays} gün</strong><small>${weeks(preDays)} · ${fmt(legalStart)} itibarıyla</small></div>
+                <div class="metric"><span>Doğumdan önce izinde geçen</span><strong>${usedPre} gün</strong><small>${usedPre ? weeks(usedPre) : 'Doğum izinden önce oldu'}</small></div>
+                <div class="metric"><span>Raporla fiilen çalışılan</span><strong>${workedDays} gün</strong><small>${workedDays ? weeks(workedDays) + ' · doğum sonrasına eklendi' : 'Yok'}</small></div>
+                <div class="metric"><span>Doğum sonrasına eklenen (toplam)</span><strong>${transferred} gün</strong><small>${transferred ? weeks(transferred) : 'Aktarım yok'}</small></div>
+                <div class="metric"><span>Doğum sonrası toplam süre</span><strong>${postDays} gün</strong><small>16 hafta + ${transferred} gün</small></div>
+                <div class="metric"><span>İznin son günü</span><strong>${fmt(lastDay)}</strong><small>Ertesi gün göreve başlanır</small></div>
             </div>
 
             ${notes.length ? `<div class="notes"><strong>ℹ️ Açıklamalar</strong><ul>${notes.map(n => `<li>${n}</li>`).join('')}</ul></div>` : ''}
 
-            <div class="legal-line"><strong>Hesap dayanağı:</strong> ${STATUS[$('status').value]}. Sonuç, kurumun izin onayı ve sağlık raporlarının yerine geçmez.</div>
+            <div class="legal-line"><strong>Hesap dayanağı:</strong> ${st.law}; 7578 sayılı Kanun ile doğum sonrası süre 16 haftadır. Sonuç, kurumun izin onayı ve sağlık raporlarının yerine geçmez.</div>
         `;
+
+        // Kopyalanacak düz metin
+        lastSummary = [
+            `DOĞUM İZNİ HESABI${actual ? '' : ' (tahmini)'}`,
+            person ? `Personel: ${person}` : null,
+            `Statü: ${st.law}`,
+            `${actual ? 'Doğum tarihi' : 'Beklenen doğum tarihi'}: ${fmtLong(birth)}`,
+            `İzne çıkış: ${fmtLong(start)}`,
+            workedDays ? `Raporla fiilen çalışılan: ${workedDays} gün (doğum sonrasına eklendi)` : null,
+            `Doğumdan önce izinde geçen: ${usedPre} gün`,
+            `Doğum sonrası süre: ${postDays} gün (16 hafta + ${transferred} gün aktarılan)`,
+            `İznin son günü: ${fmtLong(lastDay)}`,
+            `Göreve başlama: ${fmtLong(returnDate)}` + (firstWorkday !== returnDate ? ` (fiilen ${fmtLong(firstWorkday)})` : ''),
+            `Toplam izin: ${totalDays} gün`
+        ].filter(Boolean).join('\n');
+    }
+
+    function toast(msg) {
+        const t = $('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function copySummary() {
+        if (!lastSummary) { toast('Önce soruları cevaplayın.'); return; }
+        const fallback = () => {
+            const ta = document.createElement('textarea');
+            ta.value = lastSummary;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); toast('✅ Sonuç kopyalandı'); }
+            catch (e) { alert(lastSummary); }
+            ta.remove();
+        };
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(lastSummary).then(() => toast('✅ Sonuç kopyalandı'), fallback);
+        } else {
+            fallback();
+        }
     }
 
     function resetAll() {
         ['expected', 'actual', 'start', 'person'].forEach(id => { $(id).value = ''; });
+        document.querySelector('input[name="status"][value="657"]').checked = true;
         document.querySelector('input[name="multiple"][value="0"]').checked = true;
+        document.querySelector('input[name="startMode"][value="normal"]').checked = true;
         document.querySelector('input[name="born"][value="0"]').checked = true;
-        document.querySelector('input[name="late"][value="0"]').checked = true;
-        $('status').value = '657';
         calculate();
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        $('expected').focus();
     }
 
     document.querySelectorAll('input, select').forEach(el => {
@@ -509,8 +608,9 @@
         el.addEventListener('change', calculate);
     });
     $('resetBtn').addEventListener('click', resetAll);
+    $('copyBtn').addEventListener('click', copySummary);
     $('printBtn').addEventListener('click', () => {
-        if (!$('expected').value) { alert('Önce 1. sorudaki beklenen doğum tarihini seçin.'); $('expected').focus(); return; }
+        if (!lastSummary) { toast('Önce soruları cevaplayın.'); $('expected').focus(); return; }
         window.print();
     });
 
