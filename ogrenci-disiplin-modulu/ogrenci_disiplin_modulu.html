@@ -775,6 +775,192 @@
             text-align: right;
             margin-bottom: 3px;
         }
+
+        /* ============================================================
+           KOLAY KULLANIM ARAYÜZÜ — büyük yazı, büyük düğmeler,
+           adım adım olay kaydı (sihirbaz)
+        ============================================================ */
+        @media screen {
+            html { font-size: 17px; }
+        }
+        .form-control { font-size: 1rem; padding: 11px 13px; min-height: 46px; }
+        .form-group label { font-size: 0.9rem; }
+        .btn-submit, .btn-action-outline { min-height: 44px; font-size: 0.92rem; }
+        .btn-help { font-weight: 800; }
+        .btn-back { margin-bottom: 12px; }
+
+        .info-banner {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            color: #1E3A8A;
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        /* Ana sayfa */
+        .welcome-card { padding: 18px 20px; }
+        .welcome-title { font-family: var(--font-baslik); font-size: 1.45rem; font-weight: 700; color: var(--lacivert); }
+        .welcome-text { font-size: 1rem; color: var(--murekkep-soluk); margin-top: 4px; }
+
+        .home-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        @media (min-width: 900px) { .home-actions { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 640px) { .home-actions { grid-template-columns: 1fr; } }
+        .home-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            text-align: left;
+            background: var(--yuzey);
+            border: 2px solid var(--cizgi-belirgin);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            cursor: pointer;
+            box-shadow: var(--golge-md);
+            transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+            color: var(--murekkep);
+        }
+        .home-btn:hover { transform: translateY(-2px); box-shadow: var(--golge-lg); border-color: var(--lacivert-parlak); }
+        .home-btn .hb-icon { font-size: 2.2rem; line-height: 1.1; }
+        .home-btn .hb-title { font-size: 1.25rem; font-weight: 800; color: var(--lacivert); }
+        .home-btn .hb-desc { font-size: 0.9rem; color: var(--murekkep-soluk); line-height: 1.35; }
+        .home-btn-primary {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--muhur) 0%, var(--muhur-koyu) 100%);
+            border-color: var(--muhur-koyu);
+            align-items: center;
+            text-align: center;
+            padding: 24px 20px;
+        }
+        .home-btn-primary .hb-icon { font-size: 2.8rem; }
+        .home-btn-primary .hb-title { color: #fff; font-size: 1.6rem; }
+        .home-btn-primary .hb-desc { color: rgba(255,255,255,0.88); font-size: 1rem; }
+        .home-btn-primary:hover { border-color: var(--muhur-koyu); }
+
+        .start-guide { border: 2px dashed var(--cizgi-belirgin); background: var(--yuzey); }
+        .start-guide-title { font-size: 1.15rem; font-weight: 800; color: var(--lacivert); margin-bottom: 10px; }
+        .start-step { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--cizgi); flex-wrap: wrap; }
+        .start-step:first-of-type { border-top: none; }
+        .start-num {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--lacivert); color: #fff; font-weight: 800;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .start-step.done .start-num { background: #16A34A; }
+        .start-text { flex: 1; min-width: 180px; font-size: 0.98rem; }
+        .start-text small { display: block; color: var(--murekkep-soluk); font-size: 0.85rem; }
+
+        .list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 6px 0 12px; }
+        .list-head-title { font-size: 1.2rem; font-weight: 800; color: var(--lacivert); }
+        .list-count { font-size: 0.85rem; color: var(--murekkep-soluk); font-weight: 700; }
+        .big-search { font-size: 1.02rem; min-height: 50px; border-width: 2px; }
+        .list-head .big-search { flex: 1; min-width: 220px; max-width: 420px; }
+
+        .incident-card .inc-desc { font-size: 0.95rem; color: #1e293b; margin-top: 6px; line-height: 1.4; }
+        .inc-actions-big { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+        .inc-actions-big button { min-height: 48px; font-size: 1rem; padding: 10px 18px; }
+        .inc-actions-big .btn-print { background: var(--lacivert); color: #fff; border: none; border-radius: var(--radius-sm); font-weight: 800; cursor: pointer; flex: 1; min-width: 180px; }
+        .inc-actions-big .btn-print:hover { background: var(--lacivert-parlak); }
+
+        .stats-fold { padding: 12px 16px; margin-top: 18px; }
+        .stats-fold summary { cursor: pointer; font-weight: 800; color: var(--lacivert); }
+        .stats-fold .stats-grid { margin: 12px 0 0; }
+
+        /* Sihirbaz */
+        .wiz-progress { display: flex; gap: 6px; margin-bottom: 14px; }
+        .wiz-dot {
+            flex: 1; border: none; background: var(--yuzey-soluk); border-radius: var(--radius-sm);
+            padding: 8px 6px; text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--murekkep-silik);
+            border-bottom: 4px solid var(--cizgi); cursor: pointer;
+        }
+        .wiz-dot b { display: block; font-size: 1.05rem; }
+        .wiz-dot.done { color: #15803D; border-bottom-color: #16A34A; }
+        .wiz-dot.current { color: var(--lacivert); background: #EEF2FF; border-bottom-color: var(--muhur); }
+        .wiz-question { font-size: 1.3rem; font-weight: 800; color: var(--lacivert); margin-bottom: 4px; }
+        .wiz-hint { font-size: 0.95rem; color: var(--murekkep-soluk); margin-bottom: 12px; line-height: 1.45; }
+        .wiz-box[data-step] { display: none; }
+        .wiz-error { display: none; background: #FEF2F2; color: #B91C1C; border: 2px solid #FECACA; border-radius: var(--radius-md); padding: 12px 14px; font-weight: 700; margin: 6px 0 10px; }
+        .wiz-error.show { display: block; }
+        .wiz-nav {
+            display: flex; gap: 10px; align-items: center;
+            position: sticky; bottom: -22px; background: var(--yuzey);
+            padding: 12px 0 4px; border-top: 1px solid var(--cizgi); margin-top: 8px;
+        }
+        .btn-big { min-height: 54px; padding: 10px 24px; font-size: 1.08rem; font-weight: 800; border-radius: var(--radius-md); cursor: pointer; border: 2px solid transparent; }
+        .btn-primary { background: var(--lacivert); color: #fff; }
+        .btn-primary:hover { background: var(--lacivert-parlak); }
+        .btn-success { background: #16A34A; color: #fff; }
+        .btn-success:hover { background: #15803D; }
+        .btn-ghost { background: var(--yuzey); color: var(--lacivert); border-color: var(--cizgi-belirgin); }
+        @media (max-width: 520px) { .btn-big { padding: 10px 14px; font-size: 1rem; } }
+
+        .pick-list {
+            border: 2px solid var(--cizgi-belirgin); border-radius: var(--radius-md);
+            max-height: 260px; overflow-y: auto; background: var(--yuzey); margin-top: 8px;
+        }
+        .pick-list-tall { max-height: 330px; }
+        .pick-item {
+            display: flex; width: 100%; align-items: center; gap: 10px; text-align: left;
+            background: transparent; border: none; border-bottom: 1px solid var(--cizgi);
+            padding: 12px 14px; cursor: pointer; font-size: 1rem; color: var(--murekkep);
+        }
+        .pick-item:last-child { border-bottom: none; }
+        .pick-item:hover { background: #F1F5F9; }
+        .pick-item.selected { background: #DCFCE7; }
+        .pick-item.selected::before { content: '✔'; color: #15803D; font-weight: 900; }
+        .pick-main { flex: 1; font-weight: 700; line-height: 1.35; }
+        .pick-sub { font-size: 0.85rem; color: var(--murekkep-soluk); white-space: nowrap; }
+        .pick-empty { padding: 16px; color: var(--murekkep-soluk); text-align: center; }
+        .chosen { display: none; background: #DCFCE7; border: 2px solid #86EFAC; color: #14532D; border-radius: var(--radius-md); padding: 10px 14px; font-size: 1rem; margin-bottom: 8px; line-height: 1.4; }
+        .chosen.show { display: block; }
+
+        .quick-add { margin-top: 10px; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: var(--radius-md); padding: 10px 12px; }
+        .quick-add summary { cursor: pointer; font-weight: 700; color: #92400E; }
+        .quick-add[open] summary { margin-bottom: 10px; }
+
+        .fold > :not(.form-section-header) { display: none; }
+        .fold.open > :not(.form-section-header) { display: block; }
+        .fold.open > .form-row { display: flex; }
+        .fold > .form-section-header { cursor: pointer; margin-bottom: 0; font-size: 0.95rem; }
+        .fold > .form-section-header::after { content: '▸ Aç'; margin-left: auto; font-size: 0.8rem; color: var(--murekkep-soluk); }
+        .fold.open > .form-section-header { margin-bottom: 8px; }
+        .fold.open > .form-section-header::after { content: '▾ Kapat'; }
+
+        .wiz-done { text-align: center; padding: 10px 0; }
+        .wiz-done-icon { font-size: 3.4rem; }
+        .wiz-done-title { font-size: 1.6rem; font-weight: 800; color: #15803D; margin: 4px 0; }
+        .wiz-done-text { font-size: 1.02rem; color: var(--murekkep-soluk); margin-bottom: 16px; }
+        .wiz-done-actions { display: flex; flex-direction: column; gap: 10px; max-width: 520px; margin: 0 auto; }
+
+        /* Yazdırma penceresi */
+        .print-for { background: var(--yuzey-soluk); border-radius: var(--radius-md); padding: 10px 12px; margin: 10px 0 4px; font-size: 1rem; }
+        .print-btn {
+            display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+            width: 100%; text-align: left; background: var(--yuzey); border: 2px solid var(--cizgi-belirgin);
+            border-radius: var(--radius-md); padding: 12px 16px; font-size: 1rem; cursor: pointer; color: var(--murekkep);
+        }
+        .print-btn:hover { border-color: var(--lacivert-parlak); background: #F8FAFC; }
+        .print-btn span { font-size: 0.85rem; color: var(--murekkep-soluk); font-weight: 600; }
+        .print-btn-featured { background: #FFFBEB; border-color: #F59E0B; font-size: 1.12rem; }
+        .print-btn-featured:hover { background: #FEF3C7; border-color: #D97706; }
+        .print-btn-all { background: var(--lacivert); border-color: var(--lacivert); color: #fff; }
+        .print-btn-all:hover { background: var(--lacivert-parlak); }
+        .print-btn-all span { color: rgba(255,255,255,0.8); }
+        .print-sub { font-size: 0.88rem; font-weight: 700; color: var(--murekkep-soluk); margin-top: 6px; }
+
+        /* Yardım */
+        .help-step { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--cizgi); }
+        .help-step .start-num { width: 40px; height: 40px; font-size: 1.1rem; }
+        .help-step h4 { font-size: 1.08rem; color: var(--lacivert); margin-bottom: 2px; }
+        .help-step p { font-size: 0.95rem; color: var(--murekkep-soluk); line-height: 1.5; }
+
     </style>
 </head>
 <body>
@@ -789,35 +975,61 @@
                 Kurum: <span id="lblKurumKodu">999666</span> · <span id="lblOkulAdi">15 TEMMUZ ŞEHİTLERİ ORTAOKULU</span>
             </div>
         </div>
-        <button class="btn-refresh" onclick="location.reload()">
-            <span>🔄</span><span>Yenile</span>
+        <button class="btn-refresh btn-help" onclick="openHelp()">
+            <span>❓</span><span>Nasıl Kullanılır?</span>
         </button>
     </div>
 
     <!-- Sekmeler -->
     <div class="tabs-grid">
-        <button class="tab-btn active" onclick="switchTab('tab-olaylar', this)"><span class="nav-icon">📋</span><span class="nav-label">Olaylar</span></button>
+        <button class="tab-btn active" onclick="switchTab('tab-olaylar', this)"><span class="nav-icon">🏠</span><span class="nav-label">Ana Sayfa</span></button>
         <button class="tab-btn" onclick="switchTab('tab-ogrenciler', this)"><span class="nav-icon">👥</span><span class="nav-label">Öğrenciler</span></button>
         <button class="tab-btn" onclick="switchTab('tab-ogretmenler', this)"><span class="nav-icon">🧑‍🏫</span><span class="nav-label">Öğretmenler</span></button>
-        <button class="tab-btn" onclick="switchTab('tab-davranislar', this)"><span class="nav-icon">📖</span><span class="nav-label">Davranışlar</span></button>
-        <button class="tab-btn" onclick="switchTab('tab-kullanicilar', this)"><span class="nav-icon">🏛️</span><span class="nav-label">Okul Bilgisi</span></button>
+        <button class="tab-btn" style="display:none;" onclick="switchTab('tab-davranislar', this)"><span class="nav-icon">📖</span><span class="nav-label">Davranışlar</span></button>
+        <button class="tab-btn" onclick="switchTab('tab-kullanicilar', this)"><span class="nav-icon">⚙️</span><span class="nav-label">Ayarlar</span></button>
     </div>
 
     <!-- TAB 1: OLAYLAR VE RAPOR MERKEZİ -->
     <div id="tab-olaylar" class="tab-content">
 
-        <div class="card" style="padding: 12px 16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; background:var(--yuzey-soluk);">
-            <div class="helper-text" style="margin-bottom:0; font-weight:700; color:var(--lacivert);">💾 Çevrimdışı Yedekleme</div>
-            <div class="upload-actions" style="gap: 8px;">
-                <button class="btn-action-outline" onclick="exportFullDataJSON()">📤 Dışa Aktar</button>
-                <div class="file-input-wrapper">
-                    <button class="btn-action-outline">📥 İçe Aktar (.json)</button>
-                    <input type="file" id="importJsonFile" accept=".json" onchange="importFullDataJSON(event)">
-                </div>
-                <button class="btn-action-outline" style="color:var(--muhur); border-color:#fbdce1;" onclick="resetAllData()">⚠️ Sıfırla</button>
-            </div>
+        <div class="card welcome-card">
+            <div class="welcome-title">👋 Hoş geldiniz</div>
+            <div class="welcome-text">Ne yapmak istiyorsunuz? Aşağıdaki büyük düğmelerden birine tıklamanız yeterli.</div>
         </div>
-        
+
+        <div class="home-actions">
+            <button class="home-btn home-btn-primary" onclick="openIncidentModal()">
+                <span class="hb-icon">📝</span>
+                <span class="hb-title">Yeni Olay Kaydet</span>
+                <span class="hb-desc">Öğrencinin olumsuz davranışını kaydedin, tutanakları yazdırın</span>
+            </button>
+            <button class="home-btn" onclick="goToIncidentList()">
+                <span class="hb-icon">🖨️</span>
+                <span class="hb-title">Evrak Yazdır</span>
+                <span class="hb-desc">Daha önce kaydettiğiniz bir olayın evraklarını yazdırın</span>
+            </button>
+            <button class="home-btn" onclick="goTab('tab-ogrenciler')">
+                <span class="hb-icon">👥</span>
+                <span class="hb-title">Öğrenciler</span>
+                <span class="hb-desc">Öğrenci ekleyin veya listeyi görün</span>
+            </button>
+            <button class="home-btn" onclick="goTab('tab-kullanicilar')">
+                <span class="hb-icon">⚙️</span>
+                <span class="hb-title">Okul Bilgileri</span>
+                <span class="hb-desc">Okul adı, müdür ve kurul üyeleri (bir kez girilir)</span>
+            </button>
+        </div>
+
+        <div id="startGuide"></div>
+
+        <div class="list-head" id="incidentListHead">
+            <div class="list-head-title">📂 Kayıtlı Olaylar <span id="incCountLabel" class="list-count"></span></div>
+            <input type="search" id="incSearch" class="form-control big-search" placeholder="🔍 Öğrenci adı veya sınıfı ile arayın..." oninput="renderIncidents()" autocomplete="off">
+        </div>
+        <div id="olaylarList"></div>
+
+        <details class="card stats-fold">
+            <summary>📊 İstatistikleri göster</summary>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-val" id="stat-total">0</div>
@@ -841,30 +1053,20 @@
             </div>
         </div>
 
-        <div class="card" style="padding: 14px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-            <div>
-                <div style="font-weight: 800; font-size: 1rem;">📋 Disiplin ve Tutanak Dosyaları</div>
-                <div style="font-size: 0.8rem; color: #64748b;">Tüm şube, rehberlik, veli, savunma ve dizi pusulası form verileri eksiksiz yönetilebilir.</div>
-            </div>
-            <button class="btn-submit" onclick="openIncidentModal()">
-                ➕ Yeni Olay & Disiplin Dosyası Aç
-            </button>
-        </div>
-
-        <div id="olaylarList"></div>
+        </details>
     </div>
 
     <!-- TAB 2: ÖĞRENCİLER -->
     <div id="tab-ogrenciler" class="tab-content" style="display: none;">
         <div class="card">
             <div class="card-title">
-                <div>➕ Tek Öğrenci Ekle</div>
+                <div>➕ Yeni Öğrenci Ekle</div>
                 <span class="inc-badge badge-uyarma" id="count-ogrenciler">0 Öğrenci</span>
             </div>
             <form onsubmit="addStudentSingle(event)">
                 <div class="form-row">
-                    <input type="text" id="stuName" class="form-control" placeholder="Ad Soyad *" required>
-                    <input type="text" id="stuClass" class="form-control" placeholder="Sınıf (Örn: 8A)" required>
+                    <input type="text" id="stuName" class="form-control" placeholder="Adı Soyadı (zorunlu)" required>
+                    <input type="text" id="stuClass" class="form-control" placeholder="Sınıfı, örn: 8A (zorunlu)" required>
                 </div>
                 <div class="form-row">
                     <input type="text" id="stuNo" class="form-control" placeholder="Okul No">
@@ -873,13 +1075,13 @@
                 <div class="form-row">
                     <input type="text" id="stuParent" class="form-control" placeholder="Veli Adı Soyadı">
                     <input type="text" id="stuPhone" class="form-control" placeholder="Veli Telefonu">
-                    <button type="submit" class="btn-submit">Kaydet</button>
+                    <button type="submit" class="btn-submit">✔ Öğrenciyi Kaydet</button>
                 </div>
             </form>
         </div>
 
         <div class="card">
-            <div class="card-title">📥 Çevrimdışı CSV ile Toplu Öğrenci Yükleme</div>
+            <div class="card-title">📥 Çok Sayıda Öğrenciyi Listeden Yükle (İsteğe Bağlı)</div>
             <div class="helper-text">
                 Sütun Sıralaması: <b>A) Ad Soyad</b> · <b>B) Sınıf</b> · <b>C) Okul No</b> · <b>D) TC No</b> · <b>E) Veli Adı</b> · <b>F) Telefon</b> (1. satır başlık).
             </div>
@@ -894,6 +1096,7 @@
             </div>
         </div>
 
+        <input type="search" id="stuListSearch" class="form-control big-search" style="margin-bottom:10px;" placeholder="🔍 Listede öğrenci ara..." oninput="renderStudents()" autocomplete="off">
         <div id="ogrencilerList"></div>
     </div>
 
@@ -901,20 +1104,20 @@
     <div id="tab-ogretmenler" class="tab-content" style="display: none;">
         <div class="card">
             <div class="card-title">
-                <div>➕ Tek Öğretmen Ekle</div>
+                <div>➕ Yeni Öğretmen Ekle</div>
                 <span class="inc-badge badge-uyarma" id="count-ogretmenler">0 Öğretmen</span>
             </div>
             <form onsubmit="addTeacherSingle(event)">
                 <div class="form-row">
                     <input type="text" id="teaName" class="form-control" placeholder="Ad Soyad *" required>
                     <input type="text" id="teaBranch" class="form-control" placeholder="Branş (Matematik...)" required>
-                    <button type="submit" class="btn-submit">Kaydet</button>
+                    <button type="submit" class="btn-submit">✔ Öğretmeni Kaydet</button>
                 </div>
             </form>
         </div>
 
         <div class="card">
-            <div class="card-title">📥 Çevrimdışı CSV ile Toplu Öğretmen Yükleme</div>
+            <div class="card-title">📥 Çok Sayıda Öğretmeni Listeden Yükle (İsteğe Bağlı)</div>
             <div class="helper-text">
                 Sütun Sıralaması: <b>A) Ad Soyad</b> · <b>B) Branş</b> (1. satır başlık).
             </div>
@@ -934,6 +1137,7 @@
 
     <!-- TAB 4: DAVRANIŞ KODLARI -->
     <div id="tab-davranislar" class="tab-content" style="display: none;">
+        <button class="btn-action-outline btn-back" onclick="goTab('tab-kullanicilar')">‹ Ayarlara Geri Dön</button>
         <div class="card">
             <div class="card-title">
                 <div>➕ Yeni Davranış Maddesi Ekle</div>
@@ -962,9 +1166,9 @@
     <div id="tab-kullanicilar" class="tab-content" style="display: none;">
         <div class="card">
             <div class="card-title">
-                <div>🏛️ Okul Bilgileri ve Komisyon Heyeti</div>
+                <div>🏛️ Okul Bilgileri ve Kurul Üyeleri</div>
             </div>
-            <div class="helper-text">Burada yer alan bilgiler Dizi Pusulası, EK-10, Toplantı Tutanağı ve tüm resmi matbu evraklara otomatik basılır.</div>
+            <div class="helper-text info-banner">ℹ️ Bu bilgileri <b>yalnızca bir kez</b> girmeniz yeterlidir. Yazdığınız her şey kendiliğinden kaydedilir ve tüm evraklara otomatik olarak yazılır.</div>
 
             <div class="form-group" style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:8px; padding:10px;">
                 <label><b>🏫 Okul Türü:</b></label>
@@ -1024,6 +1228,24 @@
                 <input type="text" id="settingCounselor" class="form-control" onchange="saveSettings()">
             </div>
         </div>
+        <div class="card">
+            <div class="card-title"><div>💾 Yedek Alma</div></div>
+            <div class="helper-text">Bilgileriniz yalnızca <b>bu bilgisayardaki tarayıcıda</b> saklanır. Kaybolmaması için ayda bir <b>“Yedek Al”</b> düğmesine basıp inen dosyayı saklayın. Başka bir bilgisayarda devam etmek için o dosyayı <b>“Yedekten Geri Yükle”</b> ile açın.</div>
+            <div class="upload-actions" style="gap:10px;">
+                <button class="btn-submit" onclick="exportFullDataJSON()">📤 Yedek Al</button>
+                <div class="file-input-wrapper">
+                    <button class="btn-action-outline">📥 Yedekten Geri Yükle</button>
+                    <input type="file" id="importJsonFile" accept=".json" onchange="importFullDataJSON(event)">
+                </div>
+                <button class="btn-action-outline" style="color:var(--muhur); border-color:#fbdce1;" onclick="resetAllData()">🗑️ Tüm Bilgileri Sil</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><div>📖 Yönetmelik Davranış Maddeleri</div></div>
+            <div class="helper-text">Olay kaydederken seçilen davranış listesi hazır gelir. Değiştirmeniz gerekmez; yine de görmek veya yeni madde eklemek isterseniz:</div>
+            <button class="btn-action-outline" onclick="goTab('tab-davranislar')">📖 Davranış Maddelerini Görüntüle / Düzenle</button>
+        </div>
     </div>
 
 </div>
@@ -1034,47 +1256,149 @@
 <div id="incidentModal" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header">
-            <h3 id="modalIncidentTitle">➕ Disiplin Dosyası & Tüm Formların Veri Girişi</h3>
+            <h3 id="modalIncidentTitle">📝 Yeni Olay Kaydı</h3>
             <button class="btn-close-modal" onclick="closeIncidentModal()">&times;</button>
         </div>
-        <div class="autosave-note">Girdikleriniz otomatik olarak kaydedilir</div>
-        <form onsubmit="saveIncidentForm(event)">
+        <div class="autosave-note">Yazdıklarınız kendiliğinden kaydedilir, kaybolmaz</div>
+        <form id="incidentForm" novalidate onsubmit="saveIncidentForm(event)">
             <input type="hidden" id="editIncidentId" value="">
 
-            <!-- 1. Temel Olay Bilgileri -->
-            <div class="form-section-box">
-                <div class="form-section-header">📌 1. Temel Olay ve Öğrenci Seçimi</div>
-                <div class="form-group">
-                    <label>Öğrenci Seç *</label>
-                    <select id="incStudent" class="form-control" required></select>
-                </div>
-                <div class="form-group">
-                    <label>Olayı Bildiren / Şube Rehber Öğretmeni *</label>
-                    <select id="incTeacher" class="form-control" required></select>
-                </div>
-                <div class="form-group">
-                    <label>İhlal Edilen Yönetmelik Davranış Maddesi *</label>
-                    <select id="incBehavior" class="form-control" required></select>
-                </div>
-                <div class="form-row">
+            <!-- SİHİRBAZ: ADIM GÖSTERGESİ -->
+            <div class="wiz-progress" id="wizProgress"></div>
+
+            <!-- ADIM 1: ÖĞRENCİ VE ÖĞRETMEN -->
+            <div class="form-section-box wiz-box" data-step="1">
+                <div class="wiz-question">👤 Olay hangi öğrenciyle ilgili?</div>
+                <div class="wiz-hint">Öğrencinin adını yazmaya başlayın, sonra listeden <b>üzerine tıklayın</b>.</div>
+                <div id="stuChosen" class="chosen"></div>
+                <input type="search" id="stuSearch" class="form-control big-search" placeholder="🔍 Öğrenci adı, sınıfı veya numarası..." oninput="renderStudentPicker()" autocomplete="off">
+                <div id="stuPicker" class="pick-list"></div>
+                <select id="incStudent" class="form-control" style="display:none;"></select>
+                <details class="quick-add" id="quickStuBox">
+                    <summary>➕ Öğrenci listede yok mu? Buraya tıklayıp hemen ekleyin</summary>
+                    <div class="form-row">
+                        <input type="text" id="qsName" class="form-control quick-input" data-quick="student" placeholder="Adı Soyadı (zorunlu)">
+                        <input type="text" id="qsGrade" class="form-control quick-input" data-quick="student" placeholder="Sınıfı, örn: 7B (zorunlu)">
+                        <input type="text" id="qsNo" class="form-control quick-input" data-quick="student" placeholder="Okul No">
+                    </div>
+                    <button type="button" class="btn-submit" onclick="quickAddStudent()">✔ Öğrenciyi Ekle ve Seç</button>
+                </details>
+
+                <div class="wiz-question" style="margin-top:22px;">🧑‍🏫 Olayı bildiren öğretmen kim?</div>
+                <select id="incTeacher" class="form-control"></select>
+                <details class="quick-add">
+                    <summary>➕ Öğretmen listede yok mu? Buraya tıklayıp hemen ekleyin</summary>
+                    <div class="form-row">
+                        <input type="text" id="qtName" class="form-control quick-input" data-quick="teacher" placeholder="Adı Soyadı (zorunlu)">
+                        <input type="text" id="qtBranch" class="form-control quick-input" data-quick="teacher" placeholder="Branşı, örn: Matematik">
+                    </div>
+                    <button type="button" class="btn-submit" onclick="quickAddTeacher()">✔ Öğretmeni Ekle ve Seç</button>
+                </details>
+            </div>
+
+            <!-- ADIM 2: OLAY -->
+            <div class="form-section-box wiz-box" data-step="2">
+                <div class="wiz-question">📌 Öğrenci ne yaptı?</div>
+                <div class="wiz-hint">Bir kelime yazın (örn: <i>kavga</i>, <i>telefon</i>, <i>geç</i>, <i>kopya</i>, <i>sigara</i>) ve listeden <b>uygun olanın üzerine tıklayın</b>.</div>
+                <div id="behChosen" class="chosen"></div>
+                <input type="search" id="behSearch" class="form-control big-search" placeholder="🔍 Davranış ara..." oninput="renderBehaviorPicker()" autocomplete="off">
+                <div id="behPicker" class="pick-list pick-list-tall"></div>
+                <select id="incBehavior" class="form-control" style="display:none;"></select>
+
+                <div class="form-row" style="margin-top:16px;">
                     <div class="form-group" style="flex:1;">
-                        <label>Olay Tarihi *</label>
-                        <input type="date" id="incDate" class="form-control" required>
+                        <label>📅 Olay ne zaman oldu?</label>
+                        <input type="date" id="incDate" class="form-control">
                     </div>
                     <div class="form-group" style="flex:1;">
-                        <label>Olay Yeri</label>
-                        <input type="text" id="incPlace" class="form-control" placeholder="Koridor, Sınıf, Bahçe...">
+                        <label>📍 Olay nerede oldu?</label>
+                        <input type="text" id="incPlace" class="form-control" placeholder="Sınıf, koridor, bahçe...">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Olayın ve Yapılan İşlemlerin Özeti (Sevk Yazısı ve Genel Özet) *</label>
-                    <textarea id="incSummary" class="form-control" placeholder="Olay hakkında tutanak özeti..." required></textarea>
+                    <label>✍️ Olayı bir-iki cümleyle anlatın</label>
+                    <textarea id="incSummary" class="form-control" rows="4" placeholder="Örn: Öğrenci matematik dersi sırasında arkadaşıyla tartışıp dersin işlenişini engelledi."></textarea>
                 </div>
             </div>
 
+            <!-- 5a. Ortaokula Özel: Öğrenci Sözlü Uyarı Tutanağı (yalnız Okul Türü = Ortaokul iken görünür) -->
+            <div class="form-section-box wiz-box" data-step="3" data-school="ortaokul" id="ortaokulWarnSection" style="border-color:#f59e0b;">
+                <div class="wiz-question">⚠️ Sözlü Uyarı Tutanağı Bilgileri</div>
+                <div class="wiz-hint">Bu bilgiler <b>Öğrenci Sözlü Uyarı Tutanağına</b> yazılır. Bilmediğiniz kutuyu boş bırakabilirsiniz; çıktıda boşluk olarak kalır, elle doldurursunuz.</div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label>Olay Saati:</label>
+                        <input type="time" id="incWarnTime" class="form-control">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>Kaçıncı Ders:</label>
+                        <input type="text" id="incWarnLessonNo" class="form-control" placeholder="Örn: 3">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>Dersin Adı:</label>
+                        <input type="text" id="incWarnLesson" class="form-control" placeholder="Örn: Din Kültürü">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Öğrenci tam olarak ne yaptı? (Boş bırakırsanız olay özeti yazılır)</label>
+                    <textarea id="incWarnBehavior" class="form-control" placeholder="Örn: Öğrenci aynı sınıftan ... numaralı ... adlı öğrenci ile sınıf içerisinde dersin işlenişini engelleyen davranışlarda bulunmuştur."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tutanak (Uyarı) Tarihi:</label>
+                    <input type="date" id="incWarnDate" class="form-control">
+                </div>
+            </div>
+
+            <!-- 5b. Lise'ye Özel Alanlar (yalnız Okul Türü = Lise iken görünür) -->
+            <div class="form-section-box wiz-box" data-step="3" data-school="lise" id="liseExtraSection" style="display:none; border-color:#818cf8;">
+                <div class="wiz-question">🏫 Liseye Özel Bilgiler</div>
+                <div class="wiz-hint">Bilmediğiniz kutuyu boş bırakabilirsiniz; çıktıda boşluk olarak kalır, elle doldurursunuz.</div>
+                <div class="form-group">
+                    <label>Şikayet Dilekçesi Konusu (varsa):</label>
+                    <textarea id="incComplaintText" class="form-control" placeholder="Şikayet dilekçesinin konusu / özeti..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Mağdur Öğrencinin İfadesi:</label>
+                    <textarea id="incVictimStatement" class="form-control" placeholder="Mağdur öğrencinin beyanı..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label>Kurul Çağrı / Toplantı Tarihi:</label>
+                        <input type="date" id="incMeetingDate" class="form-control">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>Kurul Çağrı / Toplantı Saati:</label>
+                        <input type="time" id="incMeetingTime" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label>Okuldan Kısa Süreli Uzaklaştırma - Gün Sayısı (1-5):</label>
+                        <input type="number" id="incPunishmentDays" class="form-control" min="1" max="5" placeholder="Örn: 3">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label>Cezalı Olunan İlk Gün:</label>
+                        <input type="date" id="incPunishmentStart" class="form-control">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>Cezalı Olunan Son Gün:</label>
+                        <input type="date" id="incPunishmentEnd" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ADIM 4: EK BİLGİLER -->
+            <div class="wiz-box info-banner" data-step="4" style="margin-bottom:12px;">
+                ℹ️ <b>Bu adım isteğe bağlıdır.</b> Aşağıdaki bölümler diğer resmî evraklar (EK-10, savunma, veli görüşmesi vb.) içindir ve <b>hazır örnek metinlerle doldurulmuştur</b>.
+                Değiştirmek istemiyorsanız doğrudan <b>“💾 Kaydet”</b> düğmesine basın. Değiştirmek istediğiniz bölümün başlığına tıklayarak açabilirsiniz.
+            </div>
+
             <!-- 2. EK-10 Öğrenci & Aile Detay Bilgileri -->
-            <div class="form-section-box">
-                <div class="form-section-header">👨‍👩‍👦 2. EK-10 Öğrenci, Aile & Sağlık/Ceza Geçmişi Bilgileri</div>
+            <div class="form-section-box wiz-box fold" data-step="4">
+                <div class="form-section-header" onclick="this.parentElement.classList.toggle('open')">👨‍👩‍👦 2. EK-10 Öğrenci, Aile & Sağlık/Ceza Geçmişi Bilgileri</div>
                 <div class="form-row">
                     <div class="form-group" style="flex:1;">
                         <label>Cinsiyet / Yatılılık:</label>
@@ -1113,8 +1437,8 @@
             </div>
 
             <!-- 3. Şube Rehber Öğretmeni Görüş Formu (1., 2. ve 3. Maddeler) -->
-            <div class="form-section-box">
-                <div class="form-section-header">🧑‍🏫 3. Şube Rehber Öğretmeni Görüş Formu (Eksiksiz 3 Madde)</div>
+            <div class="form-section-box wiz-box fold" data-step="4">
+                <div class="form-section-header" onclick="this.parentElement.classList.toggle('open')">🧑‍🏫 3. Şube Rehber Öğretmeni Görüş Formu (Eksiksiz 3 Madde)</div>
                 <div class="form-group">
                     <label>1. Madde: Öğrencinin Okul İçinde ve Dışındaki Genel Durumu:</label>
                     <textarea id="incTeacherItem1" class="form-control" placeholder="Okul içi ve dışındaki genel hal, hareket ve arkadaş ilişkileri..."></textarea>
@@ -1130,8 +1454,8 @@
             </div>
 
             <!-- 4. Okul Rehberlik Servisi Görüş ve Öneri Formu (1., 2., 3. ve 4. Maddeler) -->
-            <div class="form-section-box">
-                <div class="form-section-header">🧭 4. Okul Rehberlik Servisi Görüş ve Öneri Formu</div>
+            <div class="form-section-box wiz-box fold" data-step="4">
+                <div class="form-section-header" onclick="this.parentElement.classList.toggle('open')">🧭 4. Okul Rehberlik Servisi Görüş ve Öneri Formu</div>
                 <div class="form-row">
                     <div class="form-group" style="flex:1;">
                         <label>1. Görüşme Tarihi ve Saati:</label>
@@ -1161,8 +1485,8 @@
             </div>
 
             <!-- 5. Savunma, İfade, Sözleşme & Veli Görüşme Formu -->
-            <div class="form-section-box">
-                <div class="form-section-header">📝 5. Savunma, İfade, Sözleşme ve Veli Görüşme Metinleri</div>
+            <div class="form-section-box wiz-box fold" data-step="4">
+                <div class="form-section-header" onclick="this.parentElement.classList.toggle('open')">📝 5. Savunma, İfade, Sözleşme ve Veli Görüşme Metinleri</div>
                 <div class="form-group">
                     <label>Öğrencinin Yazılı Savunması (Savunma Tutanağı Metni):</label>
                     <textarea id="incStudentStatement" class="form-control" placeholder="Öğrencinin savunma beyanı..."></textarea>
@@ -1189,75 +1513,9 @@
                 </div>
             </div>
 
-            <!-- 5a. Ortaokula Özel: Öğrenci Sözlü Uyarı Tutanağı (yalnız Okul Türü = Ortaokul iken görünür) -->
-            <div class="form-section-box" id="ortaokulWarnSection" style="border-color:#f59e0b;">
-                <div class="form-section-header">⚠️ 5a. Öğrenci Sözlü Uyarı Tutanağı (Ortaokul)</div>
-                <div class="form-row">
-                    <div class="form-group" style="flex:1;">
-                        <label>Olay Saati:</label>
-                        <input type="time" id="incWarnTime" class="form-control">
-                    </div>
-                    <div class="form-group" style="flex:1;">
-                        <label>Kaçıncı Ders:</label>
-                        <input type="text" id="incWarnLessonNo" class="form-control" placeholder="Örn: 3">
-                    </div>
-                    <div class="form-group" style="flex:1;">
-                        <label>Dersin Adı:</label>
-                        <input type="text" id="incWarnLesson" class="form-control" placeholder="Örn: Din Kültürü">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Olumsuz Davranışın Çeşidi ve Özelliği:</label>
-                    <textarea id="incWarnBehavior" class="form-control" placeholder="Örn: Öğrenci aynı sınıftan ... numaralı ... adlı öğrenci ile sınıf içerisinde dersin işlenişini engelleyen davranışlarda bulunmuştur."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Tutanak (Uyarı) Tarihi:</label>
-                    <input type="date" id="incWarnDate" class="form-control">
-                </div>
-            </div>
-
-            <!-- 5b. Lise'ye Özel Alanlar (yalnız Okul Türü = Lise iken görünür) -->
-            <div class="form-section-box" id="liseExtraSection" style="display:none; border-color:#818cf8;">
-                <div class="form-section-header">🏫 5b. Liseye Özel Bilgiler (Ortaöğretim Kurumları Ödül ve Disiplin Yönetmeliği)</div>
-                <div class="form-group">
-                    <label>Şikayet Dilekçesi Konusu (varsa):</label>
-                    <textarea id="incComplaintText" class="form-control" placeholder="Şikayet dilekçesinin konusu / özeti..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Mağdur Öğrencinin İfadesi:</label>
-                    <textarea id="incVictimStatement" class="form-control" placeholder="Mağdur öğrencinin beyanı..."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group" style="flex:1;">
-                        <label>Kurul Çağrı / Toplantı Tarihi:</label>
-                        <input type="date" id="incMeetingDate" class="form-control">
-                    </div>
-                    <div class="form-group" style="flex:1;">
-                        <label>Kurul Çağrı / Toplantı Saati:</label>
-                        <input type="time" id="incMeetingTime" class="form-control">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group" style="flex:1;">
-                        <label>Okuldan Kısa Süreli Uzaklaştırma - Gün Sayısı (1-5):</label>
-                        <input type="number" id="incPunishmentDays" class="form-control" min="1" max="5" placeholder="Örn: 3">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group" style="flex:1;">
-                        <label>Cezalı Olunan İlk Gün:</label>
-                        <input type="date" id="incPunishmentStart" class="form-control">
-                    </div>
-                    <div class="form-group" style="flex:1;">
-                        <label>Cezalı Olunan Son Gün:</label>
-                        <input type="date" id="incPunishmentEnd" class="form-control">
-                    </div>
-                </div>
-            </div>
-
             <!-- 6. Dizi Pusulası & Hukuki Durum -->
-            <div class="form-section-box">
-                <div class="form-section-header">🗂️ 6. Dizi Pusulası & Hukuki / İtiraz Veri Alanları</div>
+            <div class="form-section-box wiz-box fold" data-step="4">
+                <div class="form-section-header" onclick="this.parentElement.classList.toggle('open')">🗂️ 6. Dizi Pusulası & Hukuki / İtiraz Veri Alanları</div>
                 <div class="form-group">
                     <label>⚖️ Mahkeme Kararı ve/veya Safahatı (Dizi Pusulası Sıra 11) *:</label>
                     <div class="form-row">
@@ -1298,11 +1556,15 @@
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
-                <button type="button" class="btn-action-outline" onclick="closeIncidentModal()">Kapat</button>
-                <button type="submit" class="btn-submit">💾 Verileri Kaydet ve Dosyayı Kapat</button>
+            <div class="wiz-error" id="wizError"></div>
+            <div class="wiz-nav">
+                <button type="button" class="btn-big btn-ghost" id="wizBack" onclick="wizPrev()">‹ Geri</button>
+                <div style="flex:1;"></div>
+                <button type="submit" class="btn-big btn-success" id="wizSave">💾 Kaydet</button>
+                <button type="button" class="btn-big btn-primary" id="wizNextBtn" onclick="wizNext()">İleri ›</button>
             </div>
         </form>
+        <div id="wizDone" class="wiz-done" style="display:none;"></div>
     </div>
 </div>
 
@@ -1310,14 +1572,49 @@
 <div id="printDocsModal" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header">
-            <h3>📑 Resmi Disiplin Evrakları Yazdırma Menüsü</h3>
+            <h3>🖨️ Hangi evrakı yazdırmak istiyorsunuz?</h3>
             <button class="btn-close-modal" onclick="closePrintModal()">&times;</button>
         </div>
+        <div class="print-for" id="printForName"></div>
         <div class="helper-text" id="printMenuHelper">Yönetmeliğe uygun ıslak imzalı resmi evrakları tek tıkla yazdırabilirsiniz:</div>
 
         <div id="printMenuButtons" style="display: flex; flex-direction: column; gap: 8px; margin: 15px 0;"></div>
         <div style="text-align:right;">
             <button class="btn-action-outline" onclick="closePrintModal()">Kapat</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: YARDIM -->
+<div id="helpModal" class="modal-overlay" onclick="if (event.target === this) closeHelp()">
+    <div class="modal-box" style="max-width:640px;">
+        <div class="modal-header">
+            <h3>❓ Program Nasıl Kullanılır?</h3>
+            <button class="btn-close-modal" onclick="closeHelp()">&times;</button>
+        </div>
+        <div class="help-step"><div class="start-num">1</div><div>
+            <h4>⚙️ Okul bilgilerini girin (bir kez)</h4>
+            <p>Alttaki/üstteki menüden <b>Ayarlar</b>'a girin. Okul adını, müdürü ve kurul üyelerini yazın. Kendiliğinden kaydedilir.</p>
+        </div></div>
+        <div class="help-step"><div class="start-num">2</div><div>
+            <h4>👥 Öğrencileri ekleyin</h4>
+            <p><b>Öğrenciler</b> bölümünden ekleyebilirsiniz. İsterseniz olay kaydederken de “Öğrenci listede yok mu?” yazısına tıklayıp hemen ekleyebilirsiniz.</p>
+        </div></div>
+        <div class="help-step"><div class="start-num">3</div><div>
+            <h4>📝 Olayı kaydedin</h4>
+            <p>Ana sayfadaki kırmızı <b>“Yeni Olay Kaydet”</b> düğmesine basın. Program size sırayla soru sorar: <i>Hangi öğrenci? Ne yaptı? Ne zaman?</i> Cevaplayıp <b>“İleri”</b>ye basın.</p>
+        </div></div>
+        <div class="help-step"><div class="start-num">4</div><div>
+            <h4>🖨️ Yazdırın</h4>
+            <p>Kaydettikten sonra çıkan ekrandan istediğiniz evrakı seçin. Daha sonra yazdırmak için ana sayfadaki listede öğrencinin yanındaki <b>“Yazdır”</b> düğmesine basın.<br>
+            İpucu: Yazdırma penceresinde hedef olarak <b>“PDF olarak kaydet”</b>i seçerseniz evrakı dosya olarak saklarsınız.</p>
+        </div></div>
+        <div class="help-step" style="border-bottom:none;"><div class="start-num">💾</div><div>
+            <h4>Bilgileriniz nerede saklanır?</h4>
+            <p>Bilgiler bu bilgisayarın tarayıcısında saklanır; internet gerekmez. Kaybolmasın diye ayda bir <b>Ayarlar → Yedek Al</b> yapmanızı öneririz.</p>
+        </div></div>
+        <div style="text-align:right; margin-top:10px;">
+            <button class="btn-big btn-primary" onclick="closeHelp()">Anladım</button>
         </div>
     </div>
 </div>
@@ -1585,52 +1882,40 @@
 
     function renderIncidents() {
         const container = document.getElementById('olaylarList');
+        renderStartGuide();
+        const countLbl = document.getElementById('incCountLabel');
+        if (countLbl) countLbl.textContent = db.incidents.length ? `(${db.incidents.length} kayıt)` : '';
         if (db.incidents.length === 0) {
-            container.innerHTML = `<div class="card" style="text-align:center; padding:35px; color:#64748b;">Henüz kayıtlı bir disiplin olayı veya dosya bulunmuyor.</div>`;
+            container.innerHTML = `<div class="card" style="text-align:center; padding:30px; color:#64748b; font-size:1rem;">Henüz kayıtlı olay yok. Başlamak için yukarıdaki kırmızı <b>“Yeni Olay Kaydet”</b> düğmesine basın.</div>`;
             return;
         }
-        
-        container.innerHTML = db.incidents.map(inc => {
+
+        const q = trLower((document.getElementById('incSearch') || {}).value || '');
+        const list = db.incidents.filter(inc => !q || trLower(`${inc.studentName} ${inc.studentGrade} ${inc.studentNo} ${inc.behaviorDesc}`).includes(q));
+        if (list.length === 0) {
+            container.innerHTML = `<div class="card" style="text-align:center; padding:24px; color:#64748b;">Aramanıza uyan kayıt bulunamadı.</div>`;
+            return;
+        }
+
+        container.innerHTML = list.map(inc => {
             const weightClass = inc.behaviorWeight === 'Uyarma' ? 'weight-uyarma' : (inc.behaviorWeight === 'Kınama' ? 'weight-kinama' : 'weight-okuldegistirme');
             const badgeClass = inc.behaviorWeight === 'Uyarma' ? 'badge-uyarma' : (inc.behaviorWeight === 'Kınama' ? 'badge-kinama' : 'badge-okuldegistirme');
-            const hasCourt = inc.courtDecision && !inc.courtDecision.includes('İntikal Etmemiştir');
-            const hasAppeal = inc.appealStatus && !inc.appealStatus.includes('Yoktur');
 
             return `
             <div class="incident-card ${weightClass}">
                 <div class="inc-top-bar">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span class="inc-badge ${badgeClass}">${escapeHtml(inc.behaviorWeight)}</span>
-                        <span style="font-size:0.8rem; font-weight:700; color:#64748b;">Karar No: #${inc.id.toString().slice(-4)}</span>
-                    </div>
-                    <span style="font-size:0.82rem; font-weight:600; color:#64748b;">📅 ${inc.date}</span>
+                    <span class="inc-badge ${badgeClass}">${escapeHtml(inc.behaviorWeight)}</span>
+                    <span style="font-size:0.9rem; font-weight:700; color:#475569;">📅 ${escapeHtml(formatDateTR(inc.date))}</span>
                 </div>
-                
-                <div class="inc-title">${escapeHtml(inc.studentName)} (${escapeHtml(inc.studentGrade)} - No: ${escapeHtml(inc.studentNo || '---')})</div>
-                <div style="font-size:0.88rem; color:#1e293b; margin-top:4px; font-weight:600;">
-                    [${escapeHtml(inc.behaviorCode)}] ${escapeHtml(inc.behaviorDesc)}
-                </div>
-                
+                <div class="inc-title">👤 ${escapeHtml(inc.studentName)} <span style="font-weight:600; color:#64748b; font-size:0.9em;">(${escapeHtml(inc.studentGrade)} · No: ${escapeHtml(inc.studentNo || '-')})</span></div>
+                <div class="inc-desc">${escapeHtml(inc.behaviorDesc)}</div>
                 <div class="inc-meta">
-                    <span>📍 ${escapeHtml(inc.place || 'Okul İçi')}</span>
                     <span>🧑‍🏫 ${escapeHtml(inc.teacherName)}</span>
-                    <span>👨‍👩‍👦 Veli: ${escapeHtml(inc.studentParent)}</span>
+                    <span>📍 ${escapeHtml(inc.place || 'Okul İçi')}</span>
                 </div>
-
-                <div class="report-tags-container">
-                    <span class="report-tag ${inc.statement ? 'tag-active' : 'tag-passive'}">📝 Savunma ${inc.statement ? '✓' : '—'}</span>
-                    <span class="report-tag ${inc.witnesses ? 'tag-active' : 'tag-passive'}">👥 İfade/Tanık ${inc.witnesses ? '✓' : '—'}</span>
-                    <span class="report-tag ${inc.teacherItem1 || inc.teacherItem2 || inc.teacherItem3 ? 'tag-active' : 'tag-passive'}">🧑‍🏫 Şube (3 Madde) ✓</span>
-                    <span class="report-tag ${inc.counselorItem1 || inc.counselorItem4 ? 'tag-active' : 'tag-passive'}">🧭 Rehberlik (4 Madde) ✓</span>
-                    <span class="report-tag ${inc.parentOpinion ? 'tag-active' : 'tag-passive'}">👨‍👩‍👦 Veli Formu ✓</span>
-                    <span class="report-tag ${hasCourt ? 'tag-warning' : 'tag-active'}">⚖️ Mahkeme: ${hasCourt ? 'Karar Var' : 'İntikal Yok'}</span>
-                    <span class="report-tag ${hasAppeal ? 'tag-warning' : 'tag-passive'}">📨 İtiraz: ${hasAppeal ? 'Var' : 'Yok'}</span>
-                    <span class="report-tag tag-active">🗂️ Dizi Pusulası Hazır ✓</span>
-                </div>
-
-                <div class="inc-actions">
-                    <button class="btn-action-outline" onclick="editIncident(${inc.id})">✏️ Tüm Form Verilerini Düzenle</button>
-                    <button class="btn-submit" style="background:#0f172a;" onclick="openPrintModal(${inc.id})">🖨️ Matbu Evrakları Yazdır</button>
+                <div class="inc-actions-big">
+                    <button class="btn-print" onclick="openPrintModal(${inc.id})">🖨️ Evrak Yazdır</button>
+                    <button class="btn-action-outline" onclick="editIncident(${inc.id})">✏️ Düzenle</button>
                     <button class="btn-action-outline" style="color:#dc2626; border-color:#fecaca;" onclick="deleteIncident(${inc.id})">🗑️ Sil</button>
                 </div>
             </div>
@@ -1641,10 +1926,16 @@
     function renderStudents() {
         const container = document.getElementById('ogrencilerList');
         if (db.students.length === 0) {
-            container.innerHTML = `<div class="card" style="text-align:center; color:#64748b;">Henüz öğrenci kaydı yok.</div>`;
+            container.innerHTML = `<div class="card" style="text-align:center; color:#64748b;">Henüz öğrenci kaydı yok. Yukarıdaki kutulara öğrencinin adını ve sınıfını yazıp "Öğrenciyi Kaydet"e basın.</div>`;
             return;
         }
-        container.innerHTML = db.students.map(s => `
+        const q = trLower((document.getElementById('stuListSearch') || {}).value || '');
+        const list = db.students.filter(s => !q || trLower(`${s.name} ${s.grade} ${s.no}`).includes(q));
+        if (list.length === 0) {
+            container.innerHTML = `<div class="card" style="text-align:center; color:#64748b;">Aramanıza uyan öğrenci bulunamadı.</div>`;
+            return;
+        }
+        container.innerHTML = list.map(s => `
             <div class="card" style="padding:12px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <div style="font-weight:700; font-size:0.92rem;">${escapeHtml(s.name)}</div>
@@ -1828,7 +2119,7 @@
 
     function setupAutoSaveListeners() {
         // Okul Bilgileri ve Komisyon sekmesi: her tuş vuruşundan kısa süre sonra otomatik kaydeder
-        document.querySelectorAll('#tab-kullanicilar input').forEach(el => {
+        document.querySelectorAll('#tab-kullanicilar input[id^="setting"]').forEach(el => {
             el.removeAttribute('onchange');
             el.addEventListener('input', debouncedSaveSettings);
         });
@@ -1865,13 +2156,13 @@
     }
 
     function openIncidentModal() {
-        if (db.students.length === 0 || getActiveBehaviors().length === 0) {
-            alert('Lütfen önce en az bir öğrenci ve davranış kodu ekleyiniz.');
+        if (getActiveBehaviors().length === 0) {
+            alert('Davranış maddesi listesi boş. Ayarlar > Davranış Maddeleri bölümünden madde ekleyiniz.');
             return;
         }
 
         populateModalSelects();
-        document.getElementById('modalIncidentTitle').textContent = '➕ Disiplin Dosyası & Tüm Formların Veri Girişi';
+        document.getElementById('modalIncidentTitle').textContent = '📝 Yeni Olay Kaydı';
         document.getElementById('editIncidentId').value = '';
         document.getElementById('incDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('incPlace').value = 'Okul İçi';
@@ -1934,6 +2225,7 @@
         document.getElementById('incWarnDate').value = '';
         document.getElementById('ortaokulWarnSection').style.display = (db.settings.schoolType === 'lise') ? 'none' : '';
 
+        wizReset(true);
         document.getElementById('incidentModal').classList.add('active');
     }
 
@@ -1942,7 +2234,7 @@
         if (!inc) return;
 
         populateModalSelects();
-        document.getElementById('modalIncidentTitle').textContent = '✏️ Disiplin Dosyası & Tüm Form Verilerini Düzenle';
+        document.getElementById('modalIncidentTitle').textContent = '✏️ Olay Kaydını Düzenle';
         document.getElementById('editIncidentId').value = inc.id;
         document.getElementById('incStudent').value = inc.studentId;
         document.getElementById('incTeacher').value = inc.teacherId || 0;
@@ -2018,6 +2310,7 @@
         document.getElementById('incWarnDate').value = inc.warnDate || '';
         document.getElementById('ortaokulWarnSection').style.display = (db.settings.schoolType === 'lise') ? 'none' : '';
 
+        wizReset(false);
         document.getElementById('incidentModal').classList.add('active');
     }
 
@@ -2118,12 +2411,14 @@
 
     function saveIncidentForm(e) {
         e.preventDefault();
+        const invalid = wizValidate(2);
+        if (invalid) { wizGo(invalid.step); wizErr(invalid.msg); return; }
         const editId = document.getElementById('editIncidentId').value;
         const idOverride = editId ? parseInt(editId) : Date.now();
         const recordData = collectIncidentFormData(idOverride);
 
         if (!recordData) {
-            alert('Lütfen zorunlu alanları doldurunuz: Öğrenci, Davranış Maddesi ve Olay Tarihi.');
+            wizErr('Lütfen öğrenciyi, davranışı ve olay tarihini seçiniz.');
             return;
         }
 
@@ -2132,10 +2427,12 @@
             if (index !== -1) db.incidents[index] = recordData;
         } else {
             db.incidents.unshift(recordData);
+            // Bekleyen otomatik kayıt aynı kaydı güncellesin, ikinci bir kayıt açmasın
+            document.getElementById('editIncidentId').value = idOverride;
         }
 
         saveData();
-        closeIncidentModal();
+        wizShowDone(idOverride);
     }
 
     /* Her alan değiştikçe (debounce ile) sessizce kaydeder; ilk geçerli
@@ -2162,7 +2459,8 @@
     }
 
     function deleteIncident(id) {
-        if (confirm('Bu disiplin dosyasını tamamen silmek istediğinize emin misiniz?')) {
+        const inc = db.incidents.find(i => i.id === id);
+        if (confirm(`${inc ? inc.studentName + ' adlı öğrencinin ' : ''}bu olay kaydı tamamen silinecek. Emin misiniz?\n\n(Vazgeçmek için "İptal"e basın.)`)) {
             db.incidents = db.incidents.filter(i => i.id !== id);
             saveData();
         }
@@ -2175,6 +2473,8 @@
         selectedIncidentForPrint = db.incidents.find(i => i.id === incidentId);
         if (!selectedIncidentForPrint) return;
         updatePrintMenu();
+        const pf = document.getElementById('printForName');
+        if (pf) pf.innerHTML = `👤 <b>${escapeHtml(selectedIncidentForPrint.studentName)}</b> (${escapeHtml(selectedIncidentForPrint.studentGrade)}) · 📅 ${escapeHtml(formatDateTR(selectedIncidentForPrint.date))}`;
         document.getElementById('printDocsModal').classList.add('active');
     }
 
@@ -3192,10 +3492,15 @@
         const isLise = db.settings.schoolType === 'lise';
         const docList = getActiveDocList();
         const allLabel = isLise
-            ? '🗂️ <b>TÜM LİSE DİSİPLİN DOSYASINI TEK TIKLA YAZDIR (18 Evrak)</b>'
-            : '🗂️ <b>TÜM DİSİPLİN DOSYASINI TEK TIKLA YAZDIR (Tam MEB Paketi)</b>';
-        let html = `<button class="btn-submit" style="background:#0f172a; text-align:left; padding:12px 16px;" onclick="generateDoc('ALL')">${allLabel}</button>`;
-        html += docList.map(d => `<button class="btn-action-outline" style="text-align:left;" onclick="generateDoc('${d.t}')">${d.label}</button>`).join('');
+            ? '🗂️ <b>Tüm Disiplin Dosyasını Yazdır (18 Evrak)</b>'
+            : '🗂️ <b>Tüm Disiplin Dosyasını Yazdır (Tam MEB Paketi)</b>';
+        let html = '';
+        if (!isLise) {
+            html += `<button class="print-btn print-btn-featured" onclick="generateDoc('SOZLU_UYARI')">⚠️ <b>Öğrenci Sözlü Uyarı Tutanağı</b><span>En sık kullanılan evrak</span></button>`;
+        }
+        html += `<button class="print-btn print-btn-all" onclick="generateDoc('ALL')">${allLabel}<span>Aşağıdaki evrakların hepsini sırayla yazdırır</span></button>`;
+        html += `<div class="print-sub">Tek tek yazdırmak için:</div>`;
+        html += docList.filter(d => isLise || d.t !== 'SOZLU_UYARI').map(d => `<button class="print-btn" onclick="generateDoc('${d.t}')">${d.label}</button>`).join('');
         btnBox.innerHTML = html;
         const helper = document.getElementById('printMenuHelper');
         if (helper) {
@@ -3390,9 +3695,281 @@
             .replace(/'/g, "&#039;");
     }
 
+    /* ============================================================
+       KOLAY KULLANIM: yardımcılar, ana sayfa, adım adım olay kaydı
+    ============================================================ */
+    function trLower(text) {
+        return String(text || '').toLocaleLowerCase('tr-TR');
+    }
+
+    function formatDateTR(iso) {
+        return iso ? iso.split('-').reverse().join('.') : '';
+    }
+
+    function goTab(tabId) {
+        const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => (b.getAttribute('onclick') || '').includes(`'${tabId}'`));
+        switchTab(tabId, btn && btn.style.display !== 'none' ? btn : (tabId === 'tab-davranislar' ? Array.from(document.querySelectorAll('.tab-btn')).find(b => (b.getAttribute('onclick') || '').includes('tab-kullanicilar')) : null));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToIncidentList() {
+        if (db.incidents.length === 0) {
+            alert('Henüz kayıtlı olay yok. Önce "Yeni Olay Kaydet" düğmesiyle bir olay kaydedin.');
+            return;
+        }
+        goTab('tab-olaylar');
+        const head = document.getElementById('incidentListHead');
+        if (head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const search = document.getElementById('incSearch');
+        if (search) setTimeout(() => search.focus({ preventScroll: true }), 400);
+    }
+
+    function renderStartGuide() {
+        const box = document.getElementById('startGuide');
+        if (!box) return;
+        if (db.incidents.length > 0) { box.innerHTML = ''; return; }
+        const hasStudents = db.students.length > 0;
+        box.innerHTML = `
+            <div class="card start-guide">
+                <div class="start-guide-title">🚀 Başlamak için 3 kolay adım</div>
+                <div class="start-step">
+                    <div class="start-num">1</div>
+                    <div class="start-text">Okul bilgilerinizi girin<small>Okul adı, müdür ve kurul üyeleri — yalnızca bir kez.</small></div>
+                    <button class="btn-action-outline" onclick="goTab('tab-kullanicilar')">⚙️ Okul Bilgilerine Git</button>
+                </div>
+                <div class="start-step ${hasStudents ? 'done' : ''}">
+                    <div class="start-num">${hasStudents ? '✓' : '2'}</div>
+                    <div class="start-text">Öğrencilerinizi ekleyin<small>Şu an ${db.students.length} öğrenci kayıtlı. Olay kaydederken de ekleyebilirsiniz.</small></div>
+                    <button class="btn-action-outline" onclick="goTab('tab-ogrenciler')">👥 Öğrenci Ekle</button>
+                </div>
+                <div class="start-step">
+                    <div class="start-num">3</div>
+                    <div class="start-text">İlk olayı kaydedin<small>Program size adım adım soru sorar.</small></div>
+                    <button class="btn-submit" onclick="openIncidentModal()">📝 Yeni Olay Kaydet</button>
+                </div>
+            </div>`;
+    }
+
+    function openHelp() { document.getElementById('helpModal').classList.add('active'); }
+    function closeHelp() { document.getElementById('helpModal').classList.remove('active'); }
+
+    /* ---------- Arama yapılabilir seçim listeleri ---------- */
+    function renderStudentPicker() {
+        const sel = document.getElementById('incStudent');
+        const box = document.getElementById('stuPicker');
+        const cur = sel.value;
+        const q = trLower(document.getElementById('stuSearch').value.trim());
+        const list = db.students.filter(s => !q || trLower(`${s.name} ${s.grade} ${s.no}`).includes(q));
+        box.innerHTML = list.length
+            ? list.map(s => `<button type="button" class="pick-item ${String(s.id) === cur ? 'selected' : ''}" onclick="pickStudent(${s.id})"><span class="pick-main">${escapeHtml(s.name)}</span><span class="pick-sub">${escapeHtml(s.grade)} · No: ${escapeHtml(s.no || '-')}</span></button>`).join('')
+            : `<div class="pick-empty">${db.students.length ? 'Bu isimde öğrenci bulunamadı.' : 'Henüz hiç öğrenci eklenmemiş.'} Aşağıdaki sarı kutudan yeni öğrenci ekleyebilirsiniz.</div>`;
+        const chosen = document.getElementById('stuChosen');
+        const st = db.students.find(s => String(s.id) === cur);
+        chosen.innerHTML = st ? `✔ Seçilen öğrenci: <b>${escapeHtml(st.name)}</b> (${escapeHtml(st.grade)} · No: ${escapeHtml(st.no || '-')})` : '';
+        chosen.classList.toggle('show', !!st);
+    }
+
+    function pickStudent(id) {
+        const sel = document.getElementById('incStudent');
+        sel.value = id;
+        sel.dispatchEvent(new Event('change'));
+        renderStudentPicker();
+        wizErr('');
+    }
+
+    function renderBehaviorPicker() {
+        const sel = document.getElementById('incBehavior');
+        const box = document.getElementById('behPicker');
+        const cur = sel.value;
+        const q = trLower(document.getElementById('behSearch').value.trim());
+        const words = q.split(/\s+/).filter(Boolean);
+        const list = getActiveBehaviors().filter(b => {
+            const hay = trLower(`${b.desc} ${b.code} ${b.weight}`);
+            return words.every(w => hay.includes(w));
+        });
+        const badge = w => w === 'Uyarma' ? 'badge-uyarma' : (w === 'Kınama' ? 'badge-kinama' : 'badge-okuldegistirme');
+        box.innerHTML = list.length
+            ? list.map(b => `<button type="button" class="pick-item ${String(b.id) === cur ? 'selected' : ''}" onclick="pickBehavior(${b.id})"><span class="pick-main" style="font-weight:600;">${escapeHtml(b.desc)}</span><span class="inc-badge ${badge(b.weight)}">${escapeHtml(b.weight)}</span></button>`).join('')
+            : `<div class="pick-empty">Bu kelimeyle eşleşen davranış bulunamadı. Başka bir kelime deneyin (örn: “ders”, “kavga”, “eşya”).</div>`;
+        const chosen = document.getElementById('behChosen');
+        const bh = getActiveBehaviors().find(b => String(b.id) === cur);
+        chosen.innerHTML = bh ? `✔ Seçilen davranış: <b>${escapeHtml(bh.desc)}</b> <span class="inc-badge ${badge(bh.weight)}">${escapeHtml(bh.weight)}</span>` : '';
+        chosen.classList.toggle('show', !!bh);
+    }
+
+    function pickBehavior(id) {
+        const sel = document.getElementById('incBehavior');
+        sel.value = id;
+        sel.dispatchEvent(new Event('change'));
+        renderBehaviorPicker();
+        wizErr('');
+    }
+
+    function quickAddStudent() {
+        const name = document.getElementById('qsName').value.trim();
+        const grade = document.getElementById('qsGrade').value.trim();
+        const no = document.getElementById('qsNo').value.trim();
+        if (!name || !grade) { wizErr('Yeni öğrenci için adı soyadı ve sınıfı yazınız.'); return; }
+        const id = Date.now();
+        db.students.push({ id, name, grade, no, tc: '', parent: '', phone: '' });
+        saveData();
+        const sel = document.getElementById('incStudent');
+        sel.insertAdjacentHTML('beforeend', `<option value="${id}">${escapeHtml(name)}</option>`);
+        ['qsName', 'qsGrade', 'qsNo'].forEach(f => document.getElementById(f).value = '');
+        document.getElementById('quickStuBox').open = false;
+        document.getElementById('stuSearch').value = '';
+        pickStudent(id);
+    }
+
+    function quickAddTeacher() {
+        const name = document.getElementById('qtName').value.trim();
+        const branch = document.getElementById('qtBranch').value.trim() || 'Öğretmen';
+        if (!name) { wizErr('Yeni öğretmen için adı soyadı yazınız.'); return; }
+        const id = Date.now();
+        db.teachers.push({ id, name, branch: /öğretmen/i.test(branch) ? branch : branch + ' Öğretmeni' });
+        saveData();
+        const sel = document.getElementById('incTeacher');
+        if (sel.options.length === 1 && sel.options[0].value === '0') sel.innerHTML = '';
+        sel.insertAdjacentHTML('beforeend', `<option value="${id}">${escapeHtml(name)} (${escapeHtml(branch)})</option>`);
+        sel.value = id;
+        sel.dispatchEvent(new Event('change'));
+        ['qtName', 'qtBranch'].forEach(f => document.getElementById(f).value = '');
+        sel.closest('.wiz-box').querySelectorAll('.quick-add')[1].open = false;
+        wizErr('');
+    }
+
+    /* ---------- Adım adım olay kaydı (sihirbaz) ---------- */
+    let wizStep = 1;
+    const WIZ_LAST = 4;
+
+    function wizTitles() {
+        return ['Öğrenci', 'Olay', db.settings.schoolType === 'lise' ? 'Lise Bilgileri' : 'Sözlü Uyarı', 'Ek Bilgiler'];
+    }
+
+    function wizErr(msg) {
+        const el = document.getElementById('wizError');
+        if (!el) return;
+        el.textContent = msg ? '⚠️ ' + msg : '';
+        el.classList.toggle('show', !!msg);
+    }
+
+    /* upTo adımına kadar (dahil) eksik bilgi varsa {step, msg} döndürür */
+    function wizValidate(upTo) {
+        if (upTo >= 1 && !document.getElementById('incStudent').value)
+            return { step: 1, msg: 'Lütfen listeden bir öğrenci seçin (adının üzerine tıklayın).' };
+        if (upTo >= 2) {
+            if (!document.getElementById('incBehavior').value)
+                return { step: 2, msg: 'Lütfen listeden öğrencinin yaptığı davranışı seçin (üzerine tıklayın).' };
+            if (!document.getElementById('incDate').value)
+                return { step: 2, msg: 'Lütfen olayın tarihini girin.' };
+            if (!document.getElementById('incSummary').value.trim())
+                return { step: 2, msg: 'Lütfen olayı bir-iki cümleyle kısaca anlatın.' };
+        }
+        return null;
+    }
+
+    function wizGo(step) {
+        wizStep = Math.max(1, Math.min(WIZ_LAST, step));
+        const school = db.settings.schoolType === 'lise' ? 'lise' : 'ortaokul';
+        document.querySelectorAll('#incidentForm .wiz-box').forEach(box => {
+            const show = Number(box.dataset.step) === wizStep && (!box.dataset.school || box.dataset.school === school);
+            box.style.display = show ? 'block' : 'none';
+        });
+        document.getElementById('wizProgress').innerHTML = wizTitles().map((t, i) => {
+            const n = i + 1;
+            const cls = n === wizStep ? 'current' : (n < wizStep ? 'done' : '');
+            return `<button type="button" class="wiz-dot ${cls}" onclick="wizJump(${n})"><b>${n < wizStep ? '✓' : n}</b>${t}</button>`;
+        }).join('');
+        document.getElementById('wizBack').style.visibility = wizStep > 1 ? 'visible' : 'hidden';
+        document.getElementById('wizNextBtn').style.display = wizStep < WIZ_LAST ? '' : 'none';
+        document.getElementById('wizSave').style.display = wizStep >= 3 ? '' : 'none';
+        wizErr('');
+        const boxEl = document.querySelector('#incidentModal .modal-box');
+        if (boxEl) boxEl.scrollTop = 0;
+        if (wizStep === 1 && !document.getElementById('incStudent').value) {
+            setTimeout(() => document.getElementById('stuSearch').focus(), 50);
+        }
+    }
+
+    function wizNext() {
+        const invalid = wizValidate(wizStep);
+        if (invalid) { wizGo(invalid.step); wizErr(invalid.msg); return; }
+        wizGo(wizStep + 1);
+    }
+
+    function wizPrev() { wizGo(wizStep - 1); }
+
+    function wizJump(n) {
+        if (n > wizStep) {
+            const invalid = wizValidate(n - 1);
+            if (invalid) { wizGo(invalid.step); wizErr(invalid.msg); return; }
+        }
+        wizGo(n);
+    }
+
+    function wizReset(isNew) {
+        document.getElementById('incidentForm').style.display = '';
+        document.getElementById('wizDone').style.display = 'none';
+        document.getElementById('stuSearch').value = '';
+        document.getElementById('behSearch').value = '';
+        document.querySelectorAll('#incidentForm .quick-add').forEach(d => d.open = false);
+        document.querySelectorAll('#incidentForm .fold').forEach(d => d.classList.remove('open'));
+        if (isNew) {
+            document.getElementById('incStudent').value = '';
+            document.getElementById('incBehavior').value = '';
+        }
+        renderStudentPicker();
+        renderBehaviorPicker();
+        wizGo(1);
+    }
+
+    function wizShowDone(id) {
+        const inc = db.incidents.find(i => i.id === id);
+        if (!inc) { closeIncidentModal(); return; }
+        selectedIncidentForPrint = inc;
+        const isLise = db.settings.schoolType === 'lise';
+        document.getElementById('incidentForm').style.display = 'none';
+        const done = document.getElementById('wizDone');
+        done.innerHTML = `
+            <div class="wiz-done-icon">✅</div>
+            <div class="wiz-done-title">Kaydedildi!</div>
+            <div class="wiz-done-text"><b>${escapeHtml(inc.studentName)}</b> için olay kaydı tamamlandı.<br>Şimdi ne yapmak istersiniz?</div>
+            <div class="wiz-done-actions">
+                ${isLise ? '' : `<button class="print-btn print-btn-featured" onclick="printFromDone('SOZLU_UYARI')">⚠️ <b>Sözlü Uyarı Tutanağını Yazdır</b><span>Öğrenci ve öğretmen imzalar</span></button>`}
+                <button class="print-btn print-btn-all" onclick="printFromDone('ALL')">🗂️ <b>Tüm Disiplin Dosyasını Yazdır</b><span>Bütün evraklar sırayla yazdırılır</span></button>
+                <button class="print-btn" onclick="closeIncidentModal(); openPrintModal(${inc.id});">📑 <b>Başka Bir Evrak Seç</b><span>Evrak listesini açar</span></button>
+                <button class="btn-big btn-ghost" onclick="closeIncidentModal(); goTab('tab-olaylar');">🏠 Ana Sayfaya Dön</button>
+            </div>`;
+        done.style.display = 'block';
+        const boxEl = document.querySelector('#incidentModal .modal-box');
+        if (boxEl) boxEl.scrollTop = 0;
+    }
+
+    function printFromDone(type) {
+        const inc = selectedIncidentForPrint;
+        if (!inc) return;
+        generateDoc(type);
+    }
+
+    /* Enter tuşu formu yanlışlıkla göndermesin; hızlı ekleme kutularında ekleme yapsın */
+    function setupWizardKeys() {
+        const form = document.getElementById('incidentForm');
+        form.addEventListener('keydown', e => {
+            if (e.key !== 'Enter' || e.target.tagName === 'TEXTAREA') return;
+            e.preventDefault();
+            const quick = e.target.dataset && e.target.dataset.quick;
+            if (quick === 'student') quickAddStudent();
+            else if (quick === 'teacher') quickAddTeacher();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { closeHelp(); }
+        });
+    }
+
     window.onload = function () {
         loadData();
         setupAutoSaveListeners();
+        setupWizardKeys();
     };
 </script>
 
