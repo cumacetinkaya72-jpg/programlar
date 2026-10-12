@@ -76,7 +76,8 @@
         .datesel { display: grid; grid-template-columns: 1fr 1.6fr 1.2fr; gap: 10px; }
         .datesel label { display: block; font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 5px; }
         .datesel select { width: 100%; padding: 14px 10px; min-height: 60px; border: 2px solid var(--line); border-radius: 12px; font-size: 1.2rem; font-family: inherit; color: var(--ink); background: #fff; cursor: pointer; }
-        .datesel select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(180, 83, 53, 0.15); }
+        .datesel input { width: 100%; padding: 14px 10px; min-height: 60px; border: 2px solid var(--line); border-radius: 12px; font-size: 1.2rem; font-family: inherit; color: var(--ink); background: #fff; text-align: center; letter-spacing: 0.05em; }
+        .datesel select:focus, .datesel input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(180, 83, 53, 0.15); }
         .quick-dates { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
         .quick-label { align-self: center; font-size: 0.88rem; font-weight: 700; color: var(--muted); }
         .quick-dates button { padding: 9px 14px; border-radius: 99px; border: 1px solid var(--soft-line); background: var(--soft); color: var(--brand-ink); font-weight: 700; font-family: inherit; font-size: 0.92rem; cursor: pointer; }
@@ -86,6 +87,15 @@
         .date-confirm.bad { background: var(--errbg); border: 1px solid #fecdd3; color: var(--err); }
         .date-confirm strong { font-size: 1.15rem; }
 
+        .born-panel { margin-bottom: 16px; padding: 18px; border-radius: 16px; background: linear-gradient(125deg, #f5f3ff, #fff 75%); border: 2px solid #c4b5fd; }
+        .born-title { font-size: 1.2rem; font-weight: 800; color: #4c1d95; margin-bottom: 4px; }
+        .born-panel p { color: #5b21b6; font-size: 0.98rem; margin-bottom: 14px; }
+        .born-panel .sub-help { color: var(--muted); font-size: 0.92rem; margin-bottom: 12px; }
+        .btn-born { width: 100%; background: #7c3aed; color: #fff; }
+        .btn-born:hover { background: #6d28d9; }
+        .born-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .born-actions .btn { flex: 1 1 200px; min-height: 52px; font-size: 1rem; }
+        .btn-light { background: #fff; color: #4c1d95; border: 2px solid #c4b5fd; }
         .sub-box { margin-top: 16px; padding: 16px; border-radius: 14px; background: #f8fafc; border: 1px solid var(--line); display: none; }
         .sub-box.show { display: block; animation: appear 0.3s ease; }
         .sub-box .sub-title { font-weight: 800; font-size: 1.1rem; color: var(--brand-ink); margin-bottom: 4px; }
@@ -207,7 +217,7 @@
             .big-choice .ico { font-size: 1.9rem; width: 42px; }
             .big-choice b { font-size: 1.08rem; }
             .datesel { grid-template-columns: 1fr 1.5fr 1.2fr; gap: 6px; }
-            .datesel select { font-size: 1.05rem; padding: 12px 6px; }
+            .datesel select, .datesel input { font-size: 1.05rem; padding: 12px 6px; }
             .welcome-steps { grid-template-columns: 1fr; }
             .big-date strong { font-size: 1.4rem; }
             .share { grid-template-columns: 1fr 1fr; }
@@ -248,7 +258,7 @@
     <section class="screen welcome active" data-step="welcome">
         <div class="q-emoji">👋</div>
         <h2 class="q-title">Doğum iznini birlikte hesaplayalım</h2>
-        <p class="q-help">Sadece <strong>5 kolay soru</strong> soracağım. Cevaplara dokunmanız yeterli; hesabı ben yapacağım.</p>
+        <p class="q-help">Sadece <strong>4 kolay soru</strong> soracağım. Cevaplara dokunmanız yeterli; hesabı ben yapacağım.</p>
         <div class="welcome-steps">
             <div><b>👆</b>Cevaba dokunun</div>
             <div><b>⏱️</b>1 dakika sürer</div>
@@ -276,7 +286,7 @@
     <section class="screen" data-step="expected">
         <div class="q-emoji">🗓️</div>
         <h2 class="q-title">Bebeğin doğması beklenen tarih nedir?</h2>
-        <p class="q-help">Doktor raporunda <strong>"beklenen"</strong> veya <strong>"muhtemel doğum tarihi"</strong> olarak yazar. Gün, ay ve yılı seçin.</p>
+        <p class="q-help">Doktor raporunda <strong>"beklenen"</strong> veya <strong>"muhtemel doğum tarihi"</strong> olarak yazar. Günü ve ayı seçin, yılı yazın (bu yıl hazır yazılı).</p>
         <div class="datesel" id="expectedSel"></div>
         <div class="date-confirm" id="expectedMsg"></div>
         <div class="nav no-print">
@@ -321,37 +331,31 @@
         </div>
     </section>
 
-    <!-- ================= 5. DOĞUM OLDU MU ================= -->
-    <section class="screen" data-step="born">
-        <div class="q-emoji">🍼</div>
-        <h2 class="q-title">Bebek doğdu mu?</h2>
-        <p class="q-help">Doğduysa tarihini seçin. Bebek erken doğduysa, kullanılamayan günler doğumdan sonraki izne eklenir.</p>
-        <div class="big-choices">
-            <button class="big-choice" type="button" data-field="born" data-value="0"><span class="ico">⏳</span><span><b>Henüz doğmadı</b><small>Beklenen tarihe göre hesaplanır</small></span><span class="tick"></span></button>
-            <button class="big-choice" type="button" data-field="born" data-value="1"><span class="ico">🎉</span><span><b>Evet, doğdu</b><small>Doğum tarihini seçeceğim</small></span><span class="tick"></span></button>
-        </div>
-        <div class="sub-box" id="actualBox">
-            <div class="sub-title">Bebek hangi gün doğdu?</div>
-            <div class="sub-help">Gün, ay ve yılı seçin. <strong>Herhangi bir tarih</strong> seçilebilir; kolaylık olsun diye beklenen doğum tarihi yazıldı, farklıysa değiştirin.</div>
-            <div class="datesel" id="actualSel"></div>
-            <div class="quick-dates">
-                <span class="quick-label">Kısayol:</span>
-                <button type="button" data-quick="0">Bugün</button>
-                <button type="button" data-quick="1">Dün</button>
-                <button type="button" data-quick="2">Evvelsi gün</button>
-            </div>
-            <div class="date-confirm" id="actualMsg"></div>
-        </div>
-        <div class="nav no-print">
-            <button class="btn btn-back" type="button" data-back>◀ Geri</button>
-            <button class="btn btn-primary" type="button" data-next id="bornNext" style="display:none" disabled>Sonucu göster ➜</button>
-        </div>
-    </section>
-
     <!-- ================= SONUÇ ================= -->
     <section class="screen" data-step="result">
         <div class="print-only">Doğum İzni Hesap Sonucu</div>
         <div id="result"></div>
+
+        <!-- Bebek doğdu paneli: sonuç ekranına yerleştirilir -->
+        <div class="born-panel no-print" id="bornPanel">
+            <div id="bornClosed"></div>
+            <div id="bornForm" hidden>
+                <div class="born-title">🎉 Bebek hangi gün doğdu?</div>
+                <div class="sub-help">Günü ve ayı seçin, yılı yazın. Kolaylık olsun diye beklenen doğum tarihi yazıldı; farklıysa değiştirin.</div>
+                <div class="datesel" id="actualSel"></div>
+                <div class="quick-dates">
+                    <span class="quick-label">Kısayol:</span>
+                    <button type="button" data-quick="0">Bugün</button>
+                    <button type="button" data-quick="1">Dün</button>
+                    <button type="button" data-quick="2">Evvelsi gün</button>
+                </div>
+                <div class="date-confirm" id="actualMsg"></div>
+                <div class="nav">
+                    <button class="btn btn-back" type="button" id="bornCancel">Vazgeç</button>
+                    <button class="btn btn-primary" type="button" id="bornApply" disabled>Yeniden hesapla ➜</button>
+                </div>
+            </div>
+        </div>
     </section>
 
 </div>
@@ -363,8 +367,8 @@
     const POST_DAYS = 16 * 7;
     const MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
     const WEEKDAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
-    const STEPS = ['welcome', 'status', 'expected', 'multiple', 'startMode', 'born', 'result'];
-    const QUESTION_COUNT = 5;
+    const STEPS = ['welcome', 'status', 'expected', 'multiple', 'startMode', 'result'];
+    const QUESTION_COUNT = 4;
 
     // Statüye göre mevzuat ve doktor raporuyla çalışılabilecek son sınır (doğuma kalan gün)
     const STATUS = {
@@ -399,27 +403,29 @@
     }
     function esc(s) { return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
-    // --- Gün / Ay / Yıl seçici ---
+    // --- Gün / Ay seçici + elle yazılan Yıl ---
     function buildDateSelect(container, onChange) {
         const y0 = today().getFullYear();
         const opt = (v, t) => `<option value="${v}">${t}</option>`;
         container.innerHTML = `
             <div><label>Gün</label><select data-part="d" aria-label="Gün">${opt('', 'Gün')}${Array.from({ length: 31 }, (_, i) => opt(i + 1, i + 1)).join('')}</select></div>
             <div><label>Ay</label><select data-part="m" aria-label="Ay">${opt('', 'Ay')}${MONTHS.map((m, i) => opt(i, m)).join('')}</select></div>
-            <div><label>Yıl</label><select data-part="y" aria-label="Yıl">${opt('', 'Yıl')}${[y0 - 2, y0 - 1, y0, y0 + 1].map(y => opt(y, y)).join('')}</select></div>`;
-        container.querySelectorAll('select').forEach(s => { s.addEventListener('change', onChange); s.addEventListener('input', onChange); });
+            <div><label>Yıl</label><input data-part="y" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="${y0}" value="${y0}" aria-label="Yıl" autocomplete="off"></div>`;
+        container.querySelectorAll('select, input').forEach(s => { s.addEventListener('change', onChange); s.addEventListener('input', onChange); });
+        // Yıl kutusuna sadece rakam yazılabilsin
+        container.querySelector('[data-part="y"]').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); });
     }
     // null: eksik, false: takvimde olmayan gün, Date: geçerli
     function readDateSelect(container) {
         const g = p => container.querySelector(`[data-part="${p}"]`).value;
         const d = g('d'), m = g('m'), y = g('y');
-        if (d === '' || m === '' || y === '') return null;
+        if (d === '' || m === '' || !/^\d{4}$/.test(y)) return null;
         const date = mkDate(+y, +m, +d);
         return date.getMonth() === +m ? date : false;
     }
     function setDateSelect(container, date) {
         const s = (p, v) => { container.querySelector(`[data-part="${p}"]`).value = v; };
-        if (!date) { s('d', ''); s('m', ''); s('y', ''); return; }
+        if (!date) { s('d', ''); s('m', ''); s('y', today().getFullYear()); return; }
         s('d', date.getDate()); s('m', date.getMonth()); s('y', date.getFullYear());
     }
     function showMsg(el, kind, html) {
@@ -442,7 +448,7 @@
         if (d === false) return 'Bu tarih takvimde yok. Lütfen günü kontrol edin.';
         const n = diffDays(d, today());
         if (n > 300) return 'Bu tarih çok ileride. Beklenen doğum tarihi en fazla 10 ay sonra olabilir.';
-        if (n < -400) return 'Bu tarih çok eskide. Lütfen yılı kontrol edin.';
+        if (n < -3650) return 'Bu tarih 10 yıldan daha eskide. Lütfen yılı kontrol edin.';
         return null;
     }
     function checkStart(d) {
@@ -471,7 +477,7 @@
         }
         if (state.born === '1') {
             const e = checkActual(state.actual);
-            if (e !== null) return { error: e || 'Doğum tarihini seçin.', step: 'born' };
+            if (e !== null) return { error: (e || 'Doğum tarihini seçin.') + '<br><small>Beklenen doğum tarihini kontrol edin ya da sonuç ekranından doğum tarihini yeniden girin.</small>', step: 'expected', clearBirth: true };
         }
 
         const actual = state.born === '1' ? state.actual : null;
@@ -527,9 +533,13 @@
         const r = compute();
         if (r.error) {
             lastResult = null;
+            bornPanel.hidden = true;
             $('result').innerHTML = `
                 <div class="err-box"><b>⚠️</b>${r.error}</div>
-                <div class="nav no-print"><button class="btn btn-primary" type="button" onclick="goTo('${r.step}', true)">Düzelt ➜</button></div>`;
+                <div class="nav no-print">
+                    ${r.clearBirth ? '<button class="btn btn-back" type="button" onclick="clearBirth()">Doğum tarihini sil</button>' : ''}
+                    <button class="btn btn-primary" type="button" onclick="goTo('${r.step}', true)">Düzelt ➜</button>
+                </div>`;
             return;
         }
         lastResult = r;
@@ -555,6 +565,8 @@
             </div>
 
             <div class="total-strip">Toplam izin: <b>${r.totalDays} gün</b> <span>(${weeks(r.totalDays)})</span></div>
+
+            <div id="bornSlot"></div>
 
             <div class="sentence" id="sentence">${sentenceHtml(r)}</div>
 
@@ -618,7 +630,7 @@
                         <li><div><span>Beklenen doğum</span><strong>${fmtLong(state.expected)}</strong></div><button type="button" onclick="goTo('expected', true)">Değiştir</button></li>
                         <li><div><span>Bebek sayısı</span><strong>${state.multiple === '1' ? 'İkiz veya daha fazla' : '1 bebek'}</strong></div><button type="button" onclick="goTo('multiple', true)">Değiştir</button></li>
                         <li><div><span>İzne çıkış</span><strong>${startModeText}</strong></div><button type="button" onclick="goTo('startMode', true)">Değiştir</button></li>
-                        <li><div><span>Doğum</span><strong>${r.actual ? fmtLong(r.actual) : 'Henüz doğmadı'}</strong></div><button type="button" onclick="goTo('born', true)">Değiştir</button></li>
+                        <li><div><span>Doğum</span><strong>${r.actual ? fmtLong(r.actual) : 'Henüz doğmadı'}</strong></div><button type="button" onclick="openBornForm()">${r.actual ? 'Değiştir' : 'Doğdu'}</button></li>
                     </ul>
                 </div>
             </details>
@@ -642,6 +654,10 @@
                 <button class="btn btn-ghost" type="button" style="flex:1" onclick="restart()">↺ Yeni hesap yap</button>
             </div>
         `;
+
+        $('bornSlot').appendChild(bornPanel);
+        bornPanel.hidden = false;
+        updateBornPanel(r);
 
         $('person').addEventListener('input', e => {
             state.person = e.target.value;
@@ -740,14 +756,6 @@
             $('startNext').style.display = custom ? '' : 'none';
             if (custom) onStartChange();
         }
-        if (step === 'born') {
-            const yes = state.born === '1';
-            $('actualBox').classList.toggle('show', yes);
-            $('bornNext').style.display = yes ? '' : 'none';
-            // Kolaylık: boşsa beklenen doğum tarihiyle doldur, kullanıcı sadece farkı düzeltsin
-            if (yes && readDateSelect($('actualSel')) === null && state.expected) setDateSelect($('actualSel'), state.expected);
-            if (yes) onActualChange();
-        }
         document.querySelectorAll(`.screen[data-step="${step}"] .big-choice`).forEach(b => {
             const on = state[b.dataset.field] === b.dataset.value;
             b.classList.toggle('selected', on);
@@ -795,12 +803,11 @@
             const field = btn.dataset.field, value = btn.dataset.value;
             state[field] = value;
             if (field === 'startMode' && value !== 'custom') state.start = null;
-            if (field === 'born' && value !== '1') state.actual = null;
             const step = btn.closest('.screen').dataset.step;
             updateStepUI(step);
-            const needsDate = (field === 'startMode' && value === 'custom') || (field === 'born' && value === '1');
+            const needsDate = field === 'startMode' && value === 'custom';
             if (needsDate) {
-                const box = field === 'born' ? $('actualBox') : $('startBox');
+                const box = $('startBox');
                 setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
                 return;
             }
@@ -831,11 +838,52 @@
             showMsg($('startMsg'), 'good', `✅ <strong>${fmtLong(d)}</strong>` + (worked ? `<br>Raporla çalışılan ${worked} gün doğumdan sonraya eklenecek.` : ''));
         } else showMsg($('startMsg'), err ? 'bad' : '', err ? `⚠️ ${err}` : '');
     }
+    // --- Sonuç ekranındaki "Bebek doğdu" paneli ---
+    const bornPanel = $('bornPanel');
+    let pendingActual = null;
+
+    function updateBornPanel(r) {
+        $('bornForm').hidden = true;
+        $('bornClosed').hidden = false;
+        $('bornClosed').innerHTML = r.actual
+            ? `<div class="born-title">🍼 Doğum tarihi: ${fmtLong(r.actual)}</div>
+               <p>Hesap gerçek doğum tarihine göre yapıldı.${r.earlyDays ? ` Kullanılamayan <strong>${r.earlyDays} gün</strong> doğum sonrasına aktarıldı.` : ''}</p>
+               <div class="born-actions">
+                   <button class="btn btn-light" type="button" onclick="openBornForm()">✏️ Doğum tarihini değiştir</button>
+                   <button class="btn btn-light" type="button" onclick="clearBirth()">↩ Doğmadı olarak hesapla</button>
+               </div>`
+            : `<div class="born-title">🍼 Bebek doğdu mu?</div>
+               <p>Doğum olunca gerçek doğum tarihini girin. Bebek erken doğduysa, doğumdan önce kullanılamayan izin günleri <strong>doğum sonrasına aktarılır</strong> ve tarihler yeniden hesaplanır.</p>
+               <button class="btn btn-born" type="button" onclick="openBornForm()">🎉 Bebek doğdu — doğum tarihini gir</button>`;
+    }
+    function openBornForm() {
+        if (STEPS[current] !== 'result') show(STEPS.length - 1);
+        document.querySelectorAll('details.fold[open]').forEach(d => { d.open = false; });
+        setDateSelect($('actualSel'), state.actual || state.expected);
+        onActualChange();
+        $('bornClosed').hidden = true;
+        $('bornForm').hidden = false;
+        setTimeout(() => bornPanel.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+    }
+    function applyBirth() {
+        if (!pendingActual) return;
+        state.born = '1';
+        state.actual = pendingActual;
+        show(STEPS.length - 1);
+        toast('✅ Gerçek doğum tarihine göre yeniden hesaplandı.');
+    }
+    function clearBirth() {
+        state.born = '0';
+        state.actual = null;
+        show(STEPS.length - 1);
+        toast('Beklenen doğum tarihine göre hesaplandı.');
+    }
+
     function onActualChange() {
         const d = readDateSelect($('actualSel'));
         const err = checkActual(d);
-        state.actual = err === null ? d : null;
-        $('bornNext').disabled = err !== null;
+        pendingActual = err === null ? d : null;
+        $('bornApply').disabled = err !== null;
         if (err === null) {
             const diff = diffDays(state.expected, d);
             const future = d > today() ? '<br>ℹ️ Bu tarih henüz gelmedi; hesap bu tarihte doğum olacakmış gibi yapılır.' : '';
@@ -846,6 +894,8 @@
     buildDateSelect($('expectedSel'), onExpectedChange);
     buildDateSelect($('startSel'), onStartChange);
     buildDateSelect($('actualSel'), onActualChange);
+    $('bornApply').addEventListener('click', applyBirth);
+    $('bornCancel').addEventListener('click', () => updateBornPanel(lastResult));
     document.querySelectorAll('[data-quick]').forEach(b => b.addEventListener('click', () => {
         setDateSelect($('actualSel'), addDays(today(), -Number(b.dataset.quick)));
         onActualChange();
