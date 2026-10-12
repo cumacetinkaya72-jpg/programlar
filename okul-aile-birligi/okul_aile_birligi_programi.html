@@ -576,6 +576,84 @@
             #tab-genel-kurul .gk-afis-img { width: 100% !important; max-height: 19.5cm; object-fit: contain; background: none; }
         }
         .gk-btn.hidden { display: none; }
+
+        /* ===== Kolay kullanım: ekranda daha büyük ve okunur yazı (baskıyı etkilemez) ===== */
+        @media screen {
+            body { font-size: 15px; }
+            .text-xs { font-size: 13.5px !important; line-height: 1.45 !important; }
+            .text-\[11px\] { font-size: 12.5px !important; }
+            .text-\[10px\] { font-size: 12px !important; }
+            #sidebar-nav .nav-btn { font-size: 14px !important; }
+            input, select, textarea { font-size: 14px !important; }
+        }
+        .nav-ipucu { display: block; font-size: 11.5px; font-weight: 500; opacity: .75; margin-top: 1px; line-height: 1.25; }
+        .sayfa-rehber { background: #ecfdf5; border: 2px solid #6ee7b7; border-radius: 18px; padding: 16px 18px; color: #064e3b; }
+        .sayfa-rehber h3 { font-size: 17px; font-weight: 800; }
+        .sayfa-rehber h3 i { color: #059669; margin-right: 4px; }
+        .sayfa-rehber ol { margin-top: 8px; display: grid; gap: 6px; }
+        .sayfa-rehber li { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; line-height: 1.45; }
+        .sayfa-rehber li b.no { flex-shrink: 0; width: 24px; height: 24px; border-radius: 999px; background: #059669; color: #fff; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+        .sayfa-rehber .rehber-alt { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+        .sayfa-rehber button { font-weight: 700; border-radius: 12px; padding: 8px 14px; font-size: 14px; }
+        .sayfa-rehber.kapali ol, .sayfa-rehber.kapali .rehber-not { display: none; }
+        .sonraki-adim { display: flex; justify-content: flex-end; margin-top: 18px; }
+        .sonraki-adim button { background: #059669; color: #fff; font-weight: 800; font-size: 15px; border-radius: 14px; padding: 12px 20px; box-shadow: 0 4px 12px rgba(5,150,105,.25); }
+        .sonraki-adim button:hover { background: #047857; }
+        #kayit-bildirim { position: fixed; bottom: 18px; right: 18px; z-index: 60; background: #065f46; color: #fff; font-weight: 700; font-size: 14px; padding: 10px 16px; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.2); opacity: 0; transform: translateY(10px); transition: all .25s; pointer-events: none; }
+        #kayit-bildirim.goster { opacity: 1; transform: none; }
+        .yardim-btn { background: #fbbf24; color: #0f172a; }
+        .yardim-btn:hover { background: #f59e0b; }
+        .rehber-menu-btn { background: #047857; }
+        .rehber-menu-btn:hover { background: #059669; }
+        .sifirla-link { text-decoration: underline; }
+        .sifirla-link:hover { color: #fda4af; }
+        .rehber-alt-baslik { display: block; font-weight: 600; color: #065f46; font-size: 15px; margin-top: 2px; }
+        .rehber-not { font-size: 14px; margin-top: 8px; color: #065f46; }
+        .rehber-gizle { background: #fff; border: 1px solid #6ee7b7; color: #065f46; }
+        .rehber-gizle:hover { background: #d1fae5; }
+        #pano-siradaki { border-radius: 18px; padding: 22px 24px; background: linear-gradient(90deg, #059669, #0d9488); color: #fff; box-shadow: 0 10px 24px rgba(5,150,105,.25); display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+        #pano-siradaki .ps-metin { min-width: 0; }
+        #pano-siradaki .ps-ust { font-size: 14px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #d1fae5; }
+        #pano-siradaki h2 { font-size: 24px; font-weight: 800; margin-top: 4px; line-height: 1.25; }
+        #pano-siradaki p#pano-siradaki-aciklama { font-size: 15.5px; color: #ecfdf5; margin-top: 4px; line-height: 1.5; }
+        #pano-siradaki-btn { flex-shrink: 0; background: #fff; color: #047857; font-weight: 800; font-size: 18px; padding: 12px 26px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,.12); }
+        #pano-siradaki-btn:hover { background: #ecfdf5; }
+        @media (max-width: 767px) { #pano-siradaki { flex-direction: column; align-items: stretch; padding: 18px; } #pano-siradaki h2 { font-size: 20px; } }
+        #rehber-modal { position: fixed; inset: 0; z-index: 70; background: rgba(15,23,42,.6); display: flex; align-items: center; justify-content: center; padding: 12px; }
+        #rehber-modal.hidden { display: none; }
+        #rehber-modal .rh-kutu { background: #fff; border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,.3); width: 100%; max-width: 580px; max-height: 95vh; overflow-y: auto; padding: 26px 28px; color: #334155; }
+        #rehber-modal .rh-ust, #rehber-modal .rh-alt { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        #rehber-modal .rh-ust { margin-bottom: 16px; }
+        #rehber-modal .rh-alt { margin-top: 24px; }
+        #rehber-noktalar { display: flex; align-items: center; gap: 6px; }
+        #rehber-modal .rh-adim { font-size: 14px; color: #64748b; font-weight: 700; margin-left: 6px; }
+        #rehber-modal .rh-kapat { color: #64748b; font-weight: 700; font-size: 14px; }
+        #rehber-modal .rh-kapat:hover { color: #0f172a; }
+        #rehber-modal .rh-geri, #rehber-modal .rh-ileri { padding: 12px 22px; border-radius: 16px; font-size: 16px; font-weight: 800; }
+        #rehber-modal .rh-geri { background: #f1f5f9; color: #334155; }
+        #rehber-modal .rh-geri:hover { background: #e2e8f0; }
+        #rehber-modal .rh-ileri { background: #059669; color: #fff; box-shadow: 0 4px 12px rgba(5,150,105,.3); }
+        #rehber-modal .rh-ileri:hover { background: #047857; }
+        #rehber-icerik h2 { font-size: 22px; font-weight: 800; color: #1e293b; margin-bottom: 6px; }
+        #rehber-icerik h2 i { color: #059669; }
+        #rehber-icerik p { font-size: 15.5px; line-height: 1.55; margin-top: 6px; }
+        #rehber-icerik .rh-orta { text-align: center; }
+        #rehber-icerik .rh-ikon { width: 64px; height: 64px; margin: 0 auto 10px; border-radius: 18px; background: #d1fae5; color: #047857; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        #rehber-icerik .rh-liste { margin-top: 16px; background: #f8fafc; border-radius: 16px; padding: 14px 16px; }
+        #rehber-icerik .rh-liste i { color: #059669; width: 24px; }
+        #rehber-icerik .rh-form { display: grid; gap: 12px; margin-top: 14px; }
+        #rehber-icerik .rh-temizle { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 12px; border-radius: 12px; background: #fffbeb; border: 1px solid #fcd34d; color: #78350f; font-weight: 600; font-size: 14px; cursor: pointer; }
+        #rehber-icerik .rh-temizle input { width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; }
+        #rehber-icerik .rh-sira { display: grid; gap: 10px; margin-top: 10px; font-size: 15.5px; }
+        #rehber-icerik .rh-sira li { display: flex; gap: 12px; align-items: flex-start; }
+        #rehber-icerik .rh-sira li > b { flex-shrink: 0; width: 28px; height: 28px; border-radius: 999px; background: #059669; color: #fff; display: flex; align-items: center; justify-content: center; }
+        #rehber-icerik .rh-son { font-size: 19px !important; font-weight: 800; color: #047857; margin-top: 14px !important; }
+        #rehber-modal .adim-nokta { width: 10px; height: 10px; border-radius: 999px; background: #cbd5e1; }
+        #rehber-modal .adim-nokta.aktif { background: #059669; width: 26px; }
+        #rehber-modal label { display: block; font-weight: 700; font-size: 14px; color: #334155; margin-bottom: 4px; }
+        #rehber-modal input { width: 100%; padding: 10px 12px; border: 2px solid #cbd5e1; border-radius: 12px; font-size: 15px !important; }
+        #rehber-modal input:focus { outline: none; border-color: #10b981; }
+        #rehber-modal .ipucu { font-size: 12.5px; color: #64748b; margin-top: 3px; }
     </style>
 </head>
 <body class="bg-slate-50 h-screen flex overflow-hidden text-slate-800">
@@ -669,13 +747,16 @@
                 <i class="fa-solid fa-upload text-indigo-400"></i> Yedekten Geri Yükle
             </button>
             <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="importJSON(event)">
-            <button type="button" onclick="resetDefaultData()" class="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 text-[11px] font-semibold transition border border-rose-900/50">
-                <i class="fa-solid fa-rotate-left"></i> Örnek Verileri Yükle
+            <button type="button" onclick="rehberAc()" class="rehber-menu-btn w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-white text-xs font-bold transition">
+                <i class="fa-solid fa-circle-info"></i> Nasıl kullanılır? (Rehber)
+            </button>
+            <button type="button" onclick="resetDefaultData()" class="sifirla-link w-full text-center px-3 py-1 text-[11px] text-slate-500 transition">
+                Her şeyi sil, örnek verilerle başla
             </button>
         </div>
 
         <div class="p-2.5 border-t border-slate-800 text-center flex-shrink-0">
-            <p class="text-[10px] text-slate-400">MEB Yönetmeliğine %100 Uyumlu Portal</p>
+            <p class="text-[10px] text-slate-400">Okul-Aile Birliği Yönetmeliğine göre hazırlanmıştır</p>
         </div>
     </aside>
 
@@ -687,7 +768,7 @@
                         <i class="fa-solid fa-bars text-sm"></i>
                     </button>
 
-                    <button type="button" onclick="toggleKurumPanel()" title="Kurum Bilgilerini Düzenlemek İçin Tıklayın" class="flex items-center gap-2 bg-slate-50 border border-slate-300 rounded-xl px-2.5 md:px-3 py-1.5 hover:bg-slate-100 transition shadow-sm min-w-0">
+                    <button type="button" onclick="toggleKurumPanel()" title="Okul adı, ilçe ve müdür bilgilerini değiştirmek için tıklayın" class="flex items-center gap-2 bg-slate-50 border border-slate-300 rounded-xl px-2.5 md:px-3 py-1.5 hover:bg-slate-100 transition shadow-sm min-w-0">
                         <i class="fa-solid fa-school text-emerald-600 text-sm flex-shrink-0"></i>
                         <span id="kurum-header-summary" class="font-bold text-xs sm:text-sm text-slate-800 truncate">SARIÇAM KOZANOĞLU LİONS ANAOKULU</span>
                         <i id="kurum-caret-icon" class="fa-solid fa-chevron-down text-slate-400 text-xs flex-shrink-0 transition-transform"></i>
@@ -705,9 +786,14 @@
                         <span class="hidden sm:inline">Yazdır / PDF</span>
                     </button>
 
-                    <button type="button" onclick="exportExcelReport()" title="Resmî Excel Formatında İndir" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 md:px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-md shadow-indigo-600/20 transition flex items-center gap-1.5">
+                    <button type="button" onclick="exportExcelReport()" title="Bütün listeleri tek Excel dosyası olarak bilgisayarınıza indirir" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 md:px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-md shadow-indigo-600/20 transition flex items-center gap-1.5">
                         <i class="fa-solid fa-file-excel"></i>
-                        <span class="hidden sm:inline">Excel</span>
+                        <span class="hidden sm:inline">Excel'e İndir</span>
+                    </button>
+
+                    <button type="button" onclick="rehberAc()" title="Programın nasıl kullanılacağını adım adım anlatır" class="yardim-btn px-2.5 md:px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-md transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span class="hidden sm:inline">Yardım</span>
                     </button>
                 </div>
             </div>
@@ -723,11 +809,11 @@
                     <input type="text" id="k-school-name" oninput="updateKurumData()" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg font-semibold text-slate-800 focus:bg-white focus:outline-none" value="Kozanoğlu Lions Anaokulu Müdürlüğü">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-500 uppercase text-[10px] mb-1">Birlik Başkanı</label>
+                    <label class="block font-bold text-slate-500 uppercase text-[10px] mb-1" title="Yönetim Kurulu listesinde Başkan seçilince kendiliğinden dolar">Birlik Başkanı <span style="text-transform:none;color:#059669">(otomatik)</span></label>
                     <input type="text" id="k-oab-president" oninput="updateKurumData()" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg font-semibold text-slate-800 focus:bg-white focus:outline-none" value="Keziban AKKAYA">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-500 uppercase text-[10px] mb-1">Muhasip Üye</label>
+                    <label class="block font-bold text-slate-500 uppercase text-[10px] mb-1" title="Yönetim Kurulu listesinde Muhasip Üye seçilince kendiliğinden dolar">Muhasip Üye <span style="text-transform:none;color:#059669">(otomatik)</span></label>
                     <input type="text" id="k-oab-treasurer" oninput="updateKurumData()" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg font-semibold text-slate-800 focus:bg-white focus:outline-none" value="Fatma KAYA">
                 </div>
                 <div>
@@ -741,6 +827,14 @@
 
             <!-- 1. BÖLÜM: ANA SAYFA -->
             <div id="tab-ozet" class="tab-pane max-w-7xl mx-auto space-y-4 md:space-y-6">
+                <div id="pano-siradaki" class="no-print">
+                    <div class="ps-metin">
+                        <p class="ps-ust">👉 Sıradaki işiniz</p>
+                        <h2 id="pano-siradaki-baslik">—</h2>
+                        <p id="pano-siradaki-aciklama"></p>
+                    </div>
+                    <button type="button" id="pano-siradaki-btn">Başla →</button>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 no-print">
                     <button type="button" onclick="switchTab('genel-kurul')" class="text-left bg-white rounded-2xl p-4 md:p-5 border border-emerald-100 shadow-sm hover:shadow-md transition bg-gradient-to-br from-white to-emerald-50/40">
                         <p class="text-xs font-bold uppercase text-emerald-600 flex items-center gap-1.5"><i class="fa-solid fa-book-bookmark"></i> Olağan Genel Kurul</p>
@@ -769,7 +863,7 @@
                         <h3 class="font-display font-extrabold text-base text-slate-800 mb-1 flex items-center gap-2">
                             <i class="fa-solid fa-calendar-check text-emerald-600"></i> Yıl içinde yapılacak işler
                         </h3>
-                        <p class="text-xs text-slate-500 mb-3">Sıradaki işin karşısındaki düğme sizi ilgili bölüme götürür. Tamamladıklarınızı işaretleyebilirsiniz; işaretler bu eğitim yılı için saklanır.</p>
+                        <p class="text-xs text-slate-500 mb-3"><b>Aç ›</b> düğmesi sizi o işin sayfasına götürür. Bitirdiğiniz işin yanındaki kutuya tıklayın; sıradaki iş en üstteki yeşil kartta görünür.</p>
                         <ol id="pano-is-listesi" class="space-y-2"></ol>
                     </div>
 
@@ -2085,6 +2179,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function saveData() {
             localStorage.setItem('meb_oab_tam_portal_data', JSON.stringify(appData));
             renderAll();
+            if (typeof kayitBildir === 'function') kayitBildir();
         }
 
         // Sadece localStorage'a kaydeder, arayüzü yeniden çizmez. Kullanıcı bir
@@ -2600,6 +2695,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (!liste) return;
             const isaret = (appData.isTakvimi || {})[appData.academicYear || '-'] || {};
             const siradaki = PANO_ISLER.find(x => !isaret[x.id]);
+            const sKart = document.getElementById('pano-siradaki');
+            if (sKart) {
+                const sb = document.getElementById('pano-siradaki-baslik'), sa = document.getElementById('pano-siradaki-aciklama'), sbtn = document.getElementById('pano-siradaki-btn');
+                if (siradaki) {
+                    sb.textContent = siradaki.baslik;
+                    sa.textContent = `${siradaki.aciklama} (Ne zaman: ${siradaki.zaman})`;
+                    sbtn.innerHTML = 'Başla →';
+                    sbtn.onclick = () => switchTab(siradaki.tab);
+                } else {
+                    sb.textContent = 'Bu yılın bütün işleri tamamlandı 🎉';
+                    sa.textContent = 'Aşağıdaki listeden istediğiniz işi yeniden açabilirsiniz.';
+                    sbtn.innerHTML = 'Rehberi aç ';
+                    sbtn.onclick = () => rehberAc();
+                }
+            }
             liste.innerHTML = PANO_ISLER.map((x, i) => {
                 const bitti = !!isaret[x.id];
                 const sirada = siradaki && siradaki.id === x.id;
@@ -2797,6 +2907,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function handlePrint() {
+            const ozetTab = document.getElementById('tab-ozet');
+            if (ozetTab && !ozetTab.classList.contains('hidden')) {
+                alert('Ana Sayfada yazdırılacak bir belge yok.\n\nYazdırmak istediğiniz belgenin sayfasını soldaki menüden açın (örneğin "Genel Kurul Evrak Seti" veya "Yönetim Kurulu Üyeleri"), sonra Yazdır / PDF düğmesine basın.');
+                return;
+            }
             const gundemTab = document.getElementById('tab-toplanti-gundem');
             if (gundemTab && !gundemTab.classList.contains('hidden') && appData.meetingView === 'kartlar') {
                 setMeetingView('ozet');
@@ -3344,7 +3459,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
 
         function resetDefaultData() {
-            if (confirm("Örnek MEB Okul Aile Birliği verileri yüklensin mi?")) {
+            if (!confirm("DİKKAT: Girdiğiniz BÜTÜN bilgiler silinecek ve yerine örnek bir okulun bilgileri yüklenecek.\n\nEmin misiniz?")) return;
+            if (confirm("Silmeden önce mevcut bilgilerinizin yedeğini bilgisayarınıza indirelim mi? (Önerilir)")) exportJSON();
+            {
                 appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
                 populateKurumInputs();
                 saveData();
@@ -4961,5 +5078,237 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
     </script>
 
+    <div id="kayit-bildirim" class="no-print" role="status" aria-live="polite">✓ Kaydedildi</div>
+
+    <div id="rehber-modal" class="no-print hidden">
+        <div class="rh-kutu" role="dialog" aria-modal="true" aria-label="Kullanım rehberi">
+            <div class="rh-ust">
+                <div id="rehber-noktalar"></div>
+                <button type="button" onclick="rehberKapat()" class="rh-kapat">Kapat <i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="rehber-icerik"></div>
+            <div class="rh-alt">
+                <button type="button" id="rehber-geri" onclick="rehberAdim(-1)" class="rh-geri">← Geri</button>
+                <button type="button" id="rehber-ileri" onclick="rehberAdim(1)" class="rh-ileri">İleri →</button>
+            </div>
+        </div>
+    </div>
+
+    <script id="kolay-kullanim">
+        /* =====================================================================
+           KOLAY KULLANIM: ilk açılış rehberi, sayfa yardım kutuları,
+           menü ipuçları, "Kaydedildi" bildirimi
+           ===================================================================== */
+        const NAV_IPUCU = {
+            'ozet': 'Ne yapmanız gerektiğini gösterir',
+            'genel-kurul': 'Genel kurul belgelerini hazırlayın',
+            'tahmini-butce': 'Yıllık gelir-gider tahmini',
+            'yonetim': '5 asil + 5 yedek üyeyi yazın',
+            'denetleme': '3 asil + 3 yedek üyeyi yazın',
+            'toplanti-gundem': 'Yıl içi toplantı kararları',
+            'bilanco': 'Her 3 ayda bir hesap özeti',
+            'banka-yetki': 'Bankaya imza yetki yazısı',
+            'personel-sozlesme': 'Çalışan yoksa atlayın',
+            'defter-mevzuat': 'Okumanız yeterli',
+            'denetim-formu': 'Dönem sonu kontrol formu'
+        };
+        const SAYFA_REHBER = {
+            'genel-kurul': { baslik: 'Genel kurul toplantısının bütün belgeleri burada hazırlanır', adimlar: [
+                '“Toplantı bilgileri” kutularına toplantı tarihini, saatini, yerini ve divan heyetini yazın.',
+                'Üstteki düğmelerden bir belge seçin (örneğin "YK Kararı"). Belgenin hazır hâli hemen yanında (telefonda altında) görünür.',
+                'Belgeyi kâğıda basmak için <b>Yazdır / PDF</b>, düzenlemek için <b>Word\'e aktar</b> düğmesine basın.',
+                'Toplantıdan sonra seçilen üyeleri "Seçim" kutusuna yazın ve <b>Seçilenleri kurul üye listelerine aktar</b> düğmesine basın.'],
+                not: 'Bir kutuyu boş bırakırsanız belgede o yer noktalı (……) çıkar; elle doldurabilirsiniz.', sonraki: 'tahmini-butce' },
+            'tahmini-butce': { baslik: 'Genel kurulda okunacak tahmini bütçe hazırlanır', adimlar: [
+                'Bu yıl beklediğiniz gelirleri ve yapmayı düşündüğünüz harcamaları kutulara yazın.',
+                'Bilmediğiniz kalemleri boş bırakın; toplamlar kendiliğinden hesaplanır.',
+                '<b>İlanı Yazdır</b> ile çıktı alıp okul ilan panosuna asın.'], sonraki: 'yonetim' },
+            'yonetim': { baslik: 'Genel kurulda seçilen Yönetim Kurulu üyelerini buraya yazın', adimlar: [
+                '“Yönetim Kurulu Üyesi Ekle” kutusuna üyenin adını yazın, görevini seçin ve <b>Yönetim Kuruluna Ekle</b> düğmesine basın.',
+                '5 asil ve 5 yedek üye girin. Yedek üyeler için görev olarak <b>Yedek Üye</b> seçin.',
+                'Bir üyenin görevini sonradan değiştirmek için listedeki görev kutusuna tıklayın. Başkan ve Muhasip adı bütün belgelere kendiliğinden yazılır.',
+                'Listeyi kâğıda basmak için üstteki <b>Yazdır / PDF</b> düğmesine basın.'], sonraki: 'denetleme' },
+            'denetleme': { baslik: 'Denetim Kurulu üyelerini buraya yazın', adimlar: [
+                '“Denetleme Kurulu Üyesi Ekle” kutusuna üyenin adını yazın, görevini seçin ve <b>Denetleme Kuruluna Ekle</b> düğmesine basın.',
+                '3 asil üye (2 öğretmen + 1 veli) ve 3 yedek üye girin. Yedekler için <b>Yedek Üye</b> görevini seçin.',
+                'Listeyi kâğıda basmak için üstteki <b>Yazdır / PDF</b> düğmesine basın.'], sonraki: 'toplanti-gundem' },
+            'toplanti-gundem': { baslik: 'Yönetim Kurulunun yıl içindeki toplantıları için belgeler hazırlanır', adimlar: [
+                'Toplantının tarihini, saatini ve yerini yazın.',
+                'Hazır gündem maddelerini kullanın ya da <b>Yeni Madde</b> ile kendi maddenizi ekleyin.',
+                'Çağrı yazısı, karar tutanağı veya imza listesinden birini seçip <b>Yazdır / PDF</b> düğmesine basın.'],
+                not: 'Genel kurul belgeleri bu sayfada değil, "Genel Kurul Evrak Seti" sayfasındadır.', sonraki: 'bilanco' },
+            'bilanco': { baslik: 'Her 3 ayda bir hazırlanan gelir-gider özeti', adimlar: [
+                'Yılı ve dönemi (Ocak-Mart, Nisan-Haziran …) seçin.',
+                'TEFBİS\'teki dönem toplamlarını ilgili kutulara yazın. Toplam ve bankada kalan para kendiliğinden hesaplanır.',
+                '<b>Yazdır / PDF</b> ile çıktı alın, imzalatıp ilan edin.'], sonraki: 'banka-yetki' },
+            'banka-yetki': { baslik: 'Bankaya verilecek imza yetkisi yazısı hazırlanır', adimlar: [
+                'Banka adını ve hesap numarasını kontrol edin.',
+                'Başkan ve Muhasip Üye adları Yönetim Kurulu listesinden kendiliğinden gelir.',
+                'Yazıyı yazdırıp imzalatın ve bankaya teslim edin.'], sonraki: 'personel-sozlesme' },
+            'personel-sozlesme': { baslik: 'Birliğin çalıştırdığı personel (temizlik, güvenlik vb.) takip edilir', adimlar: [
+                'Birlik adına çalışan kimse yoksa bu sayfayı <b>atlayabilirsiniz</b>.',
+                'Çalışan varsa adını, görevini, başlama tarihini ve ücretini girin.',
+                'Kıdem tazminatı karşılığı kendiliğinden hesaplanır; sözleşmeyi yazdırabilirsiniz.'], sonraki: 'defter-mevzuat' },
+            'defter-mevzuat': { baslik: 'Tutulması zorunlu defterler', adimlar: [
+                'Bu sayfada bir şey doldurmanız gerekmez; <b>okumanız yeterlidir</b>.',
+                'Listelenen defterlerin okulunuzda bulunduğunu ve tasdik ettirildiğini kontrol edin.'], sonraki: 'denetim-formu' },
+            'denetim-formu': { baslik: 'Denetim Kurulunun dönem sonunda doldurduğu kontrol formu', adimlar: [
+                'Her maddenin karşısından durumunu seçin (Uygun, Kısmen, Uygun Değil).',
+                'Gerekirse açıklama kutusuna kısa bir not yazın.',
+                '<b>Yazdır / PDF</b> ile çıktı alıp Denetim Kurulu üyelerine imzalatın.'], sonraki: 'ozet' }
+        };
+        const SAYFA_ADI = { 'ozet': 'Ana Sayfa', 'genel-kurul': 'Genel Kurul Evrak Seti', 'tahmini-butce': 'Tahmini Bütçe', 'yonetim': 'Yönetim Kurulu Üyeleri', 'denetleme': 'Denetim Kurulu Üyeleri', 'toplanti-gundem': 'Yönetim Kurulu Toplantıları', 'bilanco': '3 Aylık Bilanço', 'banka-yetki': 'Banka Yetkilendirme', 'personel-sozlesme': 'Personel', 'defter-mevzuat': 'Resmî Defterler', 'denetim-formu': 'Denetim Formu' };
+
+        function rehberKapaliMi(tab) { try { return localStorage.getItem('oab_rehber_kapali_' + tab) === '1'; } catch (e) { return false; } }
+        function sayfaRehberDegistir(tab) {
+            const kutu = document.getElementById('sayfa-rehber-' + tab);
+            if (!kutu) return;
+            const kapali = !kutu.classList.contains('kapali');
+            kutu.classList.toggle('kapali', kapali);
+            try { localStorage.setItem('oab_rehber_kapali_' + tab, kapali ? '1' : '0'); } catch (e) {}
+            const b = kutu.querySelector('.rehber-gizle');
+            if (b) b.innerHTML = kapali ? '<i class="fa-solid fa-chevron-down"></i> Açıklamayı göster' : '<i class="fa-solid fa-chevron-down" style="transform:rotate(180deg)"></i> Açıklamayı gizle';
+        }
+        function sayfaRehberleriKur() {
+            Object.keys(SAYFA_REHBER).forEach(tab => {
+                const pane = document.getElementById('tab-' + tab);
+                if (!pane || document.getElementById('sayfa-rehber-' + tab)) return;
+                const r = SAYFA_REHBER[tab];
+                const kapali = rehberKapaliMi(tab);
+                const kutu = document.createElement('div');
+                kutu.id = 'sayfa-rehber-' + tab;
+                kutu.className = 'sayfa-rehber no-print' + (kapali ? ' kapali' : '');
+                kutu.innerHTML = `<h3><i class="fa-solid fa-circle-info"></i> Bu sayfada ne yapılır? <span class="rehber-alt-baslik">${r.baslik}</span></h3>
+                    <ol>${r.adimlar.map((a, i) => `<li><b class="no">${i + 1}</b><span>${a}</span></li>`).join('')}</ol>
+                    ${r.not ? `<p class="rehber-not">ⓘ ${r.not}</p>` : ''}
+                    <div class="rehber-alt"><span></span><button type="button" class="rehber-gizle" onclick="sayfaRehberDegistir('${tab}')">${kapali ? '<i class="fa-solid fa-chevron-down"></i> Açıklamayı göster' : '<i class="fa-solid fa-chevron-down" style="transform:rotate(180deg)"></i> Açıklamayı gizle'}</button></div>`;
+                pane.insertBefore(kutu, pane.firstChild);
+                if (r.sonraki) {
+                    const alt = document.createElement('div');
+                    alt.className = 'sonraki-adim no-print';
+                    alt.innerHTML = `<button type="button" onclick="switchTab('${r.sonraki}')">${r.sonraki === 'ozet' ? 'Ana Sayfaya dön' : `Sonraki adım: ${SAYFA_ADI[r.sonraki]} →`}</button>`;
+                    pane.appendChild(alt);
+                }
+            });
+        }
+        function menuIpuclariniKur() {
+            Object.keys(NAV_IPUCU).forEach(tab => {
+                const btn = document.getElementById('nav-btn-' + tab);
+                if (!btn || btn.querySelector('.nav-ipucu')) return;
+                const span = btn.querySelector('span:not([id^="badge"])');
+                if (!span) return;
+                const ip = document.createElement('small');
+                ip.className = 'nav-ipucu';
+                ip.textContent = NAV_IPUCU[tab];
+                span.appendChild(ip);
+                span.classList.add('text-left');
+            });
+        }
+
+        /* ---- "Kaydedildi" bildirimi ---- */
+        let kayitBildirimZamani = null;
+        function kayitBildir() {
+            const el = document.getElementById('kayit-bildirim');
+            if (!el) return;
+            el.classList.add('goster');
+            clearTimeout(kayitBildirimZamani);
+            kayitBildirimZamani = setTimeout(() => el.classList.remove('goster'), 1400);
+        }
+
+        /* ---- İlk açılış / yardım rehberi ---- */
+        let rehberSira = 0;
+        const REHBER_ADIMLAR = [
+            () => `<div class="rh-orta">
+                    <div class="rh-ikon"><i class="fa-solid fa-users"></i></div>
+                    <h2>Hoş geldiniz!</h2>
+                    <p>Bu program, Okul Aile Birliğinin bütün yazı ve belgelerini <b>sizin yerinize hazırlar</b>. Siz sadece istenen bilgileri yazarsınız; belgeler kendiliğinden dolar.</p>
+                </div>
+                <div class="rh-liste">
+                    <p><i class="fa-solid fa-floppy-disk"></i> Yazdığınız her şey <b>kendiliğinden kaydedilir</b>. "Kaydet" düğmesi aramanıza gerek yok.</p>
+                    <p><i class="fa-solid fa-print"></i> Her sayfadaki <b>Yazdır / PDF</b> düğmesi o sayfanın belgesini yazdırır.</p>
+                    <p><i class="fa-solid fa-circle-info"></i> Takıldığınızda üstteki sarı <b>Yardım</b> düğmesine basın.</p>
+                </div>`,
+            () => `<h2><i class="fa-solid fa-school"></i> Okulunuzun bilgileri</h2>
+                <p>Bu bilgiler bütün belgelerin başlığına yazılır. Sonradan üstteki okul adına tıklayarak değiştirebilirsiniz.</p>
+                <div class="rh-form">
+                    <div><label for="rh-okul">Okulun adı</label><input id="rh-okul" value="${gkEsc(appData.schoolName || '')}" placeholder="Örn: Atatürk İlkokulu Müdürlüğü"></div>
+                    <div><label for="rh-ilce">İlçe kaymakamlığı</label><input id="rh-ilce" value="${gkEsc(appData.districtName || '')}" placeholder="Örn: KOZLUK KAYMAKAMLIĞI"></div>
+                    <div><label for="rh-mudur">Okul müdürünün adı soyadı</label><input id="rh-mudur" value="${gkEsc(appData.principalName || '')}" placeholder="Örn: Ahmet YILMAZ"></div>
+                    <div><label for="rh-yil">Eğitim öğretim yılı</label><input id="rh-yil" value="${gkEsc(appData.academicYear || '')}" placeholder="Örn: 2026-2027"><p class="ipucu">Yeni eğitim yılı başladığında yalnızca burayı değiştirmeniz yeterli.</p></div>
+                </div>
+                ${ornekVeriMi() ? `<label class="rh-temizle"><input type="checkbox" id="rh-temizle" checked> Programdaki örnek isimleri (örnek okulun kurul üyeleri, personeli) sil; kendi bilgilerimle başlayacağım.</label>` : ''}`,
+            () => `<h2><i class="fa-solid fa-list-ol"></i> Sırayla ne yapacaksınız?</h2>
+                <p>Sol menüdeki sayfalar iş sırasına göre dizilmiştir. Yeni başlıyorsanız şu sırayı izleyin:</p>
+                <ol class="rh-sira">
+                    <li><b>1</b><span><b>Genel Kurul Evrak Seti:</b> Yıl başındaki genel kurul toplantısının bütün belgeleri.</span></li>
+                    <li><b>2</b><span><b>Tahmini Bütçe:</b> Genel kurulda okunacak yıllık bütçe.</span></li>
+                    <li><b>3</b><span><b>Yönetim ve Denetim Kurulu:</b> Seçilen üyeleri yazın, görevlerini seçin.</span></li>
+                    <li><b>4</b><span><b>Yıl boyunca:</b> Toplantı kararları, 3 aylık bilanço, banka yazısı ve denetim formu.</span></li>
+                </ol>
+                <p>Her sayfanın üstünde yeşil bir <b>“Bu sayfada ne yapılır?”</b> kutusu, altında da <b>“Sonraki adım”</b> düğmesi vardır. Ana Sayfadaki yeşil kart da her zaman sıradaki işi gösterir.</p>`,
+            () => `<div class="rh-orta">
+                    <div class="rh-ikon"><i class="fa-solid fa-floppy-disk"></i></div>
+                    <h2>Bilgileriniz kaybolmasın</h2>
+                    <p>Bilgiler bu bilgisayardaki tarayıcıda saklanır. Arada bir sol alttaki <b>Verileri Yedekle</b> düğmesine basarak bir yedek dosyası indirin.</p>
+                    <p>Başka bilgisayara geçtiğinizde programı açıp <b>Yedekten Geri Yükle</b> ile bu dosyayı seçmeniz yeterli.</p>
+                    <p class="rh-son">Hazırsınız! Kolay gelsin.</p>
+                </div>`
+        ];
+        function ornekVeriMi() {
+            return (appData.yonetimMembers || []).some(m => m.name === 'Keziban AKKAYA') || /kozanoğlu lions/i.test(appData.schoolName || '');
+        }
+        function rehberCiz() {
+            document.getElementById('rehber-icerik').innerHTML = REHBER_ADIMLAR[rehberSira]();
+            document.getElementById('rehber-noktalar').innerHTML = REHBER_ADIMLAR.map((_, i) => `<span class="adim-nokta ${i === rehberSira ? 'aktif' : ''}"></span>`).join('') + `<span class="rh-adim">Adım ${rehberSira + 1} / ${REHBER_ADIMLAR.length}</span>`;
+            document.getElementById('rehber-geri').style.visibility = rehberSira === 0 ? 'hidden' : 'visible';
+            document.getElementById('rehber-ileri').innerHTML = rehberSira === REHBER_ADIMLAR.length - 1 ? 'Başlayalım ✓' : 'İleri →';
+            const ilk = document.querySelector('#rehber-icerik input');
+            if (ilk) ilk.focus();
+        }
+        function rehberOkulBilgileriniAl() {
+            const al = id => { const el = document.getElementById(id); return el ? el.value.trim() : null; };
+            const okul = al('rh-okul'); if (okul === null) return;
+            const temizle = document.getElementById('rh-temizle');
+            if (temizle && temizle.checked) {
+                appData.yonetimMembers = [];
+                appData.denetlemeMembers = [];
+                appData.personels = [];
+                appData.presidentName = '';
+                appData.treasurerName = '';
+            }
+            if (okul) appData.schoolName = okul;
+            const ilce = al('rh-ilce'); if (ilce) appData.districtName = ilce;
+            const mudur = al('rh-mudur'); if (mudur) appData.principalName = mudur;
+            const yil = al('rh-yil'); if (yil) appData.academicYear = yil;
+            populateKurumInputs();
+            saveData();
+        }
+        function rehberAdim(yon) {
+            if (rehberSira === 1 && yon > 0) rehberOkulBilgileriniAl();
+            if (rehberSira === REHBER_ADIMLAR.length - 1 && yon > 0) { rehberKapat(); switchTab('ozet'); return; }
+            rehberSira = Math.max(0, Math.min(REHBER_ADIMLAR.length - 1, rehberSira + yon));
+            rehberCiz();
+        }
+        function rehberAc() {
+            rehberSira = 0;
+            rehberCiz();
+            document.getElementById('rehber-modal').classList.remove('hidden');
+        }
+        function rehberKapat() {
+            document.getElementById('rehber-modal').classList.add('hidden');
+            try { localStorage.setItem('oab_rehber_goruldu', '1'); } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            sayfaRehberleriKur();
+            menuIpuclariniKur();
+            let goruldu = false;
+            try { goruldu = localStorage.getItem('oab_rehber_goruldu') === '1'; } catch (e) {}
+            if (!goruldu) rehberAc();
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && !document.getElementById('rehber-modal').classList.contains('hidden')) rehberKapat();
+            });
+        });
+    </script>
 </body>
 </html>
