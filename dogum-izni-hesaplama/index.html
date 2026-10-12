@@ -78,6 +78,7 @@
         .datesel select { width: 100%; padding: 14px 10px; min-height: 60px; border: 2px solid var(--line); border-radius: 12px; font-size: 1.2rem; font-family: inherit; color: var(--ink); background: #fff; cursor: pointer; }
         .datesel select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(180, 83, 53, 0.15); }
         .quick-dates { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .quick-label { align-self: center; font-size: 0.88rem; font-weight: 700; color: var(--muted); }
         .quick-dates button { padding: 9px 14px; border-radius: 99px; border: 1px solid var(--soft-line); background: var(--soft); color: var(--brand-ink); font-weight: 700; font-family: inherit; font-size: 0.92rem; cursor: pointer; }
         .date-confirm { margin-top: 14px; padding: 14px 16px; border-radius: 12px; font-size: 1.05rem; display: none; }
         .date-confirm.show { display: block; }
@@ -331,8 +332,10 @@
         </div>
         <div class="sub-box" id="actualBox">
             <div class="sub-title">Bebek hangi gün doğdu?</div>
+            <div class="sub-help">Gün, ay ve yılı seçin. <strong>Herhangi bir tarih</strong> seçilebilir; kolaylık olsun diye beklenen doğum tarihi yazıldı, farklıysa değiştirin.</div>
             <div class="datesel" id="actualSel"></div>
             <div class="quick-dates">
+                <span class="quick-label">Kısayol:</span>
                 <button type="button" data-quick="0">Bugün</button>
                 <button type="button" data-quick="1">Dün</button>
                 <button type="button" data-quick="2">Evvelsi gün</button>
@@ -404,7 +407,7 @@
             <div><label>Gün</label><select data-part="d" aria-label="Gün">${opt('', 'Gün')}${Array.from({ length: 31 }, (_, i) => opt(i + 1, i + 1)).join('')}</select></div>
             <div><label>Ay</label><select data-part="m" aria-label="Ay">${opt('', 'Ay')}${MONTHS.map((m, i) => opt(i, m)).join('')}</select></div>
             <div><label>Yıl</label><select data-part="y" aria-label="Yıl">${opt('', 'Yıl')}${[y0 - 2, y0 - 1, y0, y0 + 1].map(y => opt(y, y)).join('')}</select></div>`;
-        container.querySelectorAll('select').forEach(s => s.addEventListener('change', onChange));
+        container.querySelectorAll('select').forEach(s => { s.addEventListener('change', onChange); s.addEventListener('input', onChange); });
     }
     // null: eksik, false: takvimde olmayan gün, Date: geçerli
     function readDateSelect(container) {
@@ -453,8 +456,7 @@
     function checkActual(d) {
         if (d === null) return '';
         if (d === false) return 'Bu tarih takvimde yok. Lütfen günü kontrol edin.';
-        if (d > today()) return 'Doğum tarihi bugünden sonra olamaz. Bebek henüz doğmadıysa <strong>"Henüz doğmadı"</strong> seçin.';
-        if (Math.abs(diffDays(d, state.expected)) > 120) return 'Bu tarih, beklenen doğum tarihinden 4 aydan fazla farklı. Lütfen kontrol edin.';
+        if (Math.abs(diffDays(d, state.expected)) > 180) return 'Bu tarih, beklenen doğum tarihinden 6 aydan fazla farklı. Lütfen gün, ay ve yılı kontrol edin.';
         return null;
     }
 
@@ -492,6 +494,7 @@
         const returnDate = addDays(birth, postDays);
         const totalDays = usedPre + postDays;
 
+        if (actual && actual > today()) notes.push('Girilen doğum tarihi henüz gelmedi; sonuç bu tarihte doğum olacağı varsayımıyla hesaplandı.');
         if (!actual) notes.push('Bebek henüz doğmadığı için tarihler <strong>tahminidir</strong>. Doğum olunca programı tekrar açıp gerçek doğum tarihini girin.');
         if (workedDays > 0) {
             notes.push(`Doktor raporuyla fiilen çalışılan <strong>${workedDays} gün</strong> (${weeks(workedDays)}) doğumdan sonraki izne eklendi.`);
@@ -537,7 +540,7 @@
             <div class="done-head">
                 <div class="q-emoji">✅</div>
                 <h2 class="q-title">Hesap tamam!</h2>
-                <span class="tag ${r.actual ? 'tag-final' : 'tag-est'}">${r.actual ? 'Gerçek doğum tarihine göre' : 'Beklenen doğum tarihine göre (tahmini)'}</span>
+                <span class="tag ${r.actual ? 'tag-final' : 'tag-est'}">${r.actual ? 'Girilen doğum tarihine göre' : 'Beklenen doğum tarihine göre (tahmini)'}</span>
             </div>
 
             <div class="big-dates">
@@ -741,6 +744,8 @@
             const yes = state.born === '1';
             $('actualBox').classList.toggle('show', yes);
             $('bornNext').style.display = yes ? '' : 'none';
+            // Kolaylık: boşsa beklenen doğum tarihiyle doldur, kullanıcı sadece farkı düzeltsin
+            if (yes && readDateSelect($('actualSel')) === null && state.expected) setDateSelect($('actualSel'), state.expected);
             if (yes) onActualChange();
         }
         document.querySelectorAll(`.screen[data-step="${step}"] .big-choice`).forEach(b => {
@@ -833,7 +838,8 @@
         $('bornNext').disabled = err !== null;
         if (err === null) {
             const diff = diffDays(state.expected, d);
-            showMsg($('actualMsg'), 'good', `✅ <strong>${fmtLong(d)}</strong><br>${diff > 0 ? `Beklenenden ${diff} gün erken.` : diff < 0 ? `Beklenenden ${-diff} gün geç.` : 'Tam beklenen günde.'}`);
+            const future = d > today() ? '<br>ℹ️ Bu tarih henüz gelmedi; hesap bu tarihte doğum olacakmış gibi yapılır.' : '';
+            showMsg($('actualMsg'), 'good', `✅ <strong>${fmtLong(d)}</strong><br>${diff > 0 ? `Beklenenden ${diff} gün erken.` : diff < 0 ? `Beklenenden ${-diff} gün geç.` : 'Tam beklenen günde.'}${future}`);
         } else showMsg($('actualMsg'), err ? 'bad' : '', err ? `⚠️ ${err}` : '');
     }
 
