@@ -7,7 +7,7 @@
     <style>
         :root {
             --ink: #1f2937;
-            --muted: #6b7280;
+            --muted: #64748b;
             --line: #e5e7eb;
             --brand: #b45335;
             --brand-dark: #9f4d2f;
@@ -22,12 +22,13 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { -webkit-text-size-adjust: 100%; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: var(--ink);
             line-height: 1.5;
             min-height: 100vh;
-            padding: 24px 16px 40px;
+            padding: 24px 16px 48px;
             background:
                 radial-gradient(1100px 560px at 82% -8%, rgba(139, 92, 246, 0.34), transparent 60%) fixed,
                 radial-gradient(900px 520px at -8% 12%, rgba(56, 189, 248, 0.26), transparent 55%),
@@ -35,172 +36,192 @@
             background-color: #2d3061;
         }
 
-        .shell { max-width: 1040px; margin: 0 auto; background: #eef2f8; border-radius: 20px; padding: 22px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25); }
+        .shell { max-width: 760px; margin: 0 auto; background: #eef2f8; border-radius: 22px; padding: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
 
-        .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+        /* ---------- Üst bant ---------- */
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: linear-gradient(125deg, #fff5ef, #fff 70%); border: 1px solid var(--soft-line); border-radius: 16px; padding: 14px 18px; margin-bottom: 14px; }
+        .topbar .kicker { font-size: 0.68rem; letter-spacing: 0.16em; font-weight: 800; color: var(--brand-dark); }
+        .topbar h1 { font-size: 1.3rem; color: var(--brand-ink); letter-spacing: -0.02em; }
+        .topbar .mark { font-size: 2rem; }
 
-        /* ---------- Başlık ---------- */
-        .hero { display: flex; align-items: center; justify-content: space-between; gap: 18px; background: linear-gradient(125deg, #fff5ef, #fff 70%); border: 1px solid var(--soft-line); border-radius: 16px; padding: 22px; margin-bottom: 16px; overflow: hidden; }
-        .kicker { font-size: 0.72rem; letter-spacing: 0.16em; font-weight: 800; color: var(--brand-dark); }
-        .hero h1 { font-size: 1.75rem; color: var(--brand-ink); letter-spacing: -0.03em; margin-top: 6px; }
-        .hero p { color: var(--muted); max-width: 640px; margin-top: 4px; }
-        .hero-mark { font-size: 2.6rem; flex-shrink: 0; }
+        /* ---------- İlerleme ---------- */
+        .progress { margin-bottom: 14px; display: none; }
+        .progress.show { display: block; }
+        .progress-text { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700; color: #475569; margin-bottom: 6px; }
+        .progress-track { height: 10px; background: #dbe2ee; border-radius: 99px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, var(--brand)); border-radius: 99px; transition: width 0.35s ease; }
 
-        /* ---------- Nasıl kullanılır ---------- */
-        .howto { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-        .howto div { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 0.9rem; color: #374151; display: flex; gap: 10px; align-items: flex-start; }
-        .howto b { font-size: 1.3rem; line-height: 1; }
+        /* ---------- Ekranlar ---------- */
+        .screen { display: none; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 26px 22px; animation: appear 0.3s ease; }
+        .screen.active { display: block; }
+        @keyframes appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-        /* ---------- Düzen ---------- */
-        .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
-        .result-col { position: sticky; top: 16px; }
+        .q-emoji { font-size: 3rem; line-height: 1; margin-bottom: 10px; }
+        .q-title { font-size: 1.6rem; line-height: 1.25; color: var(--brand-ink); font-weight: 800; letter-spacing: -0.02em; }
+        .q-help { color: var(--muted); font-size: 1.02rem; margin: 8px 0 20px; }
 
-        /* ---------- Adımlar ---------- */
-        .step { display: flex; gap: 14px; padding: 18px 0; border-bottom: 1px dashed var(--soft-line2); }
-        .step:first-of-type { padding-top: 4px; }
-        .step:last-of-type { border-bottom: 0; padding-bottom: 4px; }
-        .step-num { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: var(--brand); color: #fff; font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; justify-content: center; }
-        .step-num.done { background: var(--ok); }
-        .step-body { flex: 1; min-width: 0; }
-        .step-q { font-size: 1.08rem; font-weight: 700; color: var(--brand-ink); margin-bottom: 4px; }
-        .help { display: block; color: var(--muted); font-size: 0.86rem; margin-bottom: 10px; }
+        .big-choices { display: grid; gap: 12px; }
+        .big-choice { display: flex; align-items: center; gap: 16px; width: 100%; text-align: left; padding: 18px 18px; min-height: 84px; border: 2px solid var(--soft-line); border-radius: 16px; background: var(--soft); cursor: pointer; font-family: inherit; color: var(--brand-ink); transition: 0.15s; }
+        .big-choice:hover { border-color: #e2b29d; background: #fff4ee; }
+        .big-choice:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+        .big-choice.selected { border-color: var(--brand); background: #fff1eb; box-shadow: 0 0 0 4px rgba(180, 83, 53, 0.15); }
+        .big-choice .ico { font-size: 2.2rem; flex-shrink: 0; width: 52px; text-align: center; }
+        .big-choice b { display: block; font-size: 1.2rem; }
+        .big-choice small { display: block; font-size: 0.92rem; color: var(--muted); margin-top: 2px; }
+        .big-choice .tick { margin-left: auto; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--soft-line); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; }
+        .big-choice.selected .tick { background: var(--brand); border-color: var(--brand); }
+        .big-choice.selected .tick::after { content: "✓"; }
 
-        input[type="date"], input[type="text"], select {
-            width: 100%; padding: 13px 14px; border: 2px solid var(--line); border-radius: 10px;
-            font-size: 1.05rem; font-family: inherit; color: var(--ink); background: #fff; min-height: 52px;
-        }
-        input:focus, select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(180, 83, 53, 0.15); }
+        /* ---------- Tarih seçici ---------- */
+        .datesel { display: grid; grid-template-columns: 1fr 1.6fr 1.2fr; gap: 10px; }
+        .datesel label { display: block; font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 5px; }
+        .datesel select { width: 100%; padding: 14px 10px; min-height: 60px; border: 2px solid var(--line); border-radius: 12px; font-size: 1.2rem; font-family: inherit; color: var(--ink); background: #fff; cursor: pointer; }
+        .datesel select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(180, 83, 53, 0.15); }
+        .quick-dates { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .quick-dates button { padding: 9px 14px; border-radius: 99px; border: 1px solid var(--soft-line); background: var(--soft); color: var(--brand-ink); font-weight: 700; font-family: inherit; font-size: 0.92rem; cursor: pointer; }
+        .date-confirm { margin-top: 14px; padding: 14px 16px; border-radius: 12px; font-size: 1.05rem; display: none; }
+        .date-confirm.show { display: block; }
+        .date-confirm.good { background: var(--okbg); border: 1px solid #a7f3d0; color: #065f46; }
+        .date-confirm.bad { background: var(--errbg); border: 1px solid #fecdd3; color: var(--err); }
+        .date-confirm strong { font-size: 1.15rem; }
 
-        .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .choice { position: relative; cursor: pointer; }
-        .choice input { position: absolute; opacity: 0; pointer-events: none; }
-        .choice span { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px; min-height: 76px; padding: 10px; border: 2px solid var(--soft-line); border-radius: 12px; background: var(--soft); color: var(--brand-ink); font-weight: 700; font-size: 0.98rem; transition: 0.15s; }
-        .choice span em { font-style: normal; font-size: 1.5rem; line-height: 1.1; }
-        .choice span small { font-weight: 500; font-size: 0.78rem; color: var(--muted); }
-        .choice:hover span { border-color: #e2b29d; }
-        .choice input:checked + span { border-color: var(--brand); background: #fff1eb; box-shadow: 0 0 0 3px rgba(180, 83, 53, 0.15); }
-        .choice input:focus-visible + span { outline: 3px solid var(--brand); outline-offset: 2px; }
+        .sub-box { margin-top: 16px; padding: 16px; border-radius: 14px; background: #f8fafc; border: 1px solid var(--line); display: none; }
+        .sub-box.show { display: block; animation: appear 0.3s ease; }
+        .sub-box .sub-title { font-weight: 800; font-size: 1.1rem; color: var(--brand-ink); margin-bottom: 4px; }
+        .sub-box .sub-help { color: var(--muted); font-size: 0.92rem; margin-bottom: 12px; }
 
-        .choices.three { grid-template-columns: repeat(3, 1fr); }
-        .choices.three span { min-height: 96px; }
-
-        .info-pill { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; font-size: 0.88rem; display: none; }
-        .info-pill.open { display: block; }
-
-        .reveal { margin-top: 12px; display: none; }
-        .reveal.open { display: block; }
-        .reveal label { display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; color: #374151; }
-
-        details.extra { margin-top: 4px; border: 1px solid var(--line); border-radius: 12px; background: #fafafa; }
-        details.extra summary { cursor: pointer; padding: 14px 16px; font-weight: 700; color: #374151; list-style: none; }
-        details.extra summary::-webkit-details-marker { display: none; }
-        details.extra summary::before { content: "➕ "; }
-        details.extra[open] summary::before { content: "➖ "; }
-        .extra-body { padding: 0 16px 16px; display: grid; gap: 14px; }
-        .extra-body label { display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; color: #374151; }
-
-        .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-        .btn { flex: 1 1 auto; padding: 14px 18px; border: 0; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: 0.15s; }
-        .btn-primary { background: var(--brand); color: #fff; }
+        /* ---------- Gezinme ---------- */
+        .nav { display: flex; gap: 10px; margin-top: 22px; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 20px; min-height: 58px; border: 0; border-radius: 14px; font-size: 1.1rem; font-weight: 800; cursor: pointer; font-family: inherit; transition: 0.15s; text-decoration: none; }
+        .btn-primary { background: var(--brand); color: #fff; flex: 1; }
         .btn-primary:hover { background: var(--brand-dark); }
-        .btn-secondary { background: #e5e7eb; color: var(--ink); }
-        .btn-secondary:hover { background: #d1d5db; }
+        .btn-primary:disabled { background: #cbd5e1; color: #64748b; cursor: not-allowed; }
+        .btn-back { background: #e5e7eb; color: var(--ink); }
+        .btn-back:hover { background: #d1d5db; }
+        .btn-ghost { background: transparent; color: var(--brand-dark); border: 2px solid var(--soft-line); }
+
+        /* ---------- Karşılama ---------- */
+        .welcome { text-align: center; }
+        .welcome .q-emoji { font-size: 4rem; }
+        .welcome .q-help { max-width: 480px; margin-left: auto; margin-right: auto; }
+        .welcome-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 22px; text-align: center; }
+        .welcome-steps div { background: var(--soft); border: 1px solid var(--soft-line2); border-radius: 14px; padding: 14px 8px; font-size: 0.92rem; color: #6b4c42; }
+        .welcome-steps b { display: block; font-size: 1.8rem; }
+        .btn-start { width: 100%; font-size: 1.35rem; min-height: 70px; }
 
         /* ---------- Sonuç ---------- */
-        .empty { padding: 26px 18px; border: 2px dashed var(--soft-line); border-radius: 12px; background: var(--soft); color: #8a6257; text-align: center; font-size: 1rem; }
-        .empty b { display: block; font-size: 2rem; margin-bottom: 6px; }
-        .error { background: var(--errbg); border-color: #fecdd3; color: var(--err); }
+        .done-head { text-align: center; margin-bottom: 18px; }
+        .done-head .q-emoji { font-size: 3.2rem; }
+        .done-head .tag { display: inline-block; margin-top: 8px; padding: 5px 12px; border-radius: 99px; font-size: 0.82rem; font-weight: 800; }
+        .tag-est { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; }
+        .tag-final { background: var(--okbg); color: #065f46; border: 1px solid #a7f3d0; }
 
-        .res-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--soft-line2); padding-bottom: 12px; margin-bottom: 14px; }
-        .res-kicker { color: var(--brand); font-size: 0.7rem; font-weight: 900; letter-spacing: 0.12em; }
-        .res-head h2 { font-size: 1.25rem; color: var(--brand-ink); margin-top: 2px; }
-        .res-head p { color: var(--muted); font-size: 0.8rem; }
-        .badge { background: var(--brand); color: #fff; border-radius: 10px; padding: 9px 12px; font-weight: 900; white-space: nowrap; text-align: center; line-height: 1.2; }
-        .badge small { display: block; font-weight: 600; font-size: 0.68rem; opacity: 0.85; }
+        .big-dates { display: grid; gap: 12px; margin-bottom: 14px; }
+        .big-date { display: flex; align-items: center; gap: 16px; border-radius: 18px; padding: 18px 20px; border: 2px solid; }
+        .big-date .ico { font-size: 2.6rem; line-height: 1; }
+        .big-date span { display: block; font-size: 0.95rem; font-weight: 800; }
+        .big-date strong { display: block; font-size: 1.75rem; line-height: 1.2; letter-spacing: -0.02em; }
+        .big-date small { display: block; font-size: 0.92rem; margin-top: 3px; font-weight: 600; }
+        .bd-out { background: #fff7ed; border-color: #fdba74; color: #7c2d12; }
+        .bd-back { background: var(--okbg); border-color: #6ee7b7; color: #065f46; }
 
-        .big-dates { display: grid; gap: 10px; margin-bottom: 14px; }
-        .big-date { display: flex; align-items: center; gap: 14px; border-radius: 14px; padding: 14px 16px; border: 2px solid; }
-        .big-date .ico { font-size: 2rem; line-height: 1; }
-        .big-date span { display: block; font-size: 0.85rem; font-weight: 700; }
-        .big-date strong { display: block; font-size: 1.35rem; line-height: 1.25; }
-        .big-date small { display: block; font-size: 0.8rem; margin-top: 2px; }
-        .bd-out { background: #fff7ed; border-color: #fed7aa; color: #7c2d12; }
-        .bd-back { background: var(--okbg); border-color: #a7f3d0; color: #065f46; }
+        .total-strip { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; background: var(--brand); color: #fff; border-radius: 14px; padding: 12px 16px; font-size: 1.1rem; font-weight: 700; margin-bottom: 14px; text-align: center; }
+        .total-strip b { font-size: 1.5rem; }
 
-        .sentence { background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; padding: 13px 15px; font-size: 0.98rem; color: #334155; margin-bottom: 14px; }
+        .sentence { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 15px 17px; font-size: 1.08rem; color: #334155; margin-bottom: 16px; }
 
-        .agenda { list-style: none; margin: 0 0 14px; padding: 0; position: relative; }
-        .agenda::before { content: ""; position: absolute; left: 15px; top: 14px; bottom: 14px; width: 2px; background: var(--soft-line); }
-        .agenda li { position: relative; display: flex; align-items: center; gap: 12px; padding: 6px 0; }
-        .agenda .dot { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; background: #fff; border: 2px solid var(--soft-line); z-index: 1; }
-        .agenda span { display: block; font-size: 0.78rem; color: var(--muted); }
-        .agenda strong { display: block; font-size: 0.98rem; color: var(--brand-ink); }
+        .name-row { margin-bottom: 16px; }
+        .name-row label { display: block; font-weight: 700; font-size: 0.95rem; color: #475569; margin-bottom: 6px; }
+        .name-row input { width: 100%; padding: 14px; min-height: 54px; border: 2px solid var(--line); border-radius: 12px; font-size: 1.05rem; font-family: inherit; }
+        .name-row input:focus { outline: none; border-color: var(--brand); }
 
-        .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: #065f46; color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 700; opacity: 0; pointer-events: none; transition: 0.25s; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .share { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .share button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 84px; padding: 10px 6px; border-radius: 14px; border: 2px solid var(--line); background: #fff; font-family: inherit; font-weight: 800; font-size: 0.92rem; color: var(--ink); cursor: pointer; transition: 0.15s; }
+        .share button:hover { border-color: var(--brand); background: var(--soft); }
+        .share button em { font-style: normal; font-size: 1.7rem; line-height: 1; }
 
-        .timeline { margin-bottom: 14px; }
-        .timeline-title { font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
-        .bar { display: flex; height: 30px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
-        .bar div { display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.72rem; font-weight: 700; white-space: nowrap; overflow: hidden; min-width: 4px; }
+        .section-h { font-size: 1.05rem; font-weight: 800; color: var(--brand-ink); margin: 6px 0 10px; }
+
+        .agenda { list-style: none; margin: 0 0 18px; padding: 0; position: relative; }
+        .agenda::before { content: ""; position: absolute; left: 19px; top: 20px; bottom: 20px; width: 3px; background: var(--soft-line); border-radius: 3px; }
+        .agenda li { position: relative; display: flex; align-items: center; gap: 14px; padding: 7px 0; }
+        .agenda .dot { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: #fff; border: 3px solid var(--soft-line); z-index: 1; }
+        .agenda li.key .dot { border-color: var(--brand); }
+        .agenda span { display: block; font-size: 0.85rem; color: var(--muted); }
+        .agenda strong { display: block; font-size: 1.08rem; color: var(--brand-ink); }
+
+        .timeline { margin-bottom: 18px; }
+        .bar { display: flex; height: 34px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+        .bar div { display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8rem; font-weight: 800; white-space: nowrap; overflow: hidden; min-width: 4px; }
         .seg-pre { background: #f59e0b; }
         .seg-post { background: var(--brand); }
         .seg-tr { background: #7c3aed; }
-        .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 7px; font-size: 0.78rem; color: #475569; }
-        .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+        .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; font-size: 0.85rem; color: #475569; }
+        .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+        .notes { margin-bottom: 18px; border-radius: 12px; padding: 13px 15px; font-size: 0.95rem; line-height: 1.55; background: var(--soft); border: 1px solid var(--soft-line); border-left: 5px solid var(--brand); color: #6b4c42; }
+        .notes strong { color: var(--brand-ink); }
+        .notes ul { margin-top: 4px; padding-left: 20px; }
+        .notes li + li { margin-top: 5px; }
+
+        details.fold { border: 1px solid var(--line); border-radius: 14px; background: #fafafa; margin-bottom: 12px; }
+        details.fold summary { cursor: pointer; padding: 15px 16px; font-weight: 800; color: #374151; list-style: none; font-size: 1rem; }
+        details.fold summary::-webkit-details-marker { display: none; }
+        details.fold summary::before { content: "▸ "; color: var(--brand); }
+        details.fold[open] summary::before { content: "▾ "; }
+        .fold-body { padding: 0 16px 16px; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .metric { border: 1px solid var(--soft-line2); background: var(--soft); border-radius: 10px; padding: 11px; }
-        .metric span { display: block; color: #7b625a; font-size: 0.76rem; line-height: 1.35; }
-        .metric strong { display: block; color: var(--brand-ink); font-size: 0.98rem; margin-top: 4px; }
-        .metric small { display: block; color: #9a8077; font-size: 0.72rem; margin-top: 2px; }
+        .metric span { display: block; color: #7b625a; font-size: 0.8rem; line-height: 1.35; }
+        .metric strong { display: block; color: var(--brand-ink); font-size: 1.02rem; margin-top: 4px; }
+        .metric small { display: block; color: #9a8077; font-size: 0.76rem; margin-top: 2px; }
 
-        .notes { margin-top: 13px; border-radius: 10px; padding: 11px 13px; font-size: 0.86rem; line-height: 1.55; background: var(--soft); border: 1px solid var(--soft-line); border-left: 4px solid var(--brand); color: #6b4c42; }
-        .notes strong { color: var(--brand-ink); }
-        .notes ul { margin-top: 4px; padding-left: 20px; }
-        .notes li + li { margin-top: 3px; }
-        .notes.warn { background: #fff7ed; border-color: #fed7aa; border-left-color: #ea580c; color: #7c2d12; }
+        .answers { list-style: none; display: grid; gap: 8px; }
+        .answers li { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+        .answers span { display: block; font-size: 0.8rem; color: var(--muted); }
+        .answers strong { display: block; font-size: 0.98rem; }
+        .answers button { flex-shrink: 0; padding: 8px 12px; border-radius: 9px; border: 1px solid var(--soft-line); background: var(--soft); color: var(--brand-dark); font-weight: 800; font-family: inherit; cursor: pointer; }
 
-        .legal-line { margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--soft-line2); color: #7b625a; font-size: 0.76rem; line-height: 1.55; }
+        .law-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9rem; color: #6b4c42; }
+        .law-grid span { padding: 10px; background: #fff; border: 1px solid #f1e2dc; border-radius: 8px; }
+        .legal-line { color: #7b625a; font-size: 0.82rem; line-height: 1.55; margin-top: 12px; }
 
-        .law { background: var(--soft); border: 1px solid var(--soft-line); border-radius: 14px; padding: 16px; color: #6b4c42; font-size: 0.86rem; line-height: 1.5; }
-        .law > strong { display: block; color: var(--brand-ink); font-size: 0.95rem; margin-bottom: 9px; }
-        .law-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .law-grid span { padding: 9px; background: #fff; border: 1px solid #f1e2dc; border-radius: 8px; }
-        .law p { margin-top: 11px; color: #8a6d63; }
+        .err-box { padding: 22px 18px; border: 2px solid #fecdd3; border-radius: 14px; background: var(--errbg); color: var(--err); font-size: 1.08rem; text-align: center; margin-bottom: 16px; }
+        .err-box b { display: block; font-size: 2.4rem; margin-bottom: 6px; }
+
+        .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: #065f46; color: #fff; padding: 14px 20px; border-radius: 14px; font-weight: 800; font-size: 1.05rem; opacity: 0; pointer-events: none; transition: 0.25s; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.25); max-width: calc(100% - 32px); text-align: center; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         .print-only { display: none; }
 
-        @media (max-width: 860px) {
-            .layout { grid-template-columns: 1fr; }
-            .result-col { position: static; }
-            .howto { grid-template-columns: 1fr; }
-            .law-grid { grid-template-columns: 1fr; }
-        }
         @media (max-width: 560px) {
-            .choices.three { grid-template-columns: 1fr; }
-            .choices.three span { min-height: 64px; }
-        }
-        @media (max-width: 480px) {
-            body { padding: 12px 0 30px; }
-            .shell { border-radius: 0; padding: 14px 16px; }
-            .hero { padding: 16px; }
-            .hero h1 { font-size: 1.4rem; }
-            .hero-mark { display: none; }
-            .card { padding: 16px; }
-            .step-num { width: 32px; height: 32px; font-size: 0.95rem; }
-            .big-date strong { font-size: 1.15rem; }
-            .grid { grid-template-columns: 1fr; }
+            body { padding: 0 0 30px; }
+            .shell { border-radius: 0; padding: 12px 16px 20px; min-height: 100vh; }
+            .topbar { padding: 12px 14px; }
+            .topbar h1 { font-size: 1.12rem; }
+            .screen { padding: 22px 16px; }
+            .q-title { font-size: 1.35rem; }
+            .big-choice { padding: 14px; min-height: 76px; gap: 12px; }
+            .big-choice .ico { font-size: 1.9rem; width: 42px; }
+            .big-choice b { font-size: 1.08rem; }
+            .datesel { grid-template-columns: 1fr 1.5fr 1.2fr; gap: 6px; }
+            .datesel select { font-size: 1.05rem; padding: 12px 6px; }
+            .welcome-steps { grid-template-columns: 1fr; }
+            .big-date strong { font-size: 1.4rem; }
+            .share { grid-template-columns: 1fr 1fr; }
+            .grid, .law-grid { grid-template-columns: 1fr; }
         }
 
         @media print {
             body { background: #fff !important; padding: 0; }
             .shell { box-shadow: none; background: #fff; padding: 0; }
-            .no-print, .hero, .howto, .form-col, .toast { display: none !important; }
-            .layout { display: block; }
-            .result-col { position: static; }
-            .card, .law { break-inside: avoid; border: 1px solid #ccc !important; }
-            .print-only { display: block; font-size: 1.2rem; font-weight: 800; margin-bottom: 12px; }
+            .no-print, .progress, .toast, .topbar { display: none !important; }
+            .screen { border: 0; padding: 0; animation: none; }
+            details.fold { border: 0; background: #fff; }
+            details.fold summary::before { content: ""; }
+            .print-only { display: block; font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; }
+            .big-date, .notes, .metric, .agenda li { break-inside: avoid; }
             * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
@@ -209,362 +230,491 @@
 
 <div class="shell">
 
-    <header class="hero">
+    <header class="topbar">
         <div>
-            <span class="kicker">PERSONEL İZİNLERİ</span>
+            <div class="kicker">PERSONEL İZİNLERİ</div>
             <h1>Doğum İzni Hesaplama</h1>
-            <p>Aşağıdaki birkaç soruyu cevaplayın. Program, izne çıkış ve göreve başlama tarihlerini kendiliğinden hesaplar.</p>
         </div>
-        <div class="hero-mark" aria-hidden="true">🍼</div>
+        <div class="mark" aria-hidden="true">🍼</div>
     </header>
 
-    <div class="howto no-print">
-        <div><b>1️⃣</b><span>Personelin <strong>statüsünü</strong> ve raporundaki <strong>beklenen doğum tarihini</strong> seçin.</span></div>
-        <div><b>2️⃣</b><span>Diğer soruları <strong>tek dokunuşla</strong> işaretleyin.</span></div>
-        <div><b>3️⃣</b><span>Sonuç <strong>sağ tarafta / aşağıda</strong> hemen görünür. Yazdırın veya kopyalayın.</span></div>
+    <div class="progress" id="progress">
+        <div class="progress-text"><span id="progressLabel">Soru 1 / 5</span><span id="progressPct">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
     </div>
 
-    <div class="layout">
-
-        <!-- ===================== SORULAR ===================== -->
-        <div class="form-col">
-            <div class="card">
-
-                <div class="step">
-                    <div class="step-num" id="n1">1</div>
-                    <div class="step-body">
-                        <div class="step-q">Personel hangi statüde çalışıyor?</div>
-                        <span class="help">Bilmiyorsanız <strong>"Kadrolu memur"</strong> seçili kalsın; öğretmenlerin çoğu bu gruptadır.</span>
-                        <div class="choices three" role="radiogroup">
-                            <label class="choice"><input type="radio" name="status" value="657" checked><span><em>🏛️</em>Kadrolu memur<small>657 sayılı Kanun</small></span></label>
-                            <label class="choice"><input type="radio" name="status" value="4b"><span><em>📝</em>Sözleşmeli<small>4/B personel</small></span></label>
-                            <label class="choice"><input type="radio" name="status" value="4857"><span><em>🧰</em>İşçi<small>4857 İş Kanunu</small></span></label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-num" id="n2">2</div>
-                    <div class="step-body">
-                        <label class="step-q" for="expected">Bebeğin doğması beklenen tarih nedir?</label>
-                        <span class="help">Doktor raporunda "beklenen / muhtemel doğum tarihi" olarak yazar. Kutuya dokunup takvimden seçin.</span>
-                        <input type="date" id="expected">
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-num" id="n3">3</div>
-                    <div class="step-body">
-                        <div class="step-q">Kaç bebek bekleniyor?</div>
-                        <span class="help">İkiz, üçüz gibi durumlarda doğum öncesi izin 2 hafta daha uzundur.</span>
-                        <div class="choices" role="radiogroup">
-                            <label class="choice"><input type="radio" name="multiple" value="0" checked><span><em>👶</em>1 bebek</span></label>
-                            <label class="choice"><input type="radio" name="multiple" value="1"><span><em>👶👶</em>İkiz veya daha fazla</span></label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-num" id="n4">4</div>
-                    <div class="step-body">
-                        <div class="step-q">İzne ne zaman çıktı / çıkacak?</div>
-                        <span class="help">Doktor raporuyla bir süre daha çalışıldıysa, <strong>fiilen çalışılan günler doğum sonrasına eklenir</strong>.</span>
-                        <div class="choices three" role="radiogroup">
-                            <label class="choice"><input type="radio" name="startMode" value="normal" checked><span><em>📅</em>Normal zamanında<small id="normalHint">Doğuma 8 hafta kala</small></span></label>
-                            <label class="choice"><input type="radio" name="startMode" value="report"><span><em>🩺</em>Raporla çalıştı<small id="reportHint">Doğuma 2 hafta kalana kadar</small></span></label>
-                            <label class="choice"><input type="radio" name="startMode" value="custom"><span><em>✏️</em>Başka bir tarihte<small>Tarihi ben gireceğim</small></span></label>
-                        </div>
-                        <div class="info-pill" id="reportInfo"></div>
-                        <div class="reveal" id="startBox">
-                            <label for="start">İzne çıktığı (çıkacağı) ilk gün</label>
-                            <input type="date" id="start">
-                            <span class="help" style="margin: 6px 0 0;" id="startHelp">Normal başlangıçtan sonra çalışılan her gün doğum sonrası izne eklenir.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-num" id="n5">5</div>
-                    <div class="step-body">
-                        <div class="step-q">Doğum gerçekleşti mi?</div>
-                        <span class="help">Doğum olduysa tarihini girin; erken doğumda kullanılmayan günler doğum sonrasına eklenir.</span>
-                        <div class="choices" role="radiogroup">
-                            <label class="choice"><input type="radio" name="born" value="0" checked><span><em>⏳</em>Henüz olmadı</span></label>
-                            <label class="choice"><input type="radio" name="born" value="1"><span><em>🎉</em>Evet, doğum oldu</span></label>
-                        </div>
-                        <div class="reveal" id="actualBox">
-                            <label for="actual">Doğum hangi gün oldu?</label>
-                            <input type="date" id="actual">
-                        </div>
-                    </div>
-                </div>
-
-                <details class="extra">
-                    <summary>Personel adı (isteğe bağlı)</summary>
-                    <div class="extra-body">
-                        <div>
-                            <label for="person">Personelin adı soyadı</label>
-                            <input type="text" id="person" placeholder="Örn: Ayşe Yılmaz" maxlength="120">
-                            <span class="help" style="margin: 6px 0 0;">Sadece sonuç cümlesinde ve çıktıda görünür.</span>
-                        </div>
-                    </div>
-                </details>
-
-                <div class="actions no-print">
-                    <button class="btn btn-primary" id="printBtn" type="button">🖨️ Yazdır</button>
-                    <button class="btn btn-secondary" id="copyBtn" type="button">📋 Sonucu kopyala</button>
-                    <button class="btn btn-secondary" id="resetBtn" type="button">↺ Baştan başla</button>
-                </div>
-            </div>
+    <!-- ================= KARŞILAMA ================= -->
+    <section class="screen welcome active" data-step="welcome">
+        <div class="q-emoji">👋</div>
+        <h2 class="q-title">Doğum iznini birlikte hesaplayalım</h2>
+        <p class="q-help">Sadece <strong>5 kolay soru</strong> soracağım. Cevaplara dokunmanız yeterli; hesabı ben yapacağım.</p>
+        <div class="welcome-steps">
+            <div><b>👆</b>Cevaba dokunun</div>
+            <div><b>⏱️</b>1 dakika sürer</div>
+            <div><b>📅</b>Tarihler hazır</div>
         </div>
+        <button class="btn btn-primary btn-start" type="button" data-next>Başla ➜</button>
+    </section>
 
-        <!-- ===================== SONUÇ ===================== -->
-        <div class="result-col">
-            <div class="print-only">Doğum İzni Hesap Sonucu</div>
-            <div class="card" id="result" aria-live="polite"></div>
-
-            <div class="law">
-                <strong>📘 Kısaca kurallar</strong>
-                <div class="law-grid">
-                    <span><b>1 bebek:</b> doğumdan önce 8 hafta + doğumdan sonra 16 hafta</span>
-                    <span><b>İkiz ve üzeri:</b> doğumdan önce 10 hafta + doğumdan sonra 16 hafta</span>
-                    <span><b>Memur / sözleşmeli:</b> doktor raporuyla doğuma 2 hafta kalana kadar çalışabilir</span>
-                    <span><b>İşçi:</b> doktor onayıyla doğuma 3 hafta kalana kadar çalışabilir</span>
-                    <span><b>Raporla çalışma:</b> fiilen çalışılan günler doğum sonrasına eklenir</span>
-                    <span><b>Erken doğum:</b> kullanılmayan doğum öncesi günler doğum sonrasına eklenir</span>
-                </div>
-                <p>Bu ekran hesaplama ve ön kontrol içindir. İzin başlangıcı, raporlar ve göreve başlama işlemi kurum personel birimince onaylanmalıdır.</p>
-            </div>
+    <!-- ================= 1. STATÜ ================= -->
+    <section class="screen" data-step="status">
+        <div class="q-emoji">👩‍🏫</div>
+        <h2 class="q-title">İzne çıkacak kişi hangi statüde çalışıyor?</h2>
+        <p class="q-help">Bilmiyorsanız <strong>"Kadrolu memur"</strong> seçin. Öğretmenlerin çoğu bu gruptadır.</p>
+        <div class="big-choices">
+            <button class="big-choice" type="button" data-field="status" data-value="657"><span class="ico">🏛️</span><span><b>Kadrolu memur</b><small>Kadrolu öğretmen, memur (657)</small></span><span class="tick"></span></button>
+            <button class="big-choice" type="button" data-field="status" data-value="4b"><span class="ico">📝</span><span><b>Sözleşmeli personel</b><small>Sözleşmeli öğretmen, 4/B</small></span><span class="tick"></span></button>
+            <button class="big-choice" type="button" data-field="status" data-value="4857"><span class="ico">🧰</span><span><b>İşçi</b><small>Temizlik, güvenlik vb. (4857)</small></span><span class="tick"></span></button>
         </div>
-    </div>
+        <div class="nav no-print">
+            <button class="btn btn-back" type="button" data-back>◀ Geri</button>
+        </div>
+    </section>
+
+    <!-- ================= 2. BEKLENEN DOĞUM ================= -->
+    <section class="screen" data-step="expected">
+        <div class="q-emoji">🗓️</div>
+        <h2 class="q-title">Bebeğin doğması beklenen tarih nedir?</h2>
+        <p class="q-help">Doktor raporunda <strong>"beklenen"</strong> veya <strong>"muhtemel doğum tarihi"</strong> olarak yazar. Gün, ay ve yılı seçin.</p>
+        <div class="datesel" id="expectedSel"></div>
+        <div class="date-confirm" id="expectedMsg"></div>
+        <div class="nav no-print">
+            <button class="btn btn-back" type="button" data-back>◀ Geri</button>
+            <button class="btn btn-primary" type="button" data-next id="expectedNext" disabled>Devam ➜</button>
+        </div>
+    </section>
+
+    <!-- ================= 3. KAÇ BEBEK ================= -->
+    <section class="screen" data-step="multiple">
+        <div class="q-emoji">👶</div>
+        <h2 class="q-title">Kaç bebek bekleniyor?</h2>
+        <p class="q-help">İkiz, üçüz gibi durumlarda doğumdan önceki izin 2 hafta daha uzun olur.</p>
+        <div class="big-choices">
+            <button class="big-choice" type="button" data-field="multiple" data-value="0"><span class="ico">👶</span><span><b>1 bebek</b><small>Tekil gebelik</small></span><span class="tick"></span></button>
+            <button class="big-choice" type="button" data-field="multiple" data-value="1"><span class="ico">👶👶</span><span><b>İkiz veya daha fazla</b><small>Çoğul gebelik</small></span><span class="tick"></span></button>
+        </div>
+        <div class="nav no-print">
+            <button class="btn btn-back" type="button" data-back>◀ Geri</button>
+        </div>
+    </section>
+
+    <!-- ================= 4. İZNE ÇIKIŞ ================= -->
+    <section class="screen" data-step="startMode">
+        <div class="q-emoji">🚪</div>
+        <h2 class="q-title">İzne ne zaman çıktı ya da çıkacak?</h2>
+        <p class="q-help">Doktor raporuyla bir süre daha çalışıldıysa, <strong>çalışılan günler doğumdan sonraki izne eklenir</strong>.</p>
+        <div class="big-choices">
+            <button class="big-choice" type="button" data-field="startMode" data-value="normal"><span class="ico">📅</span><span><b>Normal zamanında</b><small id="normalHint">Doğuma 8 hafta kala</small></span><span class="tick"></span></button>
+            <button class="big-choice" type="button" data-field="startMode" data-value="report"><span class="ico">🩺</span><span><b>Doktor raporuyla çalıştı</b><small id="reportHint">Doğuma 2 hafta kalana kadar</small></span><span class="tick"></span></button>
+            <button class="big-choice" type="button" data-field="startMode" data-value="custom"><span class="ico">✏️</span><span><b>Başka bir tarihte çıktı</b><small>Tarihi ben seçeceğim</small></span><span class="tick"></span></button>
+        </div>
+        <div class="sub-box" id="startBox">
+            <div class="sub-title">İzne çıktığı (çıkacağı) ilk gün</div>
+            <div class="sub-help" id="startHelp"></div>
+            <div class="datesel" id="startSel"></div>
+            <div class="date-confirm" id="startMsg"></div>
+        </div>
+        <div class="nav no-print">
+            <button class="btn btn-back" type="button" data-back>◀ Geri</button>
+            <button class="btn btn-primary" type="button" data-next id="startNext" style="display:none" disabled>Devam ➜</button>
+        </div>
+    </section>
+
+    <!-- ================= 5. DOĞUM OLDU MU ================= -->
+    <section class="screen" data-step="born">
+        <div class="q-emoji">🍼</div>
+        <h2 class="q-title">Bebek doğdu mu?</h2>
+        <p class="q-help">Doğduysa tarihini seçin. Bebek erken doğduysa, kullanılamayan günler doğumdan sonraki izne eklenir.</p>
+        <div class="big-choices">
+            <button class="big-choice" type="button" data-field="born" data-value="0"><span class="ico">⏳</span><span><b>Henüz doğmadı</b><small>Beklenen tarihe göre hesaplanır</small></span><span class="tick"></span></button>
+            <button class="big-choice" type="button" data-field="born" data-value="1"><span class="ico">🎉</span><span><b>Evet, doğdu</b><small>Doğum tarihini seçeceğim</small></span><span class="tick"></span></button>
+        </div>
+        <div class="sub-box" id="actualBox">
+            <div class="sub-title">Bebek hangi gün doğdu?</div>
+            <div class="datesel" id="actualSel"></div>
+            <div class="quick-dates">
+                <button type="button" data-quick="0">Bugün</button>
+                <button type="button" data-quick="1">Dün</button>
+                <button type="button" data-quick="2">Evvelsi gün</button>
+            </div>
+            <div class="date-confirm" id="actualMsg"></div>
+        </div>
+        <div class="nav no-print">
+            <button class="btn btn-back" type="button" data-back>◀ Geri</button>
+            <button class="btn btn-primary" type="button" data-next id="bornNext" style="display:none" disabled>Sonucu göster ➜</button>
+        </div>
+    </section>
+
+    <!-- ================= SONUÇ ================= -->
+    <section class="screen" data-step="result">
+        <div class="print-only">Doğum İzni Hesap Sonucu</div>
+        <div id="result"></div>
+    </section>
+
 </div>
 
-<div class="toast" id="toast" role="status"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
     const DAY = 24 * 60 * 60 * 1000;
     const POST_DAYS = 16 * 7;
     const MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
     const WEEKDAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+    const STEPS = ['welcome', 'status', 'expected', 'multiple', 'startMode', 'born', 'result'];
+    const QUESTION_COUNT = 5;
 
     // Statüye göre mevzuat ve doktor raporuyla çalışılabilecek son sınır (doğuma kalan gün)
     const STATUS = {
-        '657':  { law: '657 sayılı DMK Md. 104/A — kadın memur hesabı', who: 'Memurlar', limit: 14 },
-        '4b':   { law: '4/B sözleşmeli personel — 657 sayılı DMK Md. 104/A hükümleri', who: 'Sözleşmeli personel', limit: 14 },
-        '4857': { law: '4857 sayılı İş Kanunu Md. 74 — kadın işçi hesabı', who: 'İşçiler', limit: 21 }
+        '657':  { name: 'Kadrolu memur', law: '657 sayılı DMK Md. 104/A', who: 'Memurlar', limit: 14 },
+        '4b':   { name: 'Sözleşmeli personel (4/B)', law: '657 sayılı DMK Md. 104/A (4/B sözleşmeli)', who: 'Sözleşmeli personel', limit: 14 },
+        '4857': { name: 'İşçi', law: '4857 sayılı İş Kanunu Md. 74', who: 'İşçiler', limit: 21 }
     };
 
+    const state = { status: null, expected: null, multiple: null, startMode: null, start: null, born: null, actual: null, person: '' };
+    let current = 0;
+    let editing = false;
+    let lastResult = null;
+
     const $ = id => document.getElementById(id);
-    const radioVal = name => document.querySelector(`input[name="${name}"]:checked`).value;
-    let lastSummary = '';
 
     // --- Tarih yardımcıları (saat dilimi kaymalarına karşı öğlen 12:00 kullanılır) ---
-    function parseDate(s) {
-        if (!s) return null;
-        const [y, m, d] = s.split('-').map(Number);
-        if (!y || !m || !d) return null;
-        return new Date(y, m - 1, d, 12);
-    }
+    function mkDate(y, m, d) { return new Date(y, m, d, 12); }
     function addDays(date, n) { const r = new Date(date); r.setDate(r.getDate() + n); return r; }
     function diffDays(a, b) { return Math.round((a - b) / DAY); }
-    function fmt(date) { return `${String(date.getDate()).padStart(2, '0')} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`; }
+    function fmt(date) { return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`; }
     function fmtLong(date) { return `${fmt(date)} ${WEEKDAYS[date.getDay()]}`; }
     function weeks(days) {
         const w = Math.floor(days / 7), d = days % 7;
         if (!w) return `${d} gün`;
         return d ? `${w} hafta ${d} gün` : `${w} hafta`;
     }
-    function today() { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate(), 12); }
+    function today() { const t = new Date(); return mkDate(t.getFullYear(), t.getMonth(), t.getDate()); }
+    function relative(date) {
+        const n = diffDays(date, today());
+        if (n === 0) return 'bugün';
+        return n > 0 ? `${n} gün sonra` : `${-n} gün önce`;
+    }
     function esc(s) { return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
-    function showEmpty(icon, text, isError) {
-        lastSummary = '';
-        $('result').innerHTML = `<div class="empty${isError ? ' error' : ''}"><b>${icon}</b>${text}</div>`;
+    // --- Gün / Ay / Yıl seçici ---
+    function buildDateSelect(container, onChange) {
+        const y0 = today().getFullYear();
+        const opt = (v, t) => `<option value="${v}">${t}</option>`;
+        container.innerHTML = `
+            <div><label>Gün</label><select data-part="d" aria-label="Gün">${opt('', 'Gün')}${Array.from({ length: 31 }, (_, i) => opt(i + 1, i + 1)).join('')}</select></div>
+            <div><label>Ay</label><select data-part="m" aria-label="Ay">${opt('', 'Ay')}${MONTHS.map((m, i) => opt(i, m)).join('')}</select></div>
+            <div><label>Yıl</label><select data-part="y" aria-label="Yıl">${opt('', 'Yıl')}${[y0 - 2, y0 - 1, y0, y0 + 1].map(y => opt(y, y)).join('')}</select></div>`;
+        container.querySelectorAll('select').forEach(s => s.addEventListener('change', onChange));
+    }
+    // null: eksik, false: takvimde olmayan gün, Date: geçerli
+    function readDateSelect(container) {
+        const g = p => container.querySelector(`[data-part="${p}"]`).value;
+        const d = g('d'), m = g('m'), y = g('y');
+        if (d === '' || m === '' || y === '') return null;
+        const date = mkDate(+y, +m, +d);
+        return date.getMonth() === +m ? date : false;
+    }
+    function setDateSelect(container, date) {
+        const s = (p, v) => { container.querySelector(`[data-part="${p}"]`).value = v; };
+        if (!date) { s('d', ''); s('m', ''); s('y', ''); return; }
+        s('d', date.getDate()); s('m', date.getMonth()); s('y', date.getFullYear());
+    }
+    function showMsg(el, kind, html) {
+        el.className = 'date-confirm' + (kind ? ` show ${kind}` : '');
+        el.innerHTML = html || '';
     }
 
-    function markSteps(expected, mode, customStart, born, actual) {
-        $('n1').classList.add('done');
-        $('n2').classList.toggle('done', !!expected);
-        $('n3').classList.toggle('done', !!expected);
-        $('n4').classList.toggle('done', !!expected && (mode !== 'custom' || !!customStart));
-        $('n5').classList.toggle('done', !!expected && (!born || !!actual));
+    // --- Kurallar ---
+    function rules() {
+        const st = STATUS[state.status || '657'];
+        const preDays = (state.multiple === '1' ? 10 : 8) * 7;
+        const legalStart = state.expected ? addDays(state.expected, -preDays) : null;
+        const latestStart = state.expected ? addDays(state.expected, -st.limit) : null;
+        return { st, preDays, legalStart, latestStart };
     }
 
-    // --- ANA HESAPLAMA ---
-    function calculate() {
-        const st = STATUS[radioVal('status')];
-        const multiple = radioVal('multiple') === '1';
-        const born = radioVal('born') === '1';
-        const mode = radioVal('startMode');
-        const preDays = (multiple ? 10 : 8) * 7;
-        const limitWeeks = st.limit / 7;
+    // --- Doğrulamalar: null = geçerli, '' = eksik, metin = hata ---
+    function checkExpected(d) {
+        if (d === null) return '';
+        if (d === false) return 'Bu tarih takvimde yok. Lütfen günü kontrol edin.';
+        const n = diffDays(d, today());
+        if (n > 300) return 'Bu tarih çok ileride. Beklenen doğum tarihi en fazla 10 ay sonra olabilir.';
+        if (n < -400) return 'Bu tarih çok eskide. Lütfen yılı kontrol edin.';
+        return null;
+    }
+    function checkStart(d) {
+        if (d === null) return '';
+        if (d === false) return 'Bu tarih takvimde yok. Lütfen günü kontrol edin.';
+        const { st, legalStart, latestStart } = rules();
+        if (d < legalStart) return `Bu tarih çok erken. İzne en erken <strong>${fmtLong(legalStart)}</strong> günü çıkılabilir.`;
+        if (d > latestStart) return `${st.who} doktor raporuyla en geç doğuma ${st.limit / 7} hafta kalana kadar çalışabilir. İzne en geç <strong>${fmtLong(latestStart)}</strong> günü çıkılmalıdır.`;
+        return null;
+    }
+    function checkActual(d) {
+        if (d === null) return '';
+        if (d === false) return 'Bu tarih takvimde yok. Lütfen günü kontrol edin.';
+        if (d > today()) return 'Doğum tarihi bugünden sonra olamaz. Bebek henüz doğmadıysa <strong>"Henüz doğmadı"</strong> seçin.';
+        if (Math.abs(diffDays(d, state.expected)) > 120) return 'Bu tarih, beklenen doğum tarihinden 4 aydan fazla farklı. Lütfen kontrol edin.';
+        return null;
+    }
 
-        $('normalHint').textContent = `Doğuma ${preDays / 7} hafta kala`;
-        $('reportHint').textContent = `Doğuma ${limitWeeks} hafta kalana kadar`;
-        $('actualBox').classList.toggle('open', born);
-        $('startBox').classList.toggle('open', mode === 'custom');
+    // --- HESAPLAMA ---
+    function compute() {
+        const { st, preDays, legalStart, latestStart } = rules();
+        const expected = state.expected;
 
-        const expected = parseDate($('expected').value);
-        const actual = born ? parseDate($('actual').value) : null;
-        const customStart = mode === 'custom' ? parseDate($('start').value) : null;
-        markSteps(expected, mode, customStart, born, actual);
-
-        const legalStart = expected ? addDays(expected, -preDays) : null;
-        const latestStart = expected ? addDays(expected, -st.limit) : null;
-
-        $('reportInfo').classList.toggle('open', mode === 'report');
-        $('reportInfo').innerHTML = expected
-            ? `🩺 ${st.who} doktor raporuyla doğuma ${limitWeeks} hafta kalana kadar çalışabilir. İzne çıkış: <strong>${fmtLong(latestStart)}</strong>. Çalışılan <strong>${preDays - st.limit} gün</strong> doğum sonrasına eklenir.`
-            : `🩺 ${st.who} doktor raporuyla doğuma ${limitWeeks} hafta kalana kadar çalışabilir. Önce beklenen doğum tarihini seçin.`;
-        $('startHelp').innerHTML = expected
-            ? `En erken <strong>${fmt(legalStart)}</strong>, doktor raporuyla en geç <strong>${fmt(latestStart)}</strong>. Normal başlangıçtan sonra çalışılan her gün doğum sonrasına eklenir.`
-            : 'Normal başlangıçtan sonra çalışılan her gün doğum sonrasına eklenir.';
-
-        if (!expected) return showEmpty('👈', 'Başlamak için <strong>2. sorudaki</strong> beklenen doğum tarihini seçin.');
-        if (mode === 'custom' && !customStart) return showEmpty('📅', 'İzne çıktığı ilk günü seçin. <br>Emin değilseniz 4. soruda <strong>"Normal zamanında"</strong> seçeneğine dokunun.');
-        if (born && !actual) return showEmpty('📅', 'Doğumun olduğu günü seçin. <br>Doğum henüz olmadıysa 5. soruda <strong>"Henüz olmadı"</strong> seçeneğine dokunun.');
-
-        if (actual && actual > today()) {
-            return showEmpty('⚠️', 'Doğum tarihi bugünden sonra olamaz. Lütfen tarihi kontrol edin.', true);
+        if (state.startMode === 'custom') {
+            const e = checkStart(state.start);
+            if (e !== null) return { error: e || 'İzne çıkış tarihini seçin.', step: 'startMode' };
         }
-        if (actual && Math.abs(diffDays(actual, expected)) > 120) {
-            return showEmpty('⚠️', 'Doğum tarihi ile beklenen doğum tarihi arasında 4 aydan fazla fark var. Lütfen tarihleri kontrol edin.', true);
-        }
-        if (customStart && customStart < legalStart) {
-            return showEmpty('⚠️', `İzne en erken <strong>${fmt(legalStart)}</strong> tarihinde çıkılabilir. Daha önceki bir tarih girilemez.`, true);
-        }
-        if (customStart && customStart > latestStart && !(actual && customStart >= actual)) {
-            return showEmpty('⚠️', `${st.who} doktor raporuyla en geç doğuma ${limitWeeks} hafta kalana kadar çalışabilir. İzne en geç <strong>${fmt(latestStart)}</strong> tarihinde çıkılmalıdır.`, true);
+        if (state.born === '1') {
+            const e = checkActual(state.actual);
+            if (e !== null) return { error: e || 'Doğum tarihini seçin.', step: 'born' };
         }
 
-        const notes = [];
+        const actual = state.born === '1' ? state.actual : null;
         const birth = actual || expected;
-        let plannedStart = mode === 'report' ? latestStart : (customStart || legalStart);
-        let start = plannedStart;
+        const notes = [];
+        let start = state.startMode === 'report' ? latestStart : (state.startMode === 'custom' ? state.start : legalStart);
 
         // Doğum, izne çıkılmadan önce gerçekleştiyse izin doğum günü başlar
         if (birth <= start) {
-            if (start > legalStart) notes.push('Doğum, izne çıkılmadan önce gerçekleştiği için izin doğum günü başlatıldı.');
+            if (start > legalStart) notes.push('Bebek, izne çıkılmadan önce doğduğu için izin <strong>doğum günü</strong> başlatıldı.');
             start = birth;
         }
 
-        const usedPre = diffDays(birth, start);                       // doğumdan önce izinde geçen gün
-        const workedDays = Math.max(0, diffDays(start, legalStart));  // raporla fiilen çalışılan gün
-        const earlyDays = Math.min(preDays - workedDays, Math.max(0, diffDays(expected, birth))); // erken doğumla kullanılamayan gün
-        const transferred = workedDays + earlyDays;                   // doğum sonrasına eklenen gün (geç doğum bunu azaltmaz)
+        const usedPre = diffDays(birth, start);                                                  // doğumdan önce izinde geçen
+        const workedDays = Math.max(0, diffDays(start, legalStart));                             // raporla fiilen çalışılan
+        const earlyDays = Math.min(preDays - workedDays, Math.max(0, diffDays(expected, birth))); // erken doğumla kullanılamayan
+        const transferred = workedDays + earlyDays;                                              // doğum sonrasına eklenen
         const postDays = POST_DAYS + transferred;
         const lastDay = addDays(birth, postDays - 1);
         const returnDate = addDays(birth, postDays);
         const totalDays = usedPre + postDays;
 
-        // Açıklama notları
-        if (!actual) notes.push('Doğum henüz olmadığı için tarihler <strong>beklenen doğum tarihine göre tahminidir</strong>. Doğum olunca 5. soruya gerçek tarihi girin.');
+        if (!actual) notes.push('Bebek henüz doğmadığı için tarihler <strong>tahminidir</strong>. Doğum olunca programı tekrar açıp gerçek doğum tarihini girin.');
         if (workedDays > 0) {
-            notes.push(`Doktor raporuyla fiilen çalışılan <strong>${workedDays} gün</strong> (${weeks(workedDays)}) doğum sonrasına eklendi.`);
-            if (mode === 'custom' || mode === 'report') notes.push('Doğum öncesi 8 haftadan (ikizde 10) sonra çalışmaya devam edebilmek için <strong>doktor raporu</strong> gereklidir; raporu izin dosyasına ekleyin.');
+            notes.push(`Doktor raporuyla fiilen çalışılan <strong>${workedDays} gün</strong> (${weeks(workedDays)}) doğumdan sonraki izne eklendi.`);
+            notes.push(`Doğuma ${preDays / 7} hafta kaldıktan sonra çalışmaya devam etmek için <strong>doktor raporu</strong> gerekir. Raporu izin dosyasına ekleyin.`);
         }
         if (actual && actual < expected) {
-            notes.push(`Doğum, beklenen tarihten ${diffDays(expected, actual)} gün erken oldu.` + (earlyDays > 0 ? ` Kullanılmayan <strong>${earlyDays} gün</strong> doğum öncesi izin doğum sonrasına eklendi.` : ''));
+            notes.push(`Bebek beklenenden <strong>${diffDays(expected, actual)} gün erken</strong> doğdu.` + (earlyDays > 0 ? ` Kullanılamayan <strong>${earlyDays} gün</strong> doğumdan sonraki izne eklendi.` : ''));
         }
         if (actual && actual > expected) {
-            notes.push(`Doğum, beklenen tarihten ${diffDays(actual, expected)} gün geç oldu. Bu günler doğum öncesi izinde geçer; doğum sonrası 16 hafta kısalmaz.`);
+            notes.push(`Bebek beklenenden ${diffDays(actual, expected)} gün geç doğdu. Bu günler doğumdan önceki izinde geçer; doğumdan sonraki 16 hafta kısalmaz.`);
         }
 
         const wd = returnDate.getDay();
-        let returnHint = '';
-        let firstWorkday = returnDate;
+        let firstWorkday = null;
         if (wd === 0 || wd === 6) {
             firstWorkday = addDays(returnDate, wd === 6 ? 2 : 1);
-            returnHint = `Hafta sonu — fiilen ${fmtLong(firstWorkday)}`;
-            notes.push(`Göreve başlama tarihi hafta sonuna denk geliyor. Fiilen işe dönüş ilk iş günü olan <strong>${fmtLong(firstWorkday)}</strong> günüdür. Resmî tatil olup olmadığını ayrıca kontrol edin.`);
+            notes.push(`Göreve başlama günü hafta sonuna denk geliyor. Fiilen işe dönüş ilk iş günü olan <strong>${fmtLong(firstWorkday)}</strong> günüdür. Resmî tatil olup olmadığını ayrıca kontrol edin.`);
         }
 
-        const remaining = diffDays(returnDate, today());
-        const remainingText = remaining > 0 ? `Bugünden itibaren ${remaining} gün sonra` : (remaining === 0 ? 'Bugün' : `${-remaining} gün önce`);
+        return { st, preDays, legalStart, actual, birth, start, usedPre, workedDays, earlyDays, transferred, postDays, lastDay, returnDate, firstWorkday, totalDays, notes };
+    }
 
-        const person = $('person').value.trim();
-        const who = person ? `<strong>${esc(person)}</strong>` : 'Personel';
+    function sentenceHtml(r) {
+        const n = state.person.trim();
+        return `${n ? `<strong>${esc(n)}</strong>` : 'Personel'} <strong>${fmt(r.start)}</strong> günü izne çıkar, <strong>${r.totalDays} gün</strong> izinli olur ve <strong>${fmt(r.returnDate)}</strong> günü göreve başlar.`;
+    }
 
-        // İzin dağılım çubuğu
-        const pct = n => (n / totalDays * 100).toFixed(2) + '%';
-        const bar = `
-            <div class="timeline">
-                <div class="timeline-title">İzin süresinin dağılımı (toplam ${totalDays} gün)</div>
-                <div class="bar">
-                    ${usedPre ? `<div class="seg-pre" style="width:${pct(usedPre)}" title="Doğumdan önce ${usedPre} gün">${usedPre} g</div>` : ''}
-                    <div class="seg-post" style="width:${pct(POST_DAYS)}" title="Doğumdan sonra 112 gün">112 g</div>
-                    ${transferred ? `<div class="seg-tr" style="width:${pct(transferred)}" title="Eklenen ${transferred} gün">${transferred} g</div>` : ''}
-                </div>
-                <div class="legend">
-                    ${usedPre ? '<span><i class="seg-pre"></i>Doğumdan önce</span>' : ''}
-                    <span><i class="seg-post"></i>Doğumdan sonra (16 hafta)</span>
-                    ${transferred ? '<span><i class="seg-tr"></i>Doğum sonrasına eklenen</span>' : ''}
-                </div>
-            </div>`;
+    // --- SONUÇ EKRANI ---
+    function renderResult() {
+        const r = compute();
+        if (r.error) {
+            lastResult = null;
+            $('result').innerHTML = `
+                <div class="err-box"><b>⚠️</b>${r.error}</div>
+                <div class="nav no-print"><button class="btn btn-primary" type="button" onclick="goTo('${r.step}', true)">Düzelt ➜</button></div>`;
+            return;
+        }
+        lastResult = r;
+        const pct = n => (n / r.totalDays * 100).toFixed(2) + '%';
+        const startModeText = { normal: 'Normal zamanında', report: 'Doktor raporuyla çalıştı', custom: `Başka tarihte (${state.start ? fmt(state.start) : ''})` }[state.startMode];
 
         $('result').innerHTML = `
-            <div class="res-head">
-                <div>
-                    <span class="res-kicker">${actual ? 'SONUÇ' : 'TAHMİNİ SONUÇ'}</span>
-                    <h2>İzin takvimi</h2>
-                    <p>${st.law}</p>
-                </div>
-                <div class="badge">${totalDays} gün<small>toplam izin</small></div>
+            <div class="done-head">
+                <div class="q-emoji">✅</div>
+                <h2 class="q-title">Hesap tamam!</h2>
+                <span class="tag ${r.actual ? 'tag-final' : 'tag-est'}">${r.actual ? 'Gerçek doğum tarihine göre' : 'Beklenen doğum tarihine göre (tahmini)'}</span>
             </div>
 
             <div class="big-dates">
                 <div class="big-date bd-out">
                     <div class="ico">🚪</div>
-                    <div><span>İzne çıkış (ilk izin günü)</span><strong>${fmtLong(start)}</strong></div>
+                    <div><span>İzne çıkış günü</span><strong>${fmtLong(r.start)}</strong><small>${relative(r.start)}</small></div>
                 </div>
                 <div class="big-date bd-back">
                     <div class="ico">🏫</div>
-                    <div><span>Göreve başlama (işe dönüş)</span><strong>${fmtLong(returnDate)}</strong><small>${returnHint || remainingText}</small></div>
+                    <div><span>Göreve başlama (işe dönüş) günü</span><strong>${fmtLong(r.returnDate)}</strong><small>${r.firstWorkday ? `Hafta sonu — fiilen ${fmtLong(r.firstWorkday)}` : relative(r.returnDate)}</small></div>
                 </div>
             </div>
 
-            <div class="sentence">
-                ${who} <strong>${fmt(start)}</strong> tarihinde izne çıkar, toplam <strong>${totalDays} gün</strong> izinli olur ve <strong>${fmt(returnDate)}</strong> tarihinde göreve başlar.
+            <div class="total-strip">Toplam izin: <b>${r.totalDays} gün</b> <span>(${weeks(r.totalDays)})</span></div>
+
+            <div class="sentence" id="sentence">${sentenceHtml(r)}</div>
+
+            <div class="name-row no-print">
+                <label for="person">Personelin adı (isterseniz yazın, çıktıda görünür)</label>
+                <input type="text" id="person" placeholder="Örn: Ayşe Yılmaz" maxlength="120" value="${esc(state.person)}">
             </div>
 
+            <div class="share no-print">
+                <button type="button" onclick="window.print()"><em>🖨️</em>Yazdır</button>
+                <button type="button" onclick="copyResult()"><em>📋</em>Kopyala</button>
+                <button type="button" onclick="shareWhatsApp()"><em>💬</em>WhatsApp</button>
+                <button type="button" onclick="downloadIcs()"><em>📆</em>Takvime ekle</button>
+            </div>
+
+            <div class="section-h">📍 Adım adım takvim</div>
             <ol class="agenda">
-                ${workedDays ? `<li><div class="dot">💼</div><div><span>Normal izin başlangıcı (raporla çalışmaya devam)</span><strong>${fmtLong(legalStart)}</strong></div></li>` : ''}
-                <li><div class="dot">🚪</div><div><span>İzne çıkış</span><strong>${fmtLong(start)}</strong></div></li>
-                <li><div class="dot">🍼</div><div><span>${actual ? 'Doğum' : 'Beklenen doğum'}</span><strong>${fmtLong(birth)}</strong></div></li>
-                <li><div class="dot">📌</div><div><span>İznin son günü</span><strong>${fmtLong(lastDay)}</strong></div></li>
-                <li><div class="dot">🏫</div><div><span>Göreve başlama</span><strong>${fmtLong(returnDate)}</strong></div></li>
+                ${r.workedDays ? `<li><div class="dot">💼</div><div><span>Normal izin başlangıcı — raporla çalışmaya devam</span><strong>${fmtLong(r.legalStart)}</strong></div></li>` : ''}
+                <li class="key"><div class="dot">🚪</div><div><span>İzne çıkış</span><strong>${fmtLong(r.start)}</strong></div></li>
+                <li><div class="dot">🍼</div><div><span>${r.actual ? 'Doğum' : 'Beklenen doğum'}</span><strong>${fmtLong(r.birth)}</strong></div></li>
+                <li><div class="dot">📌</div><div><span>İznin son günü</span><strong>${fmtLong(r.lastDay)}</strong></div></li>
+                <li class="key"><div class="dot">🏫</div><div><span>Göreve başlama</span><strong>${fmtLong(r.returnDate)}</strong></div></li>
             </ol>
 
-            ${bar}
-
-            <div class="grid">
-                <div class="metric"><span>Doğum öncesi izin hakkı</span><strong>${preDays} gün</strong><small>${weeks(preDays)} · ${fmt(legalStart)} itibarıyla</small></div>
-                <div class="metric"><span>Doğumdan önce izinde geçen</span><strong>${usedPre} gün</strong><small>${usedPre ? weeks(usedPre) : 'Doğum izinden önce oldu'}</small></div>
-                <div class="metric"><span>Raporla fiilen çalışılan</span><strong>${workedDays} gün</strong><small>${workedDays ? weeks(workedDays) + ' · doğum sonrasına eklendi' : 'Yok'}</small></div>
-                <div class="metric"><span>Doğum sonrasına eklenen (toplam)</span><strong>${transferred} gün</strong><small>${transferred ? weeks(transferred) : 'Aktarım yok'}</small></div>
-                <div class="metric"><span>Doğum sonrası toplam süre</span><strong>${postDays} gün</strong><small>16 hafta + ${transferred} gün</small></div>
-                <div class="metric"><span>İznin son günü</span><strong>${fmt(lastDay)}</strong><small>Ertesi gün göreve başlanır</small></div>
+            <div class="section-h">📊 İzin nasıl dağılıyor?</div>
+            <div class="timeline">
+                <div class="bar">
+                    ${r.usedPre ? `<div class="seg-pre" style="width:${pct(r.usedPre)}" title="${r.usedPre} gün">${r.usedPre}</div>` : ''}
+                    <div class="seg-post" style="width:${pct(POST_DAYS)}">112 gün</div>
+                    ${r.transferred ? `<div class="seg-tr" style="width:${pct(r.transferred)}">${r.transferred} gün</div>` : ''}
+                </div>
+                <div class="legend">
+                    ${r.usedPre ? '<span><i class="seg-pre"></i>Doğumdan önce</span>' : ''}
+                    <span><i class="seg-post"></i>Doğumdan sonra (16 hafta)</span>
+                    ${r.transferred ? '<span><i class="seg-tr"></i>Doğumdan sonraya eklenen</span>' : ''}
+                </div>
             </div>
 
-            ${notes.length ? `<div class="notes"><strong>ℹ️ Açıklamalar</strong><ul>${notes.map(n => `<li>${n}</li>`).join('')}</ul></div>` : ''}
+            ${r.notes.length ? `<div class="notes"><strong>ℹ️ Bilmeniz gerekenler</strong><ul>${r.notes.map(n => `<li>${n}</li>`).join('')}</ul></div>` : ''}
 
-            <div class="legal-line"><strong>Hesap dayanağı:</strong> ${st.law}; 7578 sayılı Kanun ile doğum sonrası süre 16 haftadır. Sonuç, kurumun izin onayı ve sağlık raporlarının yerine geçmez.</div>
+            <details class="fold">
+                <summary>Ayrıntılı hesap (personel birimi için)</summary>
+                <div class="fold-body">
+                    <div class="grid">
+                        <div class="metric"><span>Doğum öncesi izin hakkı</span><strong>${r.preDays} gün</strong><small>${weeks(r.preDays)} · ${fmt(r.legalStart)} itibarıyla</small></div>
+                        <div class="metric"><span>Doğumdan önce izinde geçen</span><strong>${r.usedPre} gün</strong><small>${r.usedPre ? weeks(r.usedPre) : 'Bebek izinden önce doğdu'}</small></div>
+                        <div class="metric"><span>Raporla fiilen çalışılan</span><strong>${r.workedDays} gün</strong><small>${r.workedDays ? 'Doğum sonrasına eklendi' : 'Yok'}</small></div>
+                        <div class="metric"><span>Erken doğum nedeniyle eklenen</span><strong>${r.earlyDays} gün</strong><small>${r.earlyDays ? weeks(r.earlyDays) : 'Yok'}</small></div>
+                        <div class="metric"><span>Doğum sonrası toplam süre</span><strong>${r.postDays} gün</strong><small>16 hafta + ${r.transferred} gün</small></div>
+                        <div class="metric"><span>İznin son günü</span><strong>${fmt(r.lastDay)}</strong><small>Ertesi gün göreve başlanır</small></div>
+                    </div>
+                    <div class="legal-line"><strong>Hesap dayanağı:</strong> ${r.st.law}; 7578 sayılı Kanun ile doğum sonrası süre 16 haftadır. Sonuç, kurumun izin onayı ve sağlık raporlarının yerine geçmez.</div>
+                </div>
+            </details>
+
+            <details class="fold no-print">
+                <summary>Cevaplarım (değiştirmek için dokunun)</summary>
+                <div class="fold-body">
+                    <ul class="answers">
+                        <li><div><span>Statü</span><strong>${r.st.name}</strong></div><button type="button" onclick="goTo('status', true)">Değiştir</button></li>
+                        <li><div><span>Beklenen doğum</span><strong>${fmtLong(state.expected)}</strong></div><button type="button" onclick="goTo('expected', true)">Değiştir</button></li>
+                        <li><div><span>Bebek sayısı</span><strong>${state.multiple === '1' ? 'İkiz veya daha fazla' : '1 bebek'}</strong></div><button type="button" onclick="goTo('multiple', true)">Değiştir</button></li>
+                        <li><div><span>İzne çıkış</span><strong>${startModeText}</strong></div><button type="button" onclick="goTo('startMode', true)">Değiştir</button></li>
+                        <li><div><span>Doğum</span><strong>${r.actual ? fmtLong(r.actual) : 'Henüz doğmadı'}</strong></div><button type="button" onclick="goTo('born', true)">Değiştir</button></li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="fold no-print">
+                <summary>📘 Kurallar kısaca</summary>
+                <div class="fold-body">
+                    <div class="law-grid">
+                        <span><b>1 bebek:</b> doğumdan önce 8 hafta + doğumdan sonra 16 hafta</span>
+                        <span><b>İkiz ve üzeri:</b> doğumdan önce 10 hafta + doğumdan sonra 16 hafta</span>
+                        <span><b>Memur / sözleşmeli:</b> doktor raporuyla doğuma 2 hafta kalana kadar çalışabilir</span>
+                        <span><b>İşçi:</b> doktor onayıyla doğuma 3 hafta kalana kadar çalışabilir</span>
+                        <span><b>Raporla çalışma:</b> fiilen çalışılan günler doğumdan sonraya eklenir</span>
+                        <span><b>Erken doğum:</b> kullanılamayan doğum öncesi günler doğumdan sonraya eklenir</span>
+                    </div>
+                    <p class="legal-line">Bu program hesaplama ve ön kontrol içindir. İzin başlangıcı, raporlar ve göreve başlama işlemi kurum personel birimince onaylanmalıdır.</p>
+                </div>
+            </details>
+
+            <div class="nav no-print">
+                <button class="btn btn-ghost" type="button" style="flex:1" onclick="restart()">↺ Yeni hesap yap</button>
+            </div>
         `;
 
-        // Kopyalanacak düz metin
-        lastSummary = [
-            `DOĞUM İZNİ HESABI${actual ? '' : ' (tahmini)'}`,
+        $('person').addEventListener('input', e => {
+            state.person = e.target.value;
+            $('sentence').innerHTML = sentenceHtml(r);
+        });
+    }
+
+    // --- Paylaşım ---
+    function summaryText() {
+        const r = lastResult;
+        if (!r) return '';
+        const person = state.person.trim();
+        return [
+            `DOĞUM İZNİ HESABI${r.actual ? '' : ' (tahmini)'}`,
             person ? `Personel: ${person}` : null,
-            `Statü: ${st.law}`,
-            `${actual ? 'Doğum tarihi' : 'Beklenen doğum tarihi'}: ${fmtLong(birth)}`,
-            `İzne çıkış: ${fmtLong(start)}`,
-            workedDays ? `Raporla fiilen çalışılan: ${workedDays} gün (doğum sonrasına eklendi)` : null,
-            `Doğumdan önce izinde geçen: ${usedPre} gün`,
-            `Doğum sonrası süre: ${postDays} gün (16 hafta + ${transferred} gün aktarılan)`,
-            `İznin son günü: ${fmtLong(lastDay)}`,
-            `Göreve başlama: ${fmtLong(returnDate)}` + (firstWorkday !== returnDate ? ` (fiilen ${fmtLong(firstWorkday)})` : ''),
-            `Toplam izin: ${totalDays} gün`
+            `Statü: ${r.st.name}`,
+            `${r.actual ? 'Doğum tarihi' : 'Beklenen doğum'}: ${fmtLong(r.birth)}`,
+            `İzne çıkış: ${fmtLong(r.start)}`,
+            r.workedDays ? `Raporla çalışılan: ${r.workedDays} gün (doğum sonrasına eklendi)` : null,
+            r.earlyDays ? `Erken doğumla eklenen: ${r.earlyDays} gün` : null,
+            `Doğum sonrası izin: ${r.postDays} gün`,
+            `İznin son günü: ${fmtLong(r.lastDay)}`,
+            `Göreve başlama: ${fmtLong(r.returnDate)}` + (r.firstWorkday ? ` (fiilen ${fmtLong(r.firstWorkday)})` : ''),
+            `Toplam izin: ${r.totalDays} gün`
         ].filter(Boolean).join('\n');
+    }
+
+    function copyResult() {
+        const text = summaryText();
+        const done = () => toast('✅ Kopyalandı! İstediğiniz yere yapıştırabilirsiniz.');
+        const fallback = () => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); done(); }
+            catch (e) { alert(text); }
+            ta.remove();
+        };
+        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback);
+        else fallback();
+    }
+
+    function shareWhatsApp() {
+        window.open('https://wa.me/?text=' + encodeURIComponent(summaryText()), '_blank', 'noopener');
+    }
+
+    function downloadIcs() {
+        const r = lastResult;
+        const ymd = d => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+        const person = state.person.trim();
+        const suffix = person ? ` - ${person}` : '';
+        const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+        const event = (uid, date, title, desc) => [
+            'BEGIN:VEVENT',
+            `UID:${uid}-${ymd(date)}@dogum-izni`,
+            `DTSTAMP:${stamp}`,
+            `DTSTART;VALUE=DATE:${ymd(date)}`,
+            `DTEND;VALUE=DATE:${ymd(addDays(date, 1))}`,
+            `SUMMARY:${title}${suffix}`,
+            `DESCRIPTION:${desc}`,
+            'END:VEVENT'
+        ].join('\r\n');
+        const ics = [
+            'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Dogum Izni Hesaplama//TR', 'CALSCALE:GREGORIAN',
+            event('izne-cikis', r.start, 'Doğum iznine çıkış', `Toplam ${r.totalDays} gün izin`),
+            event('gorev-baslama', r.returnDate, 'Doğum izni bitti - göreve başlama', `İznin son günü ${fmt(r.lastDay)}`),
+            'END:VCALENDAR'
+        ].join('\r\n');
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+        a.download = 'dogum-izni.ics';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast('📆 Takvim dosyası indirildi. Açınca tarihler takviminize eklenir.');
     }
 
     function toast(msg) {
@@ -572,49 +722,137 @@
         t.textContent = msg;
         t.classList.add('show');
         clearTimeout(toast.timer);
-        toast.timer = setTimeout(() => t.classList.remove('show'), 2500);
+        toast.timer = setTimeout(() => t.classList.remove('show'), 2800);
     }
 
-    function copySummary() {
-        if (!lastSummary) { toast('Önce soruları cevaplayın.'); return; }
-        const fallback = () => {
-            const ta = document.createElement('textarea');
-            ta.value = lastSummary;
-            document.body.appendChild(ta);
-            ta.select();
-            try { document.execCommand('copy'); toast('✅ Sonuç kopyalandı'); }
-            catch (e) { alert(lastSummary); }
-            ta.remove();
-        };
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(lastSummary).then(() => toast('✅ Sonuç kopyalandı'), fallback);
-        } else {
-            fallback();
+    // --- EKRAN GEÇİŞLERİ ---
+    function updateStepUI(step) {
+        const { st, preDays, legalStart, latestStart } = rules();
+        if (step === 'startMode' && state.expected) {
+            $('normalHint').textContent = `Doğuma ${preDays / 7} hafta kala · ${fmtLong(legalStart)}`;
+            $('reportHint').textContent = `Doğuma ${st.limit / 7} hafta kalana kadar çalıştı · izne çıkış ${fmtLong(latestStart)} · ${preDays - st.limit} gün doğumdan sonraya eklenir`;
+            $('startHelp').innerHTML = `En erken <strong>${fmt(legalStart)}</strong>, en geç <strong>${fmt(latestStart)}</strong> seçilebilir.`;
+            const custom = state.startMode === 'custom';
+            $('startBox').classList.toggle('show', custom);
+            $('startNext').style.display = custom ? '' : 'none';
+            if (custom) onStartChange();
         }
+        if (step === 'born') {
+            const yes = state.born === '1';
+            $('actualBox').classList.toggle('show', yes);
+            $('bornNext').style.display = yes ? '' : 'none';
+            if (yes) onActualChange();
+        }
+        document.querySelectorAll(`.screen[data-step="${step}"] .big-choice`).forEach(b => {
+            const on = state[b.dataset.field] === b.dataset.value;
+            b.classList.toggle('selected', on);
+            b.setAttribute('aria-pressed', on);
+        });
     }
 
-    function resetAll() {
-        ['expected', 'actual', 'start', 'person'].forEach(id => { $(id).value = ''; });
-        document.querySelector('input[name="status"][value="657"]').checked = true;
-        document.querySelector('input[name="multiple"][value="0"]').checked = true;
-        document.querySelector('input[name="startMode"][value="normal"]').checked = true;
-        document.querySelector('input[name="born"][value="0"]').checked = true;
-        calculate();
+    function show(index) {
+        current = index;
+        const step = STEPS[index];
+        document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.dataset.step === step));
+        const isResult = step === 'result';
+        $('progress').classList.toggle('show', index >= 1);
+        const pct = isResult ? 100 : Math.round((index - 1) / QUESTION_COUNT * 100);
+        $('progressFill').style.width = pct + '%';
+        $('progressPct').textContent = pct + '%';
+        $('progressLabel').textContent = isResult ? 'Tamamlandı 🎉' : `Soru ${index} / ${QUESTION_COUNT}`;
+        if (isResult) renderResult();
+        else updateStepUI(step);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    document.querySelectorAll('input, select').forEach(el => {
-        el.addEventListener('input', calculate);
-        el.addEventListener('change', calculate);
+    function next() {
+        // Sonuçtan bir cevabı değiştirmeye gelindiyse doğrudan sonuca dön
+        if (editing || current === STEPS.length - 2) { editing = false; return show(STEPS.length - 1); }
+        show(current + 1);
+    }
+    function back() {
+        if (editing) { editing = false; return show(STEPS.length - 1); }
+        if (current > 0) show(current - 1);
+    }
+    function goTo(step, edit) { editing = !!edit; show(STEPS.indexOf(step)); }
+    function restart() {
+        Object.assign(state, { status: null, expected: null, multiple: null, startMode: null, start: null, born: null, actual: null, person: '' });
+        ['expectedSel', 'startSel', 'actualSel'].forEach(id => setDateSelect($(id), null));
+        ['expectedMsg', 'startMsg', 'actualMsg'].forEach(id => showMsg($(id)));
+        $('expectedNext').disabled = true;
+        editing = false;
+        show(0);
+    }
+
+    // Seçim düğmeleri: dokununca seç ve (tarih gerekmiyorsa) kendiliğinden ilerle
+    document.querySelectorAll('.big-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const field = btn.dataset.field, value = btn.dataset.value;
+            state[field] = value;
+            if (field === 'startMode' && value !== 'custom') state.start = null;
+            if (field === 'born' && value !== '1') state.actual = null;
+            const step = btn.closest('.screen').dataset.step;
+            updateStepUI(step);
+            const needsDate = (field === 'startMode' && value === 'custom') || (field === 'born' && value === '1');
+            if (needsDate) {
+                const box = field === 'born' ? $('actualBox') : $('startBox');
+                setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+                return;
+            }
+            setTimeout(next, 280);
+        });
     });
-    $('resetBtn').addEventListener('click', resetAll);
-    $('copyBtn').addEventListener('click', copySummary);
-    $('printBtn').addEventListener('click', () => {
-        if (!lastSummary) { toast('Önce soruları cevaplayın.'); $('expected').focus(); return; }
-        window.print();
+    document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', next));
+    document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', back));
+
+    // Tarih seçicileri
+    function onExpectedChange() {
+        const d = readDateSelect($('expectedSel'));
+        const err = checkExpected(d);
+        state.expected = err === null ? d : null;
+        $('expectedNext').disabled = err !== null;
+        if (err === null) {
+            const n = diffDays(d, today());
+            showMsg($('expectedMsg'), 'good', `✅ <strong>${fmtLong(d)}</strong><br>${n > 0 ? `Doğuma ${n} gün var.` : n === 0 ? 'Beklenen doğum bugün.' : `Beklenen tarih ${-n} gün önceydi.`}`);
+        } else showMsg($('expectedMsg'), err ? 'bad' : '', err ? `⚠️ ${err}` : '');
+    }
+    function onStartChange() {
+        const d = readDateSelect($('startSel'));
+        const err = checkStart(d);
+        state.start = err === null ? d : null;
+        $('startNext').disabled = err !== null;
+        if (err === null) {
+            const worked = diffDays(d, rules().legalStart);
+            showMsg($('startMsg'), 'good', `✅ <strong>${fmtLong(d)}</strong>` + (worked ? `<br>Raporla çalışılan ${worked} gün doğumdan sonraya eklenecek.` : ''));
+        } else showMsg($('startMsg'), err ? 'bad' : '', err ? `⚠️ ${err}` : '');
+    }
+    function onActualChange() {
+        const d = readDateSelect($('actualSel'));
+        const err = checkActual(d);
+        state.actual = err === null ? d : null;
+        $('bornNext').disabled = err !== null;
+        if (err === null) {
+            const diff = diffDays(state.expected, d);
+            showMsg($('actualMsg'), 'good', `✅ <strong>${fmtLong(d)}</strong><br>${diff > 0 ? `Beklenenden ${diff} gün erken.` : diff < 0 ? `Beklenenden ${-diff} gün geç.` : 'Tam beklenen günde.'}`);
+        } else showMsg($('actualMsg'), err ? 'bad' : '', err ? `⚠️ ${err}` : '');
+    }
+
+    buildDateSelect($('expectedSel'), onExpectedChange);
+    buildDateSelect($('startSel'), onStartChange);
+    buildDateSelect($('actualSel'), onActualChange);
+    document.querySelectorAll('[data-quick]').forEach(b => b.addEventListener('click', () => {
+        setDateSelect($('actualSel'), addDays(today(), -Number(b.dataset.quick)));
+        onActualChange();
+    }));
+
+    // Enter tuşu ile devam
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Enter' || e.target.tagName === 'BUTTON' || e.target.id === 'person') return;
+        const btn = document.querySelector('.screen.active [data-next]');
+        if (btn && !btn.disabled && btn.offsetParent) btn.click();
     });
 
-    calculate();
+    show(0);
 </script>
 
 </body>
