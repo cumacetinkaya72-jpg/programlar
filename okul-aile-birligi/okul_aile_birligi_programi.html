@@ -828,6 +828,7 @@
                                     <option value="Muhasip Üye">Muhasip Üye</option>
                                     <option value="Sekreter Üye">Sekreter Üye</option>
                                     <option value="Üye">Üye</option>
+                                    <option value="Yedek Üye">Yedek Üye</option>
                                 </select>
                             </div>
                             <div>
@@ -871,6 +872,29 @@
                         </div>
                     </div>
                 </div>
+                <div id="yonetim-print-card" class="print-only official-print-card">
+                    <div class="official-header">
+                        <h1>T.C.</h1>
+                        <h1 id="yonetim-print-district"></h1>
+                        <h2>İLÇE MİLLİ EĞİTİM MÜDÜRLÜĞÜ</h2>
+                        <h2 id="yonetim-print-school"></h2>
+                        <h3 id="yonetim-print-title">OKUL AİLE BİRLİĞİ YÖNETİM KURULU ÜYE LİSTESİ</h3>
+                    </div>
+                    <p style="font-weight:bold;margin-top:8px">ASİL ÜYELER</p>
+                    <table class="official-table">
+                        <thead><tr><th style="width:6%">S.No</th><th style="width:22%">Görevi</th><th style="width:28%">Adı Soyadı</th><th style="width:16%">Unvanı</th><th style="width:14%">Telefon</th><th style="width:14%">İmza</th></tr></thead>
+                        <tbody id="yonetim-print-asil"></tbody>
+                    </table>
+                    <p style="font-weight:bold;margin-top:8px">YEDEK ÜYELER</p>
+                    <table class="official-table">
+                        <thead><tr><th style="width:6%">S.No</th><th style="width:22%">Görevi</th><th style="width:28%">Adı Soyadı</th><th style="width:16%">Unvanı</th><th style="width:14%">Telefon</th><th style="width:14%">İmza</th></tr></thead>
+                        <tbody id="yonetim-print-yedek"></tbody>
+                    </table>
+                    <div class="official-signatures">
+                        <div class="official-sig-box"><p id="yonetim-print-sig1-name" style="margin-top:28px;font-weight:bold"></p><p>Okul Aile Birliği Başkanı</p></div>
+                        <div class="official-sig-box"><p id="yonetim-print-sig2-name" style="margin-top:28px;font-weight:bold"></p><p>Okul Müdürü</p></div>
+                    </div>
+                </div>
             </div>
 
             <!-- 3. BÖLÜM: DENETLEME KURULU ÜYELERİ -->
@@ -899,6 +923,8 @@
                                     <option value="Başkan (Öğretmen)">Başkan (Öğretmen)</option>
                                     <option value="Üye (Öğretmen)">Üye (Öğretmen)</option>
                                     <option value="Üye (Veli)">Üye (Veli / Kursiyer)</option>
+                                    <option value="Yedek Üye (Öğretmen)">Yedek Üye (Öğretmen)</option>
+                                    <option value="Yedek Üye (Veli)">Yedek Üye (Veli / Kursiyer)</option>
                                 </select>
                             </div>
                             <div>
@@ -940,6 +966,29 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+                <div id="denetleme-print-card" class="print-only official-print-card">
+                    <div class="official-header">
+                        <h1>T.C.</h1>
+                        <h1 id="denetleme-print-district"></h1>
+                        <h2>İLÇE MİLLİ EĞİTİM MÜDÜRLÜĞÜ</h2>
+                        <h2 id="denetleme-print-school"></h2>
+                        <h3 id="denetleme-print-title">OKUL AİLE BİRLİĞİ DENETİM KURULU ÜYE LİSTESİ</h3>
+                    </div>
+                    <p style="font-weight:bold;margin-top:8px">ASİL ÜYELER</p>
+                    <table class="official-table">
+                        <thead><tr><th style="width:6%">S.No</th><th style="width:22%">Görevi</th><th style="width:28%">Adı Soyadı</th><th style="width:16%">Unvanı</th><th style="width:14%">Telefon</th><th style="width:14%">İmza</th></tr></thead>
+                        <tbody id="denetleme-print-asil"></tbody>
+                    </table>
+                    <p style="font-weight:bold;margin-top:8px">YEDEK ÜYELER</p>
+                    <table class="official-table">
+                        <thead><tr><th style="width:6%">S.No</th><th style="width:22%">Görevi</th><th style="width:28%">Adı Soyadı</th><th style="width:16%">Unvanı</th><th style="width:14%">Telefon</th><th style="width:14%">İmza</th></tr></thead>
+                        <tbody id="denetleme-print-yedek"></tbody>
+                    </table>
+                    <div class="official-signatures">
+                        <div class="official-sig-box"><p id="denetleme-print-sig1-name" style="margin-top:28px;font-weight:bold"></p><p>Denetim Kurulu Başkanı</p></div>
+                        <div class="official-sig-box"><p id="denetleme-print-sig2-name" style="margin-top:28px;font-weight:bold"></p><p>Okul Müdürü</p></div>
                     </div>
                 </div>
             </div>
@@ -2345,13 +2394,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             if (document.getElementById('bilanco-print-fark')) document.getElementById('bilanco-print-fark').innerText = formatTRY(fark);
             if (document.getElementById('bilanco-print-kalan')) document.getElementById('bilanco-print-kalan').innerText = formatTRY(bankadaKalan);
 
-            const baskanYrd = (appData.yonetimMembers || []).find(m => m.role === 'Başkan Yardımcısı');
-            const sekreter = (appData.yonetimMembers || []).find(m => m.role === 'Sekreter Üye');
-            const asilUye = (appData.denetlemeMembers || [])[0];
+            const baskanYrd = ykRolUyesi('Başkan Yardımcısı');
+            const sekreter = ykRolUyesi('Sekreter Üye');
+            const asilUye = dkAsilUyeler()[0];
 
-            if (document.getElementById('bilanco-sig-baskan')) document.getElementById('bilanco-sig-baskan').innerText = appData.presidentName || '-';
+            if (document.getElementById('bilanco-sig-baskan')) document.getElementById('bilanco-sig-baskan').innerText = oabBaskanAdi() || '-';
             if (document.getElementById('bilanco-sig-baskan-yrd')) document.getElementById('bilanco-sig-baskan-yrd').innerText = baskanYrd ? baskanYrd.name : '-';
-            if (document.getElementById('bilanco-sig-muhasip')) document.getElementById('bilanco-sig-muhasip').innerText = appData.treasurerName || '-';
+            if (document.getElementById('bilanco-sig-muhasip')) document.getElementById('bilanco-sig-muhasip').innerText = oabMuhasipAdi() || '-';
             if (document.getElementById('bilanco-sig-sekreter')) document.getElementById('bilanco-sig-sekreter').innerText = sekreter ? sekreter.name : '-';
             if (document.getElementById('bilanco-sig-asil')) document.getElementById('bilanco-sig-asil').innerText = asilUye ? asilUye.name : '-';
             if (document.getElementById('bilanco-sig-mudur')) document.getElementById('bilanco-sig-mudur').innerText = appData.principalName || '-';
@@ -2370,9 +2419,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const fark = toplamGelir - toplamGider;
             const bankadaKalan = (parseFloat(period.devirOncesi) || 0) + fark;
 
-            const baskanYrd = (appData.yonetimMembers || []).find(m => m.role === 'Başkan Yardımcısı');
-            const sekreter = (appData.yonetimMembers || []).find(m => m.role === 'Sekreter Üye');
-            const asilUye = (appData.denetlemeMembers || [])[0];
+            const baskanYrd = ykRolUyesi('Başkan Yardımcısı');
+            const sekreter = ykRolUyesi('Sekreter Üye');
+            const asilUye = dkAsilUyeler()[0];
 
             const wb = XLSX.utils.book_new();
             let rows = [];
@@ -2400,7 +2449,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             rows.push(["Bankada Kalan:", bankadaKalan]);
             rows.push([]);
             rows.push(["O.A.B Başkanı", "O.A.B Başkan Yardımcısı", "", "Muhasip Üye"]);
-            rows.push([appData.presidentName || "-", baskanYrd ? baskanYrd.name : "-", "", appData.treasurerName || "-"]);
+            rows.push([oabBaskanAdi() || "-", baskanYrd ? baskanYrd.name : "-", "", oabMuhasipAdi() || "-"]);
             rows.push([]);
             rows.push(["Sekreter", "", "Asil Üye"]);
             rows.push([sekreter ? sekreter.name : "-", "", asilUye ? asilUye.name : "-"]);
@@ -2510,10 +2559,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const yk = appData.yonetimMembers || [], dk = appData.denetlemeMembers || [];
             const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
             set('pano-yk-sayi', `${yk.length} üye`);
-            const baskan = yk.find(m => /^başkan$/i.test(String(m.role || '').trim()));
-            set('pano-yk-baskan', `Başkan: ${(baskan && baskan.name) || appData.presidentName || '—'}`);
-            set('pano-dk-sayi', `${dk.length} üye`);
-            set('pano-dk-baskan', dk[0] ? `${dk[0].role || 'Üye'}: ${dk[0].name}` : 'Üye girilmedi');
+            const ykY = yk.filter(uyeYedekMi).length, dkY = dk.filter(uyeYedekMi).length;
+            set('pano-yk-sayi', `${yk.length - ykY} asil · ${ykY} yedek`);
+            set('pano-yk-baskan', `Başkan: ${oabBaskanAdi() || '—'}`);
+            set('pano-dk-sayi', `${dk.length - dkY} asil · ${dkY} yedek`);
+            const dkB = dkAsilUyeler()[0];
+            set('pano-dk-baskan', dkB ? `${dkB.role || 'Üye'}: ${dkB.name}` : 'Üye girilmedi');
 
             // Genel kurul tarihi
             const v = (typeof gkV === 'function') ? gkV() : {};
@@ -2569,7 +2620,75 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount);
         }
 
+        // ---- Kurul üyesi yardımcıları (asil/yedek ayrımı, görev bazlı isimler) ----
+        const YK_ROLLER = ['Başkan', 'Başkan Yardımcısı', 'Muhasip Üye', 'Sekreter Üye', 'Üye', 'Yedek Üye'];
+        const DK_ROLLER = ['Başkan (Öğretmen)', 'Üye (Öğretmen)', 'Üye (Veli)', 'Yedek Üye (Öğretmen)', 'Yedek Üye (Veli)'];
+        function uyeYedekMi(m) {
+            return /yedek/i.test(`${(m && m.role) || ''} ${(m && m.title) || ''}`);
+        }
+        // Unvanında "Yedek" yazan ama görevi "Üye" kalmış eski kayıtları yedek göreve taşır
+        function normalizeKurulUyeleri() {
+            (appData.yonetimMembers || []).forEach(m => {
+                if (uyeYedekMi(m) && !/yedek/i.test(m.role || '')) m.role = 'Yedek Üye';
+            });
+            (appData.denetlemeMembers || []).forEach(m => {
+                if (uyeYedekMi(m) && !/yedek/i.test(m.role || '')) m.role = /veli/i.test(`${m.role || ''} ${m.title || ''}`) ? 'Yedek Üye (Veli)' : 'Yedek Üye (Öğretmen)';
+            });
+        }
+        function ykAsilUyeler() { return (appData.yonetimMembers || []).filter(m => !uyeYedekMi(m)); }
+        function ykYedekUyeler() { return (appData.yonetimMembers || []).filter(m => uyeYedekMi(m)); }
+        function ykRolUyesi(rol) {
+            return ykAsilUyeler().find(m => String(m.role || '').trim().toLocaleLowerCase('tr-TR') === rol.toLocaleLowerCase('tr-TR'));
+        }
+        // Yönetim Kurulu listesinde görev atanmışsa onu, yoksa Kurum Ayarlarındaki adı kullanır
+        function oabBaskanAdi() { const m = ykRolUyesi('Başkan'); return (m && m.name) || appData.presidentName || ''; }
+        function oabMuhasipAdi() { const m = ykRolUyesi('Muhasip Üye'); return (m && m.name) || appData.treasurerName || ''; }
+        function dkAsilUyeler() {
+            const l = (appData.denetlemeMembers || []).filter(m => !uyeYedekMi(m));
+            // Başkan her zaman ilk sırada
+            return [...l.filter(m => /başkan/i.test(m.role || '')), ...l.filter(m => !/başkan/i.test(m.role || ''))];
+        }
+        function dkYedekUyeler() { return (appData.denetlemeMembers || []).filter(m => uyeYedekMi(m)); }
+        function kurulRolSecimi(roller, m, fn) {
+            const liste = roller.includes(m.role) ? roller : [m.role, ...roller];
+            return `<select onchange="${fn}(${m.id}, this.value)" class="px-2 py-1 border border-slate-300 rounded-lg bg-white font-bold text-[11px]">${liste.map(r => `<option value="${gkEsc(r)}" ${r === m.role ? 'selected' : ''}>${gkEsc(r)}</option>`).join('')}</select>`;
+        }
+        function kurulBaskiDoldur(on, asil, yedek, imza1) {
+            const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            set(`${on}-print-district`, gkKaymakamlik());
+            set(`${on}-print-school`, gkBuyuk(appData.schoolName || ''));
+            const baslik = on === 'yonetim' ? 'YÖNETİM' : 'DENETİM';
+            set(`${on}-print-title`, `${appData.academicYear || ''} EĞİTİM ÖĞRETİM YILI OKUL AİLE BİRLİĞİ ${baslik} KURULU ÜYE LİSTESİ`);
+            const satir = (l, bos) => {
+                const s = l.map((m, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${gkEsc(m.role)}</td><td style="font-weight:bold">${gkEsc(m.name)}</td><td>${gkEsc(m.title || '')}</td><td>${gkEsc(m.phone || '')}</td><td style="height:22px"></td></tr>`);
+                for (let i = l.length; i < bos; i++) s.push(`<tr><td style="text-align:center">${i + 1}</td><td></td><td></td><td></td><td></td><td style="height:22px"></td></tr>`);
+                return s.join('');
+            };
+            const bos = on === 'yonetim' ? 5 : 3;
+            const a = document.getElementById(`${on}-print-asil`); if (a) a.innerHTML = satir(asil, bos);
+            const y = document.getElementById(`${on}-print-yedek`); if (y) y.innerHTML = satir(yedek, bos);
+            set(`${on}-print-sig1-name`, imza1 || '');
+            set(`${on}-print-sig2-name`, appData.principalName || '');
+        }
+        function updateYonetimRole(id, role) {
+            const m = (appData.yonetimMembers || []).find(x => String(x.id) === String(id));
+            if (!m) return;
+            m.role = role;
+            if (!/yedek/i.test(role)) m.title = String(m.title || '').replace(/\s*\(\s*yedek\s*üye\s*\)\s*/i, ' ').trim();
+            if (role === 'Başkan') appData.presidentName = m.name;
+            if (role === 'Muhasip Üye') appData.treasurerName = m.name;
+            saveData();
+        }
+        function updateDenetlemeRole(id, role) {
+            const m = (appData.denetlemeMembers || []).find(x => String(x.id) === String(id));
+            if (!m) return;
+            m.role = role;
+            if (!/yedek/i.test(role)) m.title = String(m.title || '').replace(/\s*\(\s*yedek\s*üye\s*\)\s*/i, ' ').trim();
+            saveData();
+        }
+
         function renderYonetimTable() {
+            normalizeKurulUyeleri();
             const tbody = document.getElementById('yonetim-table-body');
             tbody.innerHTML = '';
 
@@ -2577,7 +2696,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 tr.innerHTML = `
-                    <td class="p-3"><span class="bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200">${m.role}</span></td>
+                    <td class="p-3">${kurulRolSecimi(YK_ROLLER, m, 'updateYonetimRole')}</td>
                     <td class="p-3 font-bold text-slate-800">${m.name}</td>
                     <td class="p-3 text-slate-600">${m.title || '-'}</td>
                     <td class="p-3 text-slate-600 font-mono">${m.phone || '-'}</td>
@@ -2589,6 +2708,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 `;
                 tbody.appendChild(tr);
             });
+            kurulBaskiDoldur('yonetim', ykAsilUyeler(), ykYedekUyeler(), oabBaskanAdi());
         }
 
         function handleAddYonetimMember(e) {
@@ -2602,6 +2722,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
             if (!Array.isArray(appData.yonetimMembers)) appData.yonetimMembers = [];
             appData.yonetimMembers.push({ id: Date.now(), role, name, title, phone });
+            if (role === 'Başkan') appData.presidentName = name;
+            if (role === 'Muhasip Üye') appData.treasurerName = name;
 
             document.getElementById('add-yonetim-form').reset();
             saveData();
@@ -2616,6 +2738,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
         // DENETLEME KURULU ÜYELERİ
         function renderDenetlemeTable() {
+            normalizeKurulUyeleri();
             const tbody = document.getElementById('denetleme-table-body');
             tbody.innerHTML = '';
 
@@ -2623,7 +2746,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 tr.innerHTML = `
-                    <td class="p-3"><span class="bg-indigo-50 text-indigo-800 font-bold px-2 py-0.5 rounded border border-indigo-200">${m.role}</span></td>
+                    <td class="p-3">${kurulRolSecimi(DK_ROLLER, m, 'updateDenetlemeRole')}</td>
                     <td class="p-3 font-bold text-slate-800">${m.name}</td>
                     <td class="p-3 text-slate-600">${m.title || '-'}</td>
                     <td class="p-3 text-slate-600 font-mono">${m.phone || '-'}</td>
@@ -2635,6 +2758,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 `;
                 tbody.appendChild(tr);
             });
+            kurulBaskiDoldur('denetleme', dkAsilUyeler(), dkYedekUyeler(), (dkAsilUyeler()[0] || {}).name);
         }
 
         function handleAddDenetlemeMember(e) {
@@ -2861,8 +2985,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 document.getElementById('ozet-print-date').innerText = (appData.meetingDecisionInfo || "").split(' ')[0] || "15.10.2026";
                 if (document.getElementById('ozet-approval-date')) document.getElementById('ozet-approval-date').innerText = (appData.meetingDecisionInfo || "").split(' ')[0] || "15.10.2026";
                 document.getElementById('gundem-ozet-principal').innerText = appData.principalName;
-                document.getElementById('gundem-ozet-president').innerText = appData.presidentName;
-                document.getElementById('gundem-ozet-treasurer').innerText = appData.treasurerName;
+                document.getElementById('gundem-ozet-president').innerText = oabBaskanAdi();
+                document.getElementById('gundem-ozet-treasurer').innerText = oabMuhasipAdi();
 
                 const ozetBody = document.getElementById('gundem-ozet-body');
                 ozetBody.innerHTML = '';
@@ -2940,7 +3064,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 document.getElementById('davet-print-decision').innerText = appData.meetingDecisionInfo || "15.10.2026 tarih ve 01 sayılı";
                 document.getElementById('davet-print-datetime').innerText = appData.meetingDateTime || "23.10.2026 Cuma günü saat 10:00'da";
                 document.getElementById('davet-print-location').innerText = appData.meetingLocation || "okulumuz bahçesinde";
-                document.getElementById('davet-print-president-name').innerText = appData.presidentName;
+                document.getElementById('davet-print-president-name').innerText = oabBaskanAdi();
 
                 const davetList = document.getElementById('gundem-davet-list');
                 davetList.innerHTML = '';
@@ -2989,8 +3113,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 tbody.appendChild(tr);
             });
 
-            const denetimHead = (appData.denetlemeMembers && appData.denetlemeMembers[0]) ? appData.denetlemeMembers[0].name : "Hasan ŞAHİN";
-            const denetimMember = (appData.denetlemeMembers && appData.denetlemeMembers[1]) ? appData.denetlemeMembers[1].name : "Selin YILDIZ";
+            const dkAsil = dkAsilUyeler();
+            const denetimHead = dkAsil[0] ? dkAsil[0].name : "Hasan ŞAHİN";
+            const denetimMember = dkAsil[1] ? dkAsil[1].name : "Selin YILDIZ";
 
             if (document.getElementById('audit-sig-head')) document.getElementById('audit-sig-head').innerText = denetimHead;
             if (document.getElementById('audit-sig-member')) document.getElementById('audit-sig-member').innerText = denetimMember;
@@ -3049,7 +3174,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             });
 
             document.querySelectorAll('.p-school-name').forEach(el => el.innerText = appData.schoolName);
-            if (document.getElementById('p-contract-president')) document.getElementById('p-contract-president').innerText = appData.presidentName;
+            if (document.getElementById('p-contract-president')) document.getElementById('p-contract-president').innerText = oabBaskanAdi();
         }
 
         function handleAddPersonel(e) {
@@ -3085,11 +3210,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             document.getElementById('bank-doc-name').innerText = appData.bankName || "Ziraat Bankası";
             document.getElementById('bank-doc-iban').innerText = appData.bankAccount || "TR00...";
 
-            document.getElementById('bank-doc-president').innerText = appData.presidentName;
-            document.getElementById('bank-doc-treasurer').innerText = appData.treasurerName;
+            document.getElementById('bank-doc-president').innerText = oabBaskanAdi();
+            document.getElementById('bank-doc-treasurer').innerText = oabMuhasipAdi();
 
-            document.getElementById('bank-sig-president').innerText = appData.presidentName;
-            document.getElementById('bank-sig-treasurer').innerText = appData.treasurerName;
+            document.getElementById('bank-sig-president').innerText = oabBaskanAdi();
+            document.getElementById('bank-sig-treasurer').innerText = oabMuhasipAdi();
             document.getElementById('bank-sig-principal').innerText = appData.principalName;
         }
 
@@ -3140,8 +3265,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             const pg = document.getElementById('tb-print-gelir'), pd = document.getElementById('tb-print-gider');
             if (pg) pg.innerHTML = tablo(GK_BUTCE_GELIR, v.butceGelir, tg, 'TOPLAM TAHMİNİ GELİR');
             if (pd) pd.innerHTML = tablo(GK_BUTCE_GIDER, v.butceGider, tgd, 'TOPLAM TAHMİNİ GİDER');
-            set('tb-p-president-name', appData.presidentName || '');
-            set('tb-p-treasurer-name', appData.treasurerName || '');
+            set('tb-p-president-name', oabBaskanAdi() || '');
+            set('tb-p-treasurer-name', oabMuhasipAdi() || '');
             set('tb-p-principal-name', appData.principalName || '');
             set('tb-p-date', /^\d{4}-\d{2}-\d{2}$/.test(v.t1Tarih || '') ? gkTarih(v.t1Tarih) : '…/…/……');
         }
@@ -3477,8 +3602,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
             return m ? m.name : '';
         }
         function gkDkBaskani() {
-            const l = appData.denetlemeMembers || [];
-            const b = l.find(x => /başkan/i.test(x.role || '')) || l[0];
+            const b = dkAsilUyeler()[0];
             return b ? b.name : '';
         }
 
@@ -3490,7 +3614,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         function gkAlanlar() {
             const v = gkV(), y = gkYillar();
             return {
-                OKUL: gkOkul(), MUDUR: appData.principalName || '……………', BASKAN: appData.presidentName || '……………',
+                OKUL: gkOkul(), MUDUR: appData.principalName || '……………', BASKAN: oabBaskanAdi() || '……………',
                 YIL: y.yil, ONCEKI_YIL: y.onceki, GENELGE: v.genelgeNo || '……',
                 TARIH1: gkTarih(v.t1Tarih), TARIH1_UZUN: gkTarih(v.t1Tarih, 'uzun'), SAAT1: v.t1Saat || '……', YER1: v.t1Yer || '……',
                 TARIH2: gkTarih(v.t2Tarih), TARIH2_UZUN: gkTarih(v.t2Tarih, 'uzun'), SAAT2: v.t2Saat || '……', YER2: v.t2Yer || v.t1Yer || '……',
@@ -3618,7 +3742,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         /* ---------- Belgeler ---------- */
         function gkBelge_ykKarar() {
             const v = gkV(), a = gkAlanlar();
-            const yk = appData.yonetimMembers || [];
+            const ykSira = ['Başkan', 'Başkan Yardımcısı', 'Muhasip Üye', 'Sekreter Üye'];
+            const ykKalan = [...ykAsilUyeler()];
+            const ykSatir = [];
+            ykSira.forEach(r => { const i = ykKalan.findIndex(x => String(x.role || '').trim() === r); if (i >= 0) ykSatir.push([r, ykKalan.splice(i, 1)[0].name]); });
+            ykKalan.forEach(x => ykSatir.push([String(x.role || '').trim() || 'Üye', x.name]));
+            ykSira.filter(r => !ykSatir.some(x => x[0] === r)).forEach(r => { if (ykSatir.length < 5) ykSatir.push([r, '']); });
+            while (ykSatir.length < 5) ykSatir.push(['Üye', '']);
             const ikinciYer = v.t2Yer && v.t2Yer !== v.t1Yer ? gkYerEk(v.t2Yer) : 'aynı yerde';
             return `${gkBirlikBaslik(['OKUL AİLE BİRLİĞİ YÖNETİM KURULU KARARI'])}
                 <table class="gk-lt gk-sayi" ${GK_LT}><tr><td><b>Karar Tarihi:</b> ${gkTarih(v.ykKararTarih)}</td><td style="text-align:right"><b>Karar No:</b> ${gkNokta(v.ykKararNo, 10)}</td></tr></table>
@@ -3639,10 +3769,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <p class="gk-p">İşbu karar, karar defterine yazılarak imza altına alınmıştır.</p>
                 <p class="gk-ara" style="text-align:center">OKUL AİLE BİRLİĞİ YÖNETİM KURULU</p>
                 <table class="gk-tablo" ${GK_BT}><thead><tr><th style="width:32%">Görevi</th><th style="width:43%">Adı Soyadı</th><th style="width:25%">İmza</th></tr></thead><tbody>
-                ${['Başkan', 'Başkan Yardımcısı', 'Muhasip Üye', 'Sekreter Üye', 'Üye'].map(r => {
-                    const ad = r === 'Başkan' ? (yk.find(x => x.role === 'Başkan') || {}).name : gkUyeRol(yk, r);
-                    return `<tr class="gk-imza-satir"><td>${r}</td><td>${gkNokta(ad, 36)}</td><td></td></tr>`;
-                }).join('')}</tbody></table>
+                ${ykSatir.map(([r, ad]) => `<tr class="gk-imza-satir"><td>${gkEsc(r)}</td><td>${gkNokta(ad, 36)}</td><td></td></tr>`).join('')}</tbody></table>
                 ${gkSagImza(appData.principalName, 'Okul Müdürü')}`;
         }
 
@@ -3704,7 +3831,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ${maddeler.length ? maddeler.map((m, i) => `<div class="gk-madde"><p class="gk-madde-bas">${gkEsc(m.no || (i + 1))}. ${gkDoldur(m.konu, 'html')}</p>${gkZengin(m.aciklama)}</div>`).join('')
                     : '<p class="gk-p0"><i>Gündem maddesi girilmemiş.</i></p>'}
                 <table class="gk-lt gk-imza-blok" ${GK_LT} style="margin-top:22pt"><tr>
-                    <td style="width:50%;text-align:center"><p class="gk-p0"><b>Hazırlayan</b></p><p class="gk-p0" style="margin-top:26pt">${gkNokta(appData.presidentName, 30)}</p><p class="gk-p0">Okul Aile Birliği Başkanı</p></td>
+                    <td style="width:50%;text-align:center"><p class="gk-p0"><b>Hazırlayan</b></p><p class="gk-p0" style="margin-top:26pt">${gkNokta(oabBaskanAdi(), 30)}</p><p class="gk-p0">Okul Aile Birliği Başkanı</p></td>
                     <td style="width:50%;text-align:center"><p class="gk-p0"><b>Uygun görüşle arz ederim.</b></p><p class="gk-p0" style="margin-top:26pt">${gkNokta(appData.principalName, 30)}</p><p class="gk-p0">Okul Müdürü</p></td>
                 </tr></table>`;
         }
@@ -3725,7 +3852,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <p class="gk-p">İşbu tutanak tarafımızdan düzenlenerek imza altına alınmıştır.</p>
                 ${gkTarihSatiri()}
                 ${gkImzaTablosu([[v.divanBaskani, 'Divan Başkanı'], [v.divanKatibi, 'Divan Kâtibi'], [appData.principalName, 'Okul Müdürü'],
-                    [appData.presidentName, 'Okul Aile Birliği Başkanı'], [gkDkBaskani(), 'Okul Aile Birliği Denetim Kurulu Başkanı']])}
+                    [oabBaskanAdi(), 'Okul Aile Birliği Başkanı'], [gkDkBaskani(), 'Okul Aile Birliği Denetim Kurulu Başkanı']])}
                 <p class="gk-p0" style="margin-top:12pt"><b>Ekler:</b></p>
                 <p class="gk-p0">EK-1 Hazirun cetveli</p><p class="gk-p0">EK-2 Faaliyet raporu</p><p class="gk-p0">EK-3 Denetim kurulu raporu</p>
                 <p class="gk-p0">EK-4 Tahmini bütçe</p><p class="gk-p0">EK-5 Seçim sonuç tutanağı</p><p class="gk-p0">EK-6 Alınan kararlar listesi</p>`;
@@ -3804,21 +3931,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ${gkBirlikBaslik(['OKUL AİLE BİRLİĞİ', `${a.ONCEKI_YIL} EĞİTİM ÖĞRETİM YILI FAALİYET RAPORU`])}
                 ${gkBolumler(bolumler)}
                 ${gkTarihSatiri()}
-                ${gkImzaTablosu([[appData.presidentName, 'Okul Aile Birliği Başkanı'], [appData.treasurerName, 'Okul Aile Birliği Muhasip Üyesi'], [appData.principalName, 'Okul Müdürü']])}
+                ${gkImzaTablosu([[oabBaskanAdi(), 'Okul Aile Birliği Başkanı'], [oabMuhasipAdi(), 'Okul Aile Birliği Muhasip Üyesi'], [appData.principalName, 'Okul Müdürü']])}
                 ${gkOyKutusu('faaliyet', `${a.ONCEKI_YIL} eğitim öğretim yılı Okul Aile Birliği Faaliyet Raporu`, true)}`;
         }
 
         function gkBelge_ek3() {
             const v = gkV(), a = gkAlanlar();
-            const dk = (appData.denetlemeMembers || []).map(m => m.name).filter(Boolean);
+            const sec = v.secim || {};
+            const secAd = l => (l || []).map(x => String(x.ad || '').trim()).filter(Boolean);
+            let dk = dkAsilUyeler().map(m => m.name).filter(Boolean);
+            let dkYedek = dkYedekUyeler().map(m => m.name).filter(Boolean);
+            if (!dk.length && !dkYedek.length) { dk = secAd(sec.dkAsil); dkYedek = secAd(sec.dkYedek); }
             while (dk.length < 3) dk.push('');
+            while (dkYedek.length < 3) dkYedek.push('');
             const gelir = gkSayi(v.maliGelir), gider = gkSayi(v.maliGider);
             const bakiye = gelir !== null && gider !== null ? gelir - gider : null;
             const noktali = t => String(t || '').trim() ? gkZengin(t) : `<p class="gk-p0">${'.'.repeat(260)}</p>`;
             const bolumler = [
                 { baslik: 'RAPORUN KONUSU', html: `<p class="gk-p">Bu rapor, Okul Aile Birliğinin ${gkEsc(a.ONCEKI_YIL)} eğitim öğretim yılı içerisinde gerçekleştirdiği faaliyetlerin, gelir ve gider işlemlerinin, karar ve kayıtlarının ilgili mevzuat çerçevesinde incelenmesi sonucunda hazırlanmıştır.</p>` },
                 { baslik: 'DENETİM KURULU', html: `<p class="gk-p0"><b>Denetim Kurulu Asıl Üyeleri:</b></p>${gkMadde(dk.map(x => gkNokta(x, 56)))}
-                    <p class="gk-p0"><b>Denetim Kurulu Yedek Üyeleri:</b></p>${gkMadde(['', '', ''].map(() => '.'.repeat(56)))}` },
+                    <p class="gk-p0"><b>Denetim Kurulu Yedek Üyeleri:</b></p>${gkMadde(dkYedek.map(x => gkNokta(x, 56)))}` },
                 { baslik: 'İNCELENEN BELGELER', html: `<p class="gk-p">Denetim Kurulu tarafından aşağıdaki belge ve kayıtlar incelenmiştir:</p>
                     ${gkMadde(['Okul Aile Birliği karar defteri,', 'Genel kurul toplantı tutanakları,', 'Yönetim kurulu toplantı kararları,', 'Gelir-gider kayıtları,', 'Bağış ve yardım makbuzları,', 'Banka hesap hareketleri,', 'Harcama belgeleri ve faturalar,', 'Tahsilat ve ödeme belgeleri,', 'Bütçe ve kesin hesap kayıtları,', 'Faaliyet raporu,', 'Diğer ilgili evrak ve belgeler.'])}` },
                 { baslik: 'YÖNETİMSEL İŞLEMLERİN DENETİMİ', html: `<p class="gk-p">Yapılan incelemede;</p>
@@ -3890,7 +4022,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 <p class="gk-ara">F. GENEL KURUL KARARI</p>
                 ${gkOyKutusu('butce', `${a.YIL} eğitim öğretim yılı Okul Aile Birliği Tahmini Bütçesi`, false)}
                 ${gkTarihSatiri()}
-                ${gkImzaTablosu([[appData.presidentName, 'Okul Aile Birliği Başkanı'], [appData.treasurerName, 'Okul Aile Birliği Muhasip Üyesi'], [appData.principalName, 'Okul Müdürü']])}`;
+                ${gkImzaTablosu([[oabBaskanAdi(), 'Okul Aile Birliği Başkanı'], [oabMuhasipAdi(), 'Okul Aile Birliği Muhasip Üyesi'], [appData.principalName, 'Okul Müdürü']])}`;
         }
 
         function gkBelge_ek5() {
@@ -3930,7 +4062,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
                 ${(v.kararlar || []).filter(k => String(k || '').trim()).map((k, i) => `<div class="gk-madde"><p class="gk-madde-bas">KARAR ${i + 1}</p>${gkZengin(k)}</div>`).join('')}
                 <p class="gk-p">İşbu kararlar listesi, genel kurul toplantısında alınan kararları göstermek üzere düzenlenmiş ve imza altına alınmıştır.</p>
                 ${gkTarihSatiri()}
-                ${gkImzaTablosu([[v.divanBaskani, 'Divan Başkanı'], [v.divanKatibi, 'Divan Kâtibi'], [appData.presidentName, 'Okul Aile Birliği Başkanı'], [appData.principalName, 'Okul Müdürü']])}`;
+                ${gkImzaTablosu([[v.divanBaskani, 'Divan Başkanı'], [v.divanKatibi, 'Divan Kâtibi'], [oabBaskanAdi(), 'Okul Aile Birliği Başkanı'], [appData.principalName, 'Okul Müdürü']])}`;
         }
 
         const GK_URETICI = {
@@ -4182,16 +4314,32 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         }
         function gkSecimAktar() {
             const s = gkV().secim;
-            const yk = s.ykAsil.filter(x => String(x.ad || '').trim());
-            const dk = s.dkAsil.filter(x => String(x.ad || '').trim());
+            const dolu = l => (l || []).filter(x => String(x.ad || '').trim());
+            const yk = dolu(s.ykAsil), ykY = dolu(s.ykYedek);
+            const dk = dolu(s.dkAsil), dkY = dolu(s.dkYedek);
             if (!yk.length && !dk.length) { alert('Önce seçilen asıl üyelerin adlarını girin.'); return; }
-            if (!confirm(`${yk.length} Yönetim Kurulu ve ${dk.length} Denetim Kurulu asıl üyesi, Yönetim Kurulu ve Denetim Kurulu üye listelerinin yerine yazılacak. Görev dağılımını (Başkan, Muhasip vb.) Yönetim Kurulunun ilk toplantısından sonra 2. bölümden düzenleyebilirsiniz. Devam edilsin mi?`)) return;
+            if (!confirm(`${yk.length} asil + ${ykY.length} yedek Yönetim Kurulu ve ${dk.length} asil + ${dkY.length} yedek Denetim Kurulu üyesi, kurul üye listelerinin yerine yazılacak. Aynı isimli üyelerin görev ve iletişim bilgileri korunur; yeni üyelerin görev dağılımını (Başkan, Muhasip vb.) Yönetim Kurulu ve Denetleme Kurulu bölümlerinden seçebilirsiniz. Devam edilsin mi?`)) return;
             const t = Date.now();
-            if (yk.length) appData.yonetimMembers = yk.map((x, i) => ({ id: t + i, role: 'Üye', name: x.ad.trim(), title: 'Veli', phone: '' }));
-            if (dk.length) appData.denetlemeMembers = dk.map((x, i) => {
-                const ogretmen = /öğretmen/i.test(x.not || '');
-                return { id: t + 100 + i, role: ogretmen ? 'Üye (Öğretmen)' : 'Üye (Veli)', name: x.ad.trim(), title: ogretmen ? 'Öğretmen' : 'Veli', phone: '' };
-            });
+            const ayni = (a, b) => gkBuyuk(String(a || '').trim()) === gkBuyuk(String(b || '').trim());
+            const eskiBul = (liste, ad) => (liste || []).find(m => ayni(m.name, ad));
+            if (yk.length) {
+                const eski = appData.yonetimMembers || [];
+                appData.yonetimMembers = [
+                    ...yk.map((x, i) => { const e = eskiBul(eski, x.ad); return { id: t + i, role: e && !uyeYedekMi(e) ? e.role : 'Üye', name: x.ad.trim(), title: e && !uyeYedekMi(e) ? (e.title || 'Veli') : 'Veli', phone: (e && e.phone) || '' }; }),
+                    ...ykY.map((x, i) => { const e = eskiBul(eski, x.ad); return { id: t + 50 + i, role: 'Yedek Üye', name: x.ad.trim(), title: 'Veli', phone: (e && e.phone) || '' }; })
+                ];
+            }
+            if (dk.length) {
+                const eski = appData.denetlemeMembers || [];
+                const donustur = (x, i, yedek) => {
+                    const e = eskiBul(eski, x.ad);
+                    const ogretmen = /öğretmen/i.test(x.not || '') || (e && /öğretmen/i.test(`${e.role} ${e.title}`));
+                    let role = yedek ? (ogretmen ? 'Yedek Üye (Öğretmen)' : 'Yedek Üye (Veli)') : (ogretmen ? 'Üye (Öğretmen)' : 'Üye (Veli)');
+                    if (!yedek && e && !uyeYedekMi(e) && /başkan/i.test(e.role || '')) role = e.role;
+                    return { id: t + (yedek ? 150 : 100) + i, role, name: x.ad.trim(), title: ogretmen ? 'Öğretmen' : 'Veli', phone: (e && e.phone) || '' };
+                };
+                appData.denetlemeMembers = [...dk.map((x, i) => donustur(x, i, false)), ...dkY.map((x, i) => donustur(x, i, true))];
+            }
             saveData();
             alert('Seçilen üyeler aktarıldı.');
         }
