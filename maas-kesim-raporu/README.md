@@ -7,10 +7,11 @@ yapılan **%25 rapor kesintisinin** bordrosunu hazırlayan, tek dosyalık HTML p
 
 `index.html` dosyasını herhangi bir tarayıcıda (Chrome, Edge, Firefox) açmanız yeterli.
 Kurulum veya internet bağlantısı gerekmez; veriler yalnızca tarayıcınızda saklanır.
+Program ilk açılışta kısa bir kullanım rehberi gösterir; denemek için **🧪 Örnekle dene** butonu vardır.
 
-1. Kurum, personel ve imza bilgilerini girin.
-2. Her rapor dönemi için ay/yıl, yan ödeme, ÖHT, ek tazminat, rapor günü ve istisnayı girip **Dönem Ekle**'ye basın.
-3. **PDF Bordro İndir / Yazdır** ile yazdırma penceresinde "PDF olarak kaydet"i seçin.
+1. **Kişi bilgileri:** Okul adı, personel adı ve imza bilgileri.
+2. **Rapor bilgileri:** Maaş bordrosundaki tutarlar ve rapor günü. Hesap yazarken anında görünür; her ay için **Bu dönemi listeye ekle**.
+3. **Kontrol ve yazdır:** Bordro önizlemesine bakıp **Bordroyu yazdır / PDF olarak kaydet**.
 
 ## Hesap
 
