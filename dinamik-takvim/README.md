@@ -18,6 +18,10 @@
   sonra **Süresi geçmiş, tamamlanmamış** işler ve en altta dönemdeki diğer işler.
 - Kutu ile "tamamlandı" işaretlenen iş listeden çıkar ve tamamlanma tarihiyle **Tamamlananlar** listesine geçer
   (oradan kutuyu kaldırarak geri alınabilir).
+- Tüm listeler **başlangıç tarihine** göre sıralanır (Hft sütununda yıl da yazar; 2026'da başlayıp 2027'de biten işler karışmaz).
+- **Rutin işler:** "Yeni iş" penceresinde Tekrar seçilebilir. *Günlük rutin* Günlük İş Programı'na eklenir;
+  *Haftalık* / *Aylık rutin* seçilen son tarihe kadar (varsayılan: eğitim yılı sonu 30 Haziran) otomatik kayıtlar oluşturur.
+  Rutin bir kaydı düzenlerken değişiklikler sonraki kayıtlara da uygulanabilir; "Seriyi sil" ile bu ve sonraki kayıtlar silinir.
 - Özet kartları ile filtreleme, arama; göreve tıklayınca düzenleme / silme / kopyalama; yeni iş ekleme.
 
 **Günlük İş Programı** (Excel'deki "GÜNLÜK İŞ PROGRAMI" sayfası)

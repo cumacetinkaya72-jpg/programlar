@@ -73,7 +73,8 @@ table.grid{border-collapse:separate;border-spacing:0;font-size:12.5px}
 .grid td.day .b.s{margin-left:3px;border-top-left-radius:5px;border-bottom-left-radius:5px}
 .grid td.day .b.e{margin-right:3px;border-top-right-radius:5px;border-bottom-right-radius:5px}
 .grid tr.done td.day .b{background:var(--bar-done)}
-.c-hf{width:40px;min-width:40px;text-align:center;color:var(--muted)}
+.c-hf{width:44px;min-width:44px;text-align:center;color:var(--muted);line-height:1.15}
+.c-hf small{display:block;font-size:10px;opacity:.8}
 .c-kod{width:118px;min-width:118px}
 .c-dur{width:150px;min-width:150px;text-align:left;white-space:nowrap}
 .c-dur .chip{margin-top:3px}
@@ -156,10 +157,20 @@ dialog form{padding:16px 18px;max-height:calc(100vh - 40px);overflow:auto}
 dialog h3{margin:0 0 12px;font-size:16px}
 .fg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px}
 .fg input,.fg textarea{width:100%;min-width:0}
+.fg input[type="radio"],.fg input[type="checkbox"]{width:16px;flex:none}
+.tekrar .son input{width:auto}
 .fg .f{display:flex;flex-direction:column;gap:4px}
 .fg .f span{font-size:12px;color:var(--muted)}
 .fg .w2{grid-column:span 2}.fg .w4{grid-column:1/-1}
 .fg textarea{min-height:90px;resize:vertical}
+fieldset.tekrar{border:1px solid var(--line);border-radius:8px;padding:8px 12px 10px;margin:0}
+fieldset.tekrar legend{font-size:12px;color:var(--muted);padding:0 4px}
+.tekrar .secim{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.tekrar .secim label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.tekrar .son{margin-left:auto;color:var(--muted);font-size:12px}
+.tekrar .ipucu{font-size:12px;color:var(--muted);margin-top:6px;min-height:1em}
+label.seri{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer}
+.chip.rut{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
 .acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .acts .grow{flex:1}
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
@@ -313,9 +324,22 @@ dialog h3{margin:0 0 12px;font-size:16px}
       <label class="f"><span>Kapanış (T / CV / DY)</span><input name="f" list="tamamList"></label>
       <label class="f"><span>Yazının tarihi</span><input type="date" name="yaziTar"></label>
       <label class="f w2"><span>Yazının sayısı</span><input name="yaziNo"></label>
+      <fieldset class="w4 tekrar" id="tekrarAlan">
+        <legend>Tekrar</legend>
+        <div class="secim">
+          <label><input type="radio" name="tekrar" value="" checked> Tek seferlik</label>
+          <label><input type="radio" name="tekrar" value="gun"> Günlük rutin</label>
+          <label><input type="radio" name="tekrar" value="hafta"> Haftalık rutin</label>
+          <label><input type="radio" name="tekrar" value="ay"> Aylık rutin</label>
+          <label class="son">Son tarih <input type="date" name="tekrarSon"></label>
+        </div>
+        <div class="ipucu" id="tekrarBilgi"></div>
+      </fieldset>
+      <label class="w4 seri" id="seriAlan"><input type="checkbox" name="seriyeUygula"> <span id="seriYazi"></span></label>
     </div>
     <div class="acts">
       <button class="btn danger" value="sil" id="isSil">Sil</button>
+      <button class="btn danger" value="seriSil" id="isSeriSil">Seriyi sil (bu ve sonrakiler)</button>
       <button class="btn" value="kopya" id="isKopya">Kopyala</button>
       <div class="grow"></div>
       <button class="btn" value="iptal" formnovalidate>Vazgeç</button>
@@ -469,7 +493,7 @@ function renderIs(){
   let tum = S.isler.slice();
   if (q) tum = tum.filter(x => [x.is,x.b,x.c,x.d,x.e,x.f,x.yaziNo].join(" ").toLocaleLowerCase("tr").includes(q));
   const G = gruplar(tum, today, wS, wE);
-  const tamam = tum.filter(isDone).sort((x,y)=>(y.tamamTar||"").localeCompare(x.tamamTar||"") || (endOf(y)||"").localeCompare(endOf(x)||""));
+  const tamam = tum.filter(isDone).sort(tarihSira);
   const yakin = G.flatMap(g=>g.list).filter(x => x.bit && x.bit >= today && x.bit <= soonEnd);
   const gs = k => G.find(g=>g.k===k).list.length;
   const kart = [["acik","Açık işler",G.reduce((n,g)=>n+g.list.length,0)],["de","Devam eden",gs("de")],["hafta","Bu hafta",gs("hafta")],
@@ -478,9 +502,9 @@ function renderIs(){
   $("isStats").innerHTML = kart.map(([k,ad,n]) => `<div class="stat ${isFiltre===k?"on":""}" data-f="${k}"><b>${n}</b><span>${ad}</span></div>`).join("");
 
   let bolumler;
-  if (isFiltre === "tamam") bolumler = [{k:"tamam", ad:"Tamamlananlar (son tamamlanan en üstte)", list:tamam.filter(x=>x.f!=="CV")},
+  if (isFiltre === "tamam") bolumler = [{k:"tamam", ad:"Tamamlananlar", list:tamam.filter(x=>x.f!=="CV")},
                                          {k:"tamam", ad:"Cevap verilenler", list:tamam.filter(x=>x.f==="CV")}];
-  else if (isFiltre === "yakin") bolumler = [{k:"yakin", ad:"5 gün içinde bitecek işler", list:yakin.sort((x,y)=>x.bit.localeCompare(y.bit))}];
+  else if (isFiltre === "yakin") bolumler = [{k:"yakin", ad:"5 gün içinde bitecek işler", list:yakin.sort(tarihSira)}];
   else if (isFiltre === "acik") bolumler = G;
   else bolumler = G.filter(g => g.k === isFiltre);
   const list = bolumler.flatMap(g=>g.list);
@@ -516,12 +540,12 @@ function renderIs(){
     const yazi = [x.yaziTar||x.yaziNo ? `Yazı: ${fmt(x.yaziTar)}${x.yaziNo?" · Sayı: "+esc(x.yaziNo):""}` : "",
                   isDone(x) && x.tamamTar ? `${x.f==="CV"?"Cevap verildi":"Tamamlandı"}: ${fmt(x.tamamTar)}` : ""].filter(Boolean).map(t=>`<div class="y">${t}</div>`).join("");
     html += `<tr class="${rowClass(x,today,soonEnd)} ${isDone(x)?"done":""}" data-id="${x.id}">
-      <td class="stk c-hf" ${st(0)}>${s?isoWeek(parse(s)):""}</td>
+      <td class="stk c-hf" ${st(0)} title="${s?fmt(s):""}">${s?`${isoWeek(parse(s))}<small>${s.slice(0,4)}</small>`:""}</td>
       <td class="stk c-kod" ${st(1)}>${chips(x.b,x.c,x.d)}</td>
       <td class="stk c-dur" ${st(2)}><input type="checkbox" class="tm" title="${isDone(x)?"Açık işlere geri al":"Tamamlandı olarak işaretle"}" ${isDone(x)?"checked":""}> ${durumSec(x)}${ACIK_DURUM.has(x.e)?"":chips(x.e)}${x.f&&x.f!=="T"&&x.f!=="CV"?chips(x.f):""}</td>
       <td class="stk c-tar" ${st(3)}>${fmt(x.bas)}</td><td class="stk c-tar" ${st(4)}>${fmt(x.bit)}</td>
       <td class="stk c-saat" ${st(5)}>${esc(saat)}</td>
-      <td class="stk c-is" ${st(6)}><div class="t" title="${esc(x.is)}">${esc(x.is)}</div>${yazi}</td>`;
+      <td class="stk c-is" ${st(6)}><div class="t" title="${esc(x.is)}">${x.tekrar?`<span class="chip rut">↻ ${TEKRAR_AD[x.tekrar]}</span>`:""}${esc(x.is)}</div>${yazi}</td>`;
     for (let i=0;i<N;i++){ const d=dIso[i], dw=days[i].getDay();
       const on = s && d>=s && d<=e;
       const cls = `day ${dw===0||dw===6?"we":""} ${d===today?"td":""} ${dw===1?"wk0":""}`;
@@ -565,24 +589,79 @@ $("isWrap").addEventListener("click", e => {
 });
 $("isYeni").onclick = () => openIs(null);
 
+/* ---------- tekrarlayan işler ---------- */
+const TEKRAR_AD = {hafta:"Haftalık", ay:"Aylık"};
+// Eğitim-öğretim yılı sonu: Temmuz ve sonrası için ertesi yılın 30 Haziranı
+function yilSonu(t){ const d = parse(t) || new Date(); return (d.getMonth() >= 6 ? d.getFullYear()+1 : d.getFullYear()) + "-06-30"; }
+function tekrarTarihleri(bas, bit, tip, son){
+  const b0 = parse(bas), sure = bit ? Math.round((parse(bit) - b0) / 864e5) : null, out = [];
+  for (let k = 0; k < 400; k++){
+    let d;
+    if (tip === "hafta") d = addDays(b0, 7*k);
+    else { d = new Date(b0.getFullYear(), b0.getMonth()+k, 1); d.setDate(Math.min(b0.getDate(), new Date(d.getFullYear(), d.getMonth()+1, 0).getDate())); }
+    if (iso(d) > son) break;
+    out.push([iso(d), sure == null ? null : iso(addDays(d, sure))]);
+  }
+  return out;
+}
+function tekrarBilgi(){
+  const f = $("isForm"), tip = f.elements.tekrar.value, bas = f.elements.bas.value, son = f.elements.tekrarSon.value;
+  f.elements.tekrarSon.disabled = !(tip === "hafta" || tip === "ay");
+  let m = "";
+  if (tip === "gun") m = "Günlük İş Programı'ndaki kontrol listesine eklenir ve her iş günü otomatik olarak çıkar.";
+  else if (tip && !bas) m = "Tekrar için başlangıç tarihi gerekli.";
+  else if (tip && son) { const n = tekrarTarihleri(bas, f.elements.bit.value, tip, son).length;
+    m = `${TEKRAR_AD[tip]} olarak ${fmt(son)} tarihine kadar <b>${n}</b> kayıt oluşturulacak` + (tip==="hafta" ? ` (her ${["pazar","pazartesi","salı","çarşamba","perşembe","cuma","cumartesi"][parse(bas).getDay()]}).` : ` (her ayın ${parse(bas).getDate()}. günü${parse(bas).getDate()>28?", kısa aylarda ayın son günü":""}).`); }
+  $("tekrarBilgi").innerHTML = m;
+}
+["change","input"].forEach(ev => $("isForm").addEventListener(ev, e => { if (["tekrar","tekrarSon","bas","bit"].includes(e.target.name)) tekrarBilgi(); }));
+
 let editId = null;
 function openIs(id){
   editId = id; const f = $("isForm"); const x = id ? S.isler.find(r=>r.id===id) : {bas:todayIso(),bit:todayIso()};
   for (const k of ["is","bas","bit","saatBas","saatBit","b","c","d","e","f","yaziTar","yaziNo"]) f.elements[k].value = x[k] || "";
   $("isDlgBaslik").textContent = id ? "İşi düzenle" : "Yeni iş"; $("isSil").hidden = $("isKopya").hidden = !id;
+  f.elements.tekrar.value = ""; f.elements.tekrarSon.value = yilSonu(x.bas); f.elements.seriyeUygula.checked = false;
+  $("tekrarAlan").hidden = !!id; tekrarBilgi();
+  const seri = id && x.seri ? S.isler.filter(r => r.seri === x.seri) : [];
+  $("seriAlan").hidden = $("isSeriSil").hidden = !seri.length;
+  if (seri.length) { const sonraki = seri.filter(r => (r.bas||"") > (x.bas||"")).length;
+    $("seriYazi").textContent = `${TEKRAR_AD[x.tekrar]||""} rutin (${seri.length} kayıt). Metin, saat ve kod değişikliklerini sonraki ${sonraki} kayda da uygula`; }
   $("isDlg").showModal();
 }
 $("isDlg").addEventListener("close", () => {
   const v = $("isDlg").returnValue, f = $("isForm");
+  const SERI_ALAN = ["is","saatBas","saatBit","b","c","d","yaziTar","yaziNo"];
   if (v === "sil") { if (confirm("Bu iş silinsin mi?")) { S.isler = S.isler.filter(r=>r.id!==editId); save(); toast("İş silindi"); } }
+  else if (v === "seriSil") {
+    const x = S.isler.find(r=>r.id===editId), sil = S.isler.filter(r => r.seri === x.seri && (r.bas||"") >= (x.bas||""));
+    if (confirm(`Bu rutin işin bu ve sonraki ${sil.length} kaydı silinsin mi?`)) { const ids = new Set(sil.map(r=>r.id)); S.isler = S.isler.filter(r=>!ids.has(r.id)); save(); toast(`${sil.length} kayıt silindi`); }
+  }
+  else if (v === "kaydet" && !editId && f.elements.tekrar.value === "gun") {
+    const ad = f.elements.is.value.trim();
+    if (ad) { S.gunlukIsler.push(ad); save(); toast("Günlük İş Programı'na eklendi"); renderG(); }
+  }
+  else if (v === "kaydet" && !editId && f.elements.tekrar.value && f.elements.bas.value) {
+    const data = {}; for (const k of ["is","bas","bit","saatBas","saatBit","b","c","d","e","f","yaziTar","yaziNo"]) data[k] = f.elements[k].value.trim() || (/(bas|bit|Tar)$/.test(k)?null:"");
+    if (data.bas && data.bit && data.bit < data.bas) [data.bas, data.bit] = [data.bit, data.bas];
+    data.f = ""; if (!ACIK_DURUM.has(data.e)) data.e = data.e || "";
+    const tip = f.elements.tekrar.value, seri = "s" + Date.now();
+    const t = tekrarTarihleri(data.bas, data.bit, tip, f.elements.tekrarSon.value || yilSonu(data.bas));
+    for (const [b, e] of t) S.isler.push(Object.assign({}, data, {id: ++S.sonId, bas: b, bit: e, seri, tekrar: tip}));
+    save(); toast(`${TEKRAR_AD[tip]} rutin: ${t.length} kayıt oluşturuldu`);
+  }
   else if (v === "kaydet" || v === "kopya") {
     const data = {}; for (const k of ["is","bas","bit","saatBas","saatBit","b","c","d","e","f","yaziTar","yaziNo"]) data[k] = f.elements[k].value.trim() || (/(bas|bit|Tar)$/.test(k)?null:"");
     if (data.bas && data.bit && data.bit < data.bas) [data.bas, data.bit] = [data.bit, data.bas];
     const eski = editId && S.isler.find(r=>r.id===editId);
     if (DONE.has(data.f) && ACIK_DURUM.has(data.e)) data.e = "";
     if (DONE.has(data.f)) data.tamamTar = (eski && DONE.has(eski.f) && eski.tamamTar) || todayIso(); else data.tamamTar = undefined;
-    if (v === "kopya") { data.f = ""; data.tamamTar = undefined; }
-    if (v === "kaydet" && editId) Object.assign(eski, data);
+    if (v === "kopya") { data.f = ""; data.tamamTar = undefined; data.seri = undefined; data.tekrar = undefined; }
+    if (v === "kaydet" && editId) {
+      Object.assign(eski, data);
+      if (eski.seri && f.elements.seriyeUygula.checked)
+        S.isler.filter(r => r.seri === eski.seri && (r.bas||"") > (eski.bas||"")).forEach(r => SERI_ALAN.forEach(k => r[k] = eski[k]));
+    }
     else { data.id = ++S.sonId; const i = editId ? S.isler.findIndex(r=>r.id===editId)+1 : S.isler.length; S.isler.splice(i,0,data); }
     save(); toast(v==="kopya" ? "Kopya oluşturuldu" : "Kaydedildi");
   }
@@ -612,7 +691,7 @@ function renderPano(){
     er:   {ad:"Ertelenenler",         list:acik.filter(x=>x.e==="ER").sort(tarihSira), renk:"#f08c2e"},
     cv:   {ad:"Cevap verilenler",     list:S.isler.filter(x=>x.f==="CV"), kapali:true, renk:"#1fb5ad"},
   };
-  for (const k of ["tamam","cv"]) K[k].list.sort((x,y)=>(y.tamamTar||"").localeCompare(x.tamamTar||"") || (endOf(y)||"").localeCompare(endOf(x)||""));
+  for (const k of ["tamam","cv"]) K[k].list.sort(tarihSira);
   const gecik = gruplar(S.isler, today, "", "").find(g=>g.k==="gecik").list.length, yakin = acik.filter(x=>x.bit && x.bit>=today && x.bit<=iso(addDays(new Date(),5))).length;
   $("pKart").innerHTML = Object.entries(K).map(([k,c]) => `<button class="pk ${panoSec===k?"on":""}" data-k="${k}" style="--pk:${c.renk}">
       <span class="pa">${c.ad}</span><b>${c.sayi ?? c.list.length}</b><span class="pb">${c.alt ?? (c.kapali?"kapanan iş":"açık iş")}</span>
