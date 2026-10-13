@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="İlkokullarda Yetiştirme Programı (İYEP) yönetim sistemi — Türkiye Yüzyılı Maarif Modeli 2026 programına göre">
+<title>İYEP Yönetim Sistemi 2026</title>
+<style id="pageStyle">@page { size: A4 portrait; margin: 14mm 15mm; }</style>
+<style>
+/*@@STYLE@@*/
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sb-overlay no-print" onclick="menuKapat()"></div>
+
+  <aside class="sidebar no-print">
+    <div class="sb-head">
+      <div class="sb-mark">İY</div>
+      <div style="min-width:0">
+        <h1>İYEP Yönetim Sistemi</h1>
+        <p id="sbOkul">TYMM 2026 Programı</p>
+      </div>
+      <button class="sb-close" onclick="menuKapat()" title="Menüyü kapat">&times;</button>
+    </div>
+    <div class="sb-progress">
+      <div class="lbl"><span>Süreç tamamlanma</span><b id="sbPct">%0</b></div>
+      <div class="bar"><div id="sbBar"></div></div>
+    </div>
+    <nav class="sb-scroll" id="sideNav">
+      <button class="nav-btn" data-tab="dashboard"><span class="ic">📊</span><span>Gösterge Paneli</span></button>
+
+      <div class="sb-title">Veri girişi</div>
+      <button class="nav-btn" data-tab="settings"><span class="ic">🏫</span><span>Okul &amp; Komisyon</span></button>
+      <button class="nav-btn" data-tab="students"><span class="ic">👥</span><span>Öğrenciler &amp; ÖBA</span><span class="cnt" id="cntSt">0</span></button>
+      <button class="nav-btn" data-tab="bulk"><span class="ic">⚡</span><span>Toplu Aktarım</span></button>
+      <button class="nav-btn" data-tab="groups"><span class="ic">🧩</span><span>Gruplar &amp; Ders Saatleri</span><span class="cnt" id="cntGr">0</span></button>
+
+      <div class="sb-title">Uygulama</div>
+      <button class="nav-btn" data-tab="takvim"><span class="ic">🗓️</span><span>Uygulama Takvimi</span></button>
+      <button class="nav-btn" data-tab="izleme"><span class="ic">✅</span><span>İzleme &amp; Değerlendirme</span></button>
+
+      <div class="sb-title">Belgeler</div>
+      <div class="doc-nav" id="docNav"></div>
+
+      <div class="sb-title">Program</div>
+      <button class="nav-btn" data-tab="program"><span class="ic">📘</span><span>Öğretim Programı</span></button>
+      <button class="nav-btn" data-tab="esaslar"><span class="ic">📜</span><span>Usul ve Esaslar</span></button>
+
+      <div class="sb-title">Sistem</div>
+      <button class="nav-btn" data-tab="backup"><span class="ic">💾</span><span>Yedek &amp; Excel</span></button>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <header class="topbar no-print">
+      <button class="burger" onclick="menuAc()" title="Menü">☰</button>
+      <div class="tb-title"><h2 id="tbTitle">Gösterge Paneli</h2><p id="tbSub"></p></div>
+      <div class="tb-actions">
+        <span id="tbDoc" class="row hidden">
+          <button class="btn out sm" onclick="ebysKopyala()" title="Belgeyi biçimiyle panoya kopyalar (EBYS, Word)">📋 <span class="lbl-long">Kopyala</span></button>
+          <button class="btn pri sm" onclick="yazdir()" title="Yazdır / PDF olarak kaydet">🖨️ <span class="lbl-long">Yazdır / PDF</span></button>
+        </span>
+        <button class="btn out sm" onclick="kaydet()" title="Kaydet">💾 <span class="lbl-long">Kaydet</span></button>
+        <button class="btn ghost sm" id="btnTema" onclick="temaDegistir()" title="Açık / koyu tema">🌓</button>
+      </div>
+    </header>
+
+    <main>
+      <div id="globalUyari"></div>
+
+      <!-- GÖSTERGE PANELİ -->
+      <section class="tab" id="tab-dashboard">
+        <div id="eskiVeriKart"></div>
+        <div class="grid g4 kpis mb" id="kpiAlan"></div>
+        <div class="split">
+          <div>
+            <div class="card">
+              <div class="card-h"><h3>🧭 İYEP süreç adımları</h3><span class="sub">Tıklayarak ilgili ekrana gidin</span></div>
+              <div class="steps" id="adimlar"></div>
+            </div>
+            <div class="card">
+              <div class="card-h"><h3>🛡️ Uyum denetimi</h3><span id="uyumOzet"></span></div>
+              <div class="issue-list" id="uyumListe"></div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-h"><h3>📚 Öğrenme alanı ve tema dağılımı</h3><span class="sub">Programa dâhil öğrenciler</span></div>
+              <div class="grid g2" id="unitDagilim"></div>
+            </div>
+            <div class="card">
+              <div class="card-h"><h3>🗓️ Grupların takvim özeti</h3><button class="btn sm out" data-go="takvim">Takvimi aç</button></div>
+              <div id="grupTakvimOzet"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OKUL & KOMİSYON -->
+      <section class="tab" id="tab-settings">
+        <div class="card">
+          <div class="card-h"><h3>🏫 Okul ve program bilgileri</h3><span class="sub">Tüm belgelerde kullanılır; değişiklikler otomatik kaydedilir.</span></div>
+          <div class="fg">
+            <div class="f"><label>İl</label><input class="in" data-set="il" placeholder="Örn. ANKARA"></div>
+            <div class="f"><label>İlçe</label><input class="in" data-set="ilce" placeholder="Örn. ÇANKAYA (merkez ilçe için MERKEZ)"></div>
+            <div class="f"><label>Okul adı</label><input class="in" data-set="okul" placeholder="Örn. ATATÜRK İLKOKULU"></div>
+            <div class="f"><label>Eğitim-öğretim yılı</label><input class="in" data-set="yil" placeholder="2026-2027"></div>
+            <div class="f"><label>Okul müdürü</label><input class="in" data-set="mudur"></div>
+            <div class="f"><label>Müdür yardımcısı</label><input class="in" data-set="mudurYrd"></div>
+            <div class="f"><label>Rehber öğretmen / psikolojik danışman</label><input class="in" data-set="rehber"></div>
+            <div class="f"><label>Resmî yazı sayısı</label><input class="in" data-set="yaziSayi" placeholder="12345678-135.04-"></div>
+          </div>
+          <h4 class="mt mb" style="font-size:14px">Takvim (MEB tarafından belirlenen takvime göre giriniz)</h4>
+          <div class="fg">
+            <div class="f"><label>ÖBA uygulama tarihi</label><input class="in" type="date" data-set="obaTarihi"></div>
+            <div class="f"><label>Program başlama tarihi</label><input class="in" type="date" data-set="baslama"></div>
+            <div class="f"><label>Planlanan bitiş tarihi</label><input class="in" type="date" data-set="bitis"></div>
+            <div class="f"><label>ÖDA uygulama tarihi</label><input class="in" type="date" data-set="odaTarihi"></div>
+          </div>
+          <p class="hint mt">İYEP 1.2: ÖBA ve ÖDA, Millî Eğitim Bakanlığınca belirlenen takvim doğrultusunda uygulanır; sonuçlar e-Okul İYEP İşlemleri Modülü'ne işlenir.</p>
+        </div>
+
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h3>📅 Tatil ve ders yapılmayacak günler</h3><button class="btn sm pri" onclick="tatilEkle()">➕ Ekle</button></div>
+            <p class="hint">Uygulama takvimi bu tarihleri atlar. Ara tatil, yarıyıl tatili, resmî tatiller vb.</p>
+            <div class="tw"><table class="t"><thead><tr><th>Açıklama</th><th>Başlangıç</th><th>Bitiş</th><th></th></tr></thead><tbody id="tatilTbody"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>⚙️ Grup ayarları</h3><span class="badge">Okul tercihi</span></div>
+            <div class="fg c2">
+              <div class="f"><label>Önerilen grup büyüklüğü</label><input class="in" type="number" min="1" max="30" data-set="grupIdeal" data-num="1"></div>
+              <div class="f"><label>Grup üst sınırı (uyarı)</label><input class="in" type="number" min="1" max="40" data-set="grupMax" data-num="1"></div>
+              <div class="f"><label>Varsayılan sınıf / şube</label><input class="in" data-set="varsayilanSinif" placeholder="3/A"></div>
+            </div>
+            <p class="hint mt">2026 İYEP programı grup büyüklüğü için sayı belirtmez. Bu değerler otomatik gruplama ve uyarılar içindir; okulunuzun / ilçenizin uygulamasına göre ayarlayınız.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>✍️ İYEP Okul Komisyonu</h3><button class="btn sm pri" onclick="komisyonEkle()">➕ Üye ekle</button></div>
+          <p class="hint">İYEP İşlemleri Modülü'nden alınan öğrenci listeleri üzerinden İYEP'e dâhil edilecek öğrenciler hakkında Okul Komisyonu karar verir (İYEP 1.2). Tutanaklarda imza sırası bu listeye göredir.</p>
+          <div class="tw"><table class="t"><thead><tr><th style="width:26%">Komisyondaki görevi</th><th style="width:34%">Adı soyadı</th><th>Asıl görevi / branşı</th><th style="width:90px"></th></tr></thead><tbody id="komisyonTbody"></tbody></table></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>🏛️ İlçe komisyonu (kurs oluru imzaları)</h3><button class="btn sm pri" onclick="ilceKomEkle()">➕ Üye ekle</button></div>
+          <div class="tw"><table class="t"><thead><tr><th>Adı soyadı</th><th>Unvanı</th><th style="width:60px"></th></tr></thead><tbody id="ilceKomTbody"></tbody></table></div>
+          <div class="fg mt">
+            <div class="f"><label>İlçe millî eğitim müdürü (OLUR)</label><input class="in" id="ilceMudur"></div>
+            <div class="f" style="grid-column: span 2"><label>Kurs oluru "İlgi" satırı</label><input class="in" data-set="olurIlgi"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>🗂️ Tutanak tarihleri ve toplantı bilgileri</h3><span class="sub">Boş bırakılan tarih belgede noktalı gösterilir.</span></div>
+          <div class="tw"><table class="t"><thead><tr><th>Belge</th><th style="width:170px">Tarih</th><th style="width:120px">Saat</th><th>Yer</th></tr></thead><tbody id="evrakTbody"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- ÖĞRENCİLER -->
+      <section class="tab" id="tab-students">
+        <div class="split">
+          <div class="card">
+            <div class="card-h"><h3 id="stFormBaslik">➕ Öğrenci ekle</h3><button class="btn sm ghost" onclick="ogrenciFormTemizle()">Temizle</button></div>
+            <input type="hidden" id="stId">
+            <div class="fg c2">
+              <div class="f"><label>Öğrenci no</label><input class="in" id="stNo"></div>
+              <div class="f" style="grid-column: span 2"><label>Adı soyadı</label><input class="in" id="stAd"></div>
+              <div class="f"><label>Sınıfı / şubesi</label><input class="in" id="stSinif" placeholder="3/A"></div>
+              <div class="f" style="grid-column: span 2"><label>Sınıf öğretmeni</label><input class="in" id="stOgretmen" list="ogretmenListe"></div>
+            </div>
+            <div class="f mt"><label>Hedef kitle (İYEP 1.1)</label><div class="chips" id="stHedef"></div></div>
+            <div class="f mt">
+              <label>ÖBA sonucuna göre eksik öğrenme alanı / tema</label>
+              <div class="chips" id="stUnitsTR"></div>
+              <div class="chips mt" id="stUnitsMAT"></div>
+              <div class="row mt small">
+                <span class="muted">Hızlı seçim:</span>
+                <button class="btn xs out" onclick="hizliSec('T1+')">Türkçe 1.→2. ÖA</button>
+                <button class="btn xs out" onclick="hizliSec('M1+')">Mat. 1.→4. tema</button>
+                <button class="btn xs out" onclick="hizliSec('M2+')">2.→4.</button>
+                <button class="btn xs out" onclick="hizliSec('M3+')">3.→4.</button>
+                <button class="btn xs ghost" onclick="hizliSec('')">Temizle</button>
+              </div>
+              <div class="hint" id="stSaatOzet"></div>
+            </div>
+            <div class="fg c2 mt">
+              <div class="f"><label>Komisyon kararı</label><select class="in" id="stDurum"></select></div>
+              <div class="f"><label>Veli bilgilendirme / onay</label>
+                <select class="in" id="stVeli"><option value="">Belirtilmedi</option><option value="onay">Bilgilendirildi, onay verdi</option><option value="ret">Onay vermedi</option></select></div>
+              <div class="f"><label>ÖBA notu / puanı (isteğe bağlı)</label><input class="in" id="stObaNot"></div>
+            </div>
+            <label class="chk mt"><input type="checkbox" id="stOzel"> Özel eğitim ihtiyacı var (İYEP kapsamı dışında)</label>
+            <div class="f mt"><label>Gerekçe / açıklama</label><input class="in" id="stGerekce" placeholder="Dâhil edilmeme veya ayrılma gerekçesi"></div>
+            <div class="row mt"><button class="btn pri" onclick="ogrenciKaydet()">💾 Öğrenciyi kaydet</button><span class="hint" id="stFormHint"></span></div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>📋 Öğrenci listesi <span class="badge" id="stSayac">0</span></h3>
+              <div class="row">
+                <button class="btn sm out" onclick="secilileriDurum('dahil')" title="Seçili öğrencileri programa dâhil et">✔ Seçilileri dâhil et</button>
+                <button class="btn sm err" onclick="secilileriSil()">🗑</button>
+              </div>
+            </div>
+            <div class="fg c2 mb">
+              <div class="f"><input class="in" id="stAra" placeholder="Ad, numara veya sınıf ara…"></div>
+              <div class="f"><select class="in" id="stFiltreDurum"><option value="">Tüm durumlar</option></select></div>
+              <div class="f"><select class="in" id="stFiltreDers"><option value="">Tüm dersler</option><option value="TR">Türkçe ihtiyacı</option><option value="MAT">Matematik ihtiyacı</option><option value="grupsuz">Gruba atanmamış</option></select></div>
+            </div>
+            <div class="tw"><table class="t" id="stTablo"><thead><tr>
+              <th style="width:28px"><input type="checkbox" id="stHepsi"></th><th>No</th><th>Adı soyadı</th><th>Sınıf</th><th>Türkçe</th><th>Matematik</th><th>Hedef kitle</th><th>Karar</th><th>Grup</th><th style="width:70px"></th>
+            </tr></thead><tbody id="stTbody"></tbody></table></div>
+          </div>
+        </div>
+        <datalist id="ogretmenListe"></datalist>
+      </section>
+
+      <!-- TOPLU AKTARIM -->
+      <section class="tab" id="tab-bulk">
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h3>📊 Excel şablonu ile yükleme</h3></div>
+            <ol class="small" style="padding-left:18px; margin:0 0 12px">
+              <li>Taslak Excel dosyasını indirin.</li>
+              <li>e-Okul İYEP İşlemleri Modülü'nden aldığınız listeye göre öğrenci bilgilerini ve ÖBA ile belirlenen öğrenme alanı / tema kodlarını doldurun.</li>
+              <li>Dosyayı yükleyin. Aynı numaralı öğrenci varsa bilgileri güncellenir.</li>
+            </ol>
+            <div class="row">
+              <button class="btn pri" onclick="sablonIndir()">📄 Taslak Excel indir</button>
+              <label class="btn out">📤 Excel / CSV yükle<input type="file" accept=".xlsx,.csv,.txt,.tsv" class="hidden" onchange="excelYukle(event)"></label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>🔤 Öğrenme alanı / tema kodları</h3></div>
+            <div class="tw"><table class="t"><thead><tr><th>Kod</th><th>Öğrenme alanı / tema</th><th class="num">Saat</th></tr></thead><tbody id="kodTablo"></tbody></table></div>
+            <p class="hint mt">Örnekler: <code>T1 T2</code> · <code>T1+</code> (1. ÖA'dan sona) · <code>M2-M4</code> · <code>M3+</code> · <code>T2 M4</code></p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>⚡ e-Okul / Excel'den kopyala-yapıştır</h3></div>
+          <p class="hint">Her satır bir öğrenci: <b>No · Adı Soyadı · Sınıf · Kodlar</b> (sekme, noktalı virgül veya virgülle ayrılmış). Sınıf öğretmeni beşinci sütun olarak eklenebilir.</p>
+          <textarea class="in" id="topluMetin" style="min-height:190px; font-family: ui-monospace, Consolas, monospace; font-size:12.5px" placeholder="101	Deniz AKTAŞ	3/A	T1 T2 M1+
+102	Ece BULUT	3/A	T2
+103	Kerem ÇINAR	3/B	M3-M4"></textarea>
+          <div class="row mt">
+            <select class="in" id="topluDurum" style="max-width:280px"></select>
+            <button class="btn pri" onclick="topluAktar()">📥 Aktar ve birleştir</button>
+            <button class="btn ghost" onclick="$('topluMetin').value=''">Temizle</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- GRUPLAR -->
+      <section class="tab" id="tab-groups">
+        <div class="split">
+          <div class="card">
+            <div class="card-h"><h3 id="grFormBaslik">🧩 Grup tanımla</h3><button class="btn sm ghost" onclick="grupFormTemizle()">Temizle</button></div>
+            <input type="hidden" id="grId">
+            <div class="fg c2">
+              <div class="f"><label>Grup adı</label><input class="in" id="grAd" placeholder="Türkçe-1"></div>
+              <div class="f"><label>Ders</label><select class="in" id="grDers"><option value="TR">Türkçe</option><option value="MAT">Matematik</option></select></div>
+            </div>
+            <div class="f mt"><label>Grupta işlenecek öğrenme alanı / temalar</label><div class="chips" id="grUnits"></div><div class="hint" id="grSaatOzet"></div></div>
+            <div class="fg c2 mt">
+              <div class="f"><label>Görevli öğretmen</label><input class="in" id="grOgretmen" list="ogretmenListe"></div>
+              <div class="f"><label>T.C. kimlik no</label><input class="in" id="grTc" inputmode="numeric" maxlength="11"></div>
+              <div class="f"><label>Kadro durumu</label><select class="in" id="grKadro"><option>Kadrolu</option><option>Sözleşmeli</option><option>Ücretli</option></select></div>
+              <div class="f"><label>Branşı</label><input class="in" id="grBrans" placeholder="Sınıf Öğretmeni"></div>
+              <div class="f"><label>Derslik</label><input class="in" id="grDerslik"></div>
+              <div class="f"><label>Haftalık normal ders saati</label><input class="in" type="number" id="grNormal" min="0"></div>
+              <div class="f"><label>İYEP dışı kurs saati</label><input class="in" type="number" id="grDiger" min="0"></div>
+              <div class="f"><label>Başlama (boşsa genel tarih)</label><input class="in" type="date" id="grBaslama"></div>
+              <div class="f"><label>Çalışma saatleri</label><input class="in" id="grSaatler" placeholder="15:00 - 16:20"></div>
+            </div>
+            <div class="f mt">
+              <label>Haftalık ders dağılımı — ders saatleri dışında (hafta içi ≤ 2, hafta sonu ≤ 6, haftalık ≤ 10)</label>
+              <div class="days" id="grGunler"></div>
+              <div class="hint" id="grGunMesaj"></div>
+            </div>
+            <p class="hint mt">İYEP 1.2: Programın öğrencinin kendi sınıf öğretmeni tarafından uygulanması önceliklidir; görevlendirme türü öğrencilerin sınıf öğretmenine göre belgelerde otomatik belirtilir.</p>
+            <div class="row mt"><button class="btn pri" onclick="grupKaydet()">💾 Grubu kaydet</button></div>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="card-h"><h3>🪄 Otomatik gruplama</h3></div>
+              <p class="hint">Gruba atanmamış, programa dâhil öğrencileri derslerine ve ÖBA'da belirlenen başlangıç öğrenme alanı / temasına göre, önerilen grup büyüklüğünü (<b id="otoIdeal">6</b>) aşmadan gruplar. Öğretmen olarak öğrencilerin sınıf öğretmeni önerilir.</p>
+              <button class="btn pri" onclick="otomatikGrupla()">🪄 Grupları oluştur</button>
+            </div>
+            <div class="card">
+              <div class="card-h"><h3>👥 Gruba öğrenci ata</h3><span id="atamaSayac" class="badge"></span></div>
+              <div class="f"><select class="in" id="atamaGrup"></select></div>
+              <div id="atamaListe" class="mt" style="max-height:330px; overflow:auto"></div>
+              <div class="row mt"><button class="btn ok" onclick="atamaKaydet()">💾 Atamayı kaydet</button><span class="hint">Yalnız programa dâhil ve bu dersten ihtiyacı olan öğrenciler listelenir.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>📚 Gruplar</h3><span class="sub">Toplam saat, grubun öğrenme alanı / temalarının programdaki süresidir.</span></div>
+          <div class="tw"><table class="t"><thead><tr><th>Grup</th><th>Ders / ÖA-Tema</th><th>Öğretmen</th><th class="num">Öğrenci</th><th>Haftalık dağılım</th><th class="num">Hafta</th><th class="num">Toplam</th><th>Tahmini bitiş</th><th style="width:96px"></th></tr></thead><tbody id="grTbody"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- TAKVİM -->
+      <section class="tab" id="tab-takvim">
+        <div class="card no-print">
+          <div class="row between">
+            <div class="row"><label class="lbl">Grup</label><select class="in" id="takvimGrup" style="min-width:220px"></select></div>
+            <div class="row">
+              <button class="btn out sm" onclick="belgeAc('plan', $('takvimGrup').value)">📄 Yıllık plan belgesi</button>
+              <button class="btn out sm" onclick="belgeAc('defter', $('takvimGrup').value)">📒 Ders defteri föyü</button>
+              <button class="btn out sm" onclick="planExcel()">📊 Excel</button>
+            </div>
+          </div>
+        </div>
+        <div id="takvimOzet"></div>
+        <div class="card">
+          <div class="card-h"><h3>🗓️ Haftalık uygulama planı</h3><span class="sub">Açıklama sütunu düzenlenebilir; yıllık plan ve ders defterine aktarılır.</span></div>
+          <div id="takvimHaftalar"></div>
+        </div>
+      </section>
+
+      <!-- İZLEME -->
+      <section class="tab" id="tab-izleme">
+        <div class="card">
+          <div class="row between">
+            <div class="row">
+              <div class="f"><label>Grup</label><select class="in" id="izGrup" style="min-width:200px"></select></div>
+              <div class="f"><label>Öğrenme alanı / tema</label><select class="in" id="izUnit" style="min-width:240px"></select></div>
+            </div>
+            <div class="row">
+              <button class="btn out sm" onclick="belgeAc('izleme_formu')">📄 İzleme formu</button>
+              <button class="btn out sm" onclick="belgeAc('pg_dpa')">📄 Performans görevi DPA</button>
+            </div>
+          </div>
+          <p class="hint mt">İYEP 1.3: Öğrenciler program süresince gözlem, çalışma kâğıdı, öğrenme günlüğü, kavram haritası, performans görevi gibi öğrenme kanıtlarıyla izlenir; sonuçlar not vermekten çok öğrenmeyi geliştirmek için kullanılır. Her tema / öğrenme alanı için en az bir performans görevi uygulanır.</p>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>✅ Öğrenme çıktıları izleme</h3>
+            <div class="legend"><span><b>–</b>Gözlenmedi</span><span><b style="background:var(--warn-soft);color:var(--warn)">G</b>Gelişiyor</span><span><b style="background:var(--ok-soft);color:var(--ok)">E</b>Edindi</span><span>Hücreye tıklayarak değiştirin</span></div>
+          </div>
+          <div id="izMatris"></div>
+        </div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h3>🏅 Performans görevi</h3><span class="badge" id="pgDpaTur"></span></div>
+            <div id="pgAlan"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>🪞 Öğretmen yansıtmaları</h3><span class="sub">Öğretmenin ve programın güçlü / geliştirilmesi gereken yönleri</span></div>
+            <div id="yansitmaAlan"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>🎯 Program sonu ÖDA sonuçları</h3><button class="btn out sm" onclick="belgeAc('oda')">📄 ÖDA sonuç çizelgesi</button></div>
+          <p class="hint">İYEP 1.3: Program sonunda öğrencilerin ulaştıkları düzey, MEB'in hazırladığı Öğrenci Değerlendirme Aracı (ÖDA) ile belirlenir. Değerler, eğilimler, okuryazarlık ve sosyal-duygusal öğrenme becerileri süreçte izlenir ancak notla değerlendirilmez.</p>
+          <div id="odaAlan"></div>
+        </div>
+      </section>
+
+      <!-- BELGELER -->
+      <section class="tab" id="tab-docs">
+        <div class="card no-print">
+          <div class="doc-toolbar" id="docToolbar"></div>
+        </div>
+        <div class="card no-print hidden" id="tutanakEditor"></div>
+        <div class="card no-print ebys-panel hidden" id="ebysPanel"></div>
+        <div class="paper-wrap" id="docArea"></div>
+      </section>
+
+      <!-- ÖĞRETİM PROGRAMI -->
+      <section class="tab" id="tab-program">
+        <div class="card">
+          <div class="prog-tabs" id="progTabs"></div>
+          <div id="progIcerik"></div>
+        </div>
+      </section>
+
+      <!-- USUL VE ESASLAR -->
+      <section class="tab" id="tab-esaslar">
+        <div id="esasIcerik"></div>
+      </section>
+
+      <!-- YEDEK -->
+      <section class="tab" id="tab-backup">
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h3>💾 Yedekleme</h3></div>
+            <p class="hint">Veriler bu tarayıcıda saklanır. Bilgisayar değiştirirken veya tarayıcı verilerini temizlemeden önce yedek alın.</p>
+            <div class="stack">
+              <button class="btn ok" onclick="jsonDisaAktar()">💾 Tam yedeği indir (JSON)</button>
+              <label class="btn pri">📂 Yedek yükle (JSON — eski sürüm yedekleri de kabul edilir)<input type="file" accept=".json" class="hidden" onchange="jsonIceAktar(event)"></label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>📊 Excel çıktıları</h3></div>
+            <div class="stack">
+              <button class="btn out" onclick="ogrenciExcel()">👥 Öğrenci listesi ve ÖBA / ÖDA (xlsx)</button>
+              <button class="btn out" onclick="olurExcel()">🏛️ Kurs oluru çizelgesi (xlsx)</button>
+              <button class="btn out" onclick="izlemeExcel()">✅ Öğrenme çıktıları izleme (xlsx)</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>🧹 Yeni başlangıç</h3></div>
+            <div class="stack">
+              <button class="btn out" onclick="ornekYukle()">🔄 Örnek verileri yükle</button>
+              <button class="btn out" onclick="yeniYil()">📆 Yeni eğitim yılı (okul ve komisyon kalır, öğrenci/grup silinir)</button>
+              <button class="btn err" onclick="hepsiniSil()">🗑️ Tüm verileri sil</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>ℹ️ Sürüm</h3></div>
+            <p class="small">İYEP Yönetim Sistemi <b id="surumLbl"></b><br>Dayanak: <span id="kaynakLbl"></span>.</p>
+            <p class="hint">Program çevrimdışı çalışır; veriler hiçbir sunucuya gönderilmez.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<nav class="mobile-nav no-print">
+  <button data-tab="dashboard"><span class="ic">📊</span>Panel</button>
+  <button data-tab="students"><span class="ic">👥</span>Öğrenci</button>
+  <button data-tab="groups"><span class="ic">🧩</span>Grup</button>
+  <button data-tab="izleme"><span class="ic">✅</span>İzleme</button>
+  <button data-tab="docs"><span class="ic">📑</span>Belge</button>
+  <button onclick="menuAc()"><span class="ic">☰</span>Menü</button>
+</nav>
+
+<div class="modal" id="modal" onclick="if(event.target===this)modalKapat()"><div class="modal-box" id="modalBox"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/*@@SCRIPT@@*/
+</script>
+</body>
+</html>
