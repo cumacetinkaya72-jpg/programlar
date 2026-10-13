@@ -53,4 +53,5 @@ Sayfa tasarımı `src/takvim.template.html` içindedir; betik Excel verisini bu 
 | Gİ | Gün içi | CVM | Cevap verilemedi |
 | BGVH | Belirli gün ve hafta | CV | Cevap verildi |
 | YB | Yıl boyu | T | Tamamlandı |
-| | | İ | İptal edildi |
+| BY | Başvuru yapıldı | İ | İptal edildi |
+| BYM | Başvuru yapılmadı | | |

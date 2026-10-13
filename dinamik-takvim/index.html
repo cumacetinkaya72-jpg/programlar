@@ -293,8 +293,8 @@ label.seri{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer
       <tr><td><span class="chip" style="color:var(--st-bgvh);font-weight:700">kırmızı yazı</span></td><td><b>BGVH</b> Belirli gün ve hafta</td></tr>
       <tr><td><span class="chip" style="background:var(--st-de)">sarı</span></td><td><b>DE</b> Devam ediyor</td></tr>
       <tr><td><span class="chip" style="font-weight:700">kalın</span></td><td>Durum <b>Y</b></td></tr>
-      <tr><td><span class="chip" style="background:var(--st-by)">turkuaz</span></td><td>Durum <b>BY</b></td></tr>
-      <tr><td><span class="chip" style="background:var(--st-bym)">somon</span></td><td>Durum <b>BYM</b></td></tr>
+      <tr><td><span class="chip" style="background:var(--st-by)">turkuaz</span></td><td><b>BY</b> Başvuru yapıldı</td></tr>
+      <tr><td><span class="chip" style="background:var(--st-bym)">somon</span></td><td><b>BYM</b> Başvuru yapılmadı</td></tr>
       <tr><td><span class="chip" style="background:var(--st-cvm)">mavi</span></td><td><b>CVM</b> Cevap verilemedi</td></tr>
       <tr><td><span class="chip" style="background:var(--st-er)">turuncu</span></td><td><b>ER</b> / <b>E</b> Ertelendi</td></tr>
     </table>
@@ -364,7 +364,7 @@ label.seri{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer
 </dialog>
 
 <datalist id="kodList"><option value="Aİ">Ay içi</option><option value="Hİ">Hafta içi</option><option value="Gİ">Gün içi</option><option value="Hİ/Gİ">Hafta içi / Gün içi</option><option value="Aİ/Hİ">Ay içi / Hafta içi</option><option value="BGVH">Belirli gün ve hafta</option><option value="YB">Yıl boyu</option></datalist>
-<datalist id="durumList"><option value="DE">Devam ediyor</option><option value="ER">Ertelendi</option><option value="CVM">Cevap verilemedi</option><option value="İ">İptal edildi</option></datalist>
+<datalist id="durumList"><option value="DE">Devam ediyor</option><option value="ER">Ertelendi</option><option value="CVM">Cevap verilemedi</option><option value="BY">Başvuru yapıldı</option><option value="BYM">Başvuru yapılmadı</option><option value="İ">İptal edildi</option></datalist>
 <datalist id="tamamList"><option value="T">Tamamlandı</option><option value="CV">Cevap verildi</option><option value="DY">DY</option></datalist>
 <div class="toast" id="toast"></div>
 
@@ -377,7 +377,7 @@ const DONE = new Set(["T","CV","DY"]);
 const KODLAR = ["Aİ","Hİ","Gİ","BGVH","YB","DE","ER","E","CVM","CV","T","İ","Y","BY","BYM","DY"];
 // Kısaltmaların varsayılan anlamları (Açıklamalar sekmesinden değiştirilebilir)
 const KOD_ACIKLAMA = {"Aİ":"Ay içi","Hİ":"Hafta içi","Gİ":"Gün içi","BGVH":"Belirli gün ve hafta","BGHV":"Belirli gün ve hafta","YB":"Yıl boyu",
-  "DE":"Devam ediyor","ER":"Ertelendi","E":"Ertelendi","CVM":"Cevap verilemedi","CV":"Cevap verildi","T":"Tamamlandı","İ":"İptal edildi"};
+  "DE":"Devam ediyor","ER":"Ertelendi","E":"Ertelendi","CVM":"Cevap verilemedi","CV":"Cevap verildi","T":"Tamamlandı","İ":"İptal edildi","BY":"Başvuru yapıldı","BYM":"Başvuru yapılmadı"};
 const kodAd = k => (S.kod[k] ?? KOD_ACIKLAMA[k]) || "";
 
 /* ---------- tarih yardımcıları (yerel saat, ISO yyyy-mm-dd) ---------- */
@@ -449,8 +449,8 @@ function rowClass(x, today, soonEnd){
 const isDone = x => DONE.has(x.f) || x.e === "İ";
 const isErt = x => x.e === "ER" || x.e === "E";   // E ve ER: Ertelendi
 // Tek "durum" değeri: kapanış (f sütunu: T/DY tamamlandı, CV cevap verildi) ya da e sütunu (DE, ER/E, CVM, İ)
-const DURUMLAR = [["","— Açık —"],["DE","Devam ediyor"],["ER","Ertelendi"],["CVM","Cevap verilemedi"],["CV","Cevap verildi"],["T","Tamamlandı"],["İ","İptal edildi"]];
-const ACIK_DURUM = new Set(["DE","ER","E","CVM","İ"]);
+const DURUMLAR = [["","— Açık —"],["DE","Devam ediyor"],["ER","Ertelendi"],["CVM","Cevap verilemedi"],["CV","Cevap verildi"],["BY","Başvuru yapıldı"],["BYM","Başvuru yapılmadı"],["T","Tamamlandı"],["İ","İptal edildi"]];
+const ACIK_DURUM = new Set(["DE","ER","E","CVM","İ","BY","BYM"]);
 function durum(x){ if (x.f === "CV") return "CV"; if (DONE.has(x.f)) return "T"; if (isErt(x)) return "ER"; return ACIK_DURUM.has(x.e) ? x.e : ""; }
 function setDurum(x, d){
   const kapali = isDone(x);
@@ -590,7 +590,7 @@ $("isWrap").addEventListener("change", e => {
   const x = S.isler.find(r => r.id == t.closest("tr").dataset.id);
   durumDegis(x, t.classList.contains("tm") ? (t.checked ? "T" : "") : t.value);
 });
-const DURUM_MESAJ = {T:"Tamamlananlar listesine taşındı",CV:"Cevap verilenler listesine taşındı",ER:"Ertelenenlere taşındı (yeni tarih için işe tıklayın)",CVM:"Cevap verilemeyenlere taşındı",DE:"Devam edenlere taşındı","İ":"İptal edildi olarak kapatıldı","":"Açık işlere alındı"};
+const DURUM_MESAJ = {T:"Tamamlananlar listesine taşındı",CV:"Cevap verilenler listesine taşındı",ER:"Ertelenenlere taşındı (yeni tarih için işe tıklayın)",CVM:"Cevap verilemeyenlere taşındı",DE:"Devam edenlere taşındı",BY:"Başvuru yapıldı olarak işaretlendi",BYM:"Başvuru yapılmadı olarak işaretlendi","İ":"İptal edildi olarak kapatıldı","":"Açık işlere alındı"};
 function durumDegis(x, d){ setDurum(x, d); save(); toast(DURUM_MESAJ[d]); renderIs(); }
 $("isWrap").addEventListener("click", e => {
   if (e.target.closest(".c-is .t")) openIs(+e.target.closest("tr").dataset.id);
