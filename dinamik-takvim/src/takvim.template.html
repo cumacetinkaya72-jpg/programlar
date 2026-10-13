@@ -100,6 +100,8 @@ tr.r-cvm td:not(.day){background:var(--st-cvm)}
 tr.r-today td:not(.day){background:var(--st-today)}
 tr.r-ie td:not(.day){background:var(--st-ie)}
 tr.r-er td:not(.day){background:var(--st-er)}
+tr.r-acil td:not(.day){background:var(--st-bym);color:var(--st-bgvh);font-weight:700}
+tr.r-sd td:not(.day){background:var(--st-done);color:var(--st-bgvh)}
 .grid tr.grp td{background:var(--panel2);padding:0;border-bottom:1px solid var(--line)}
 .grid tr.grp td div{position:sticky;left:0;display:inline-block;padding:7px 10px;font-weight:650;font-size:13px}
 .grid tr.grp td div span{display:inline-block;min-width:22px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-size:11px;text-align:center;font-weight:600}
@@ -156,7 +158,7 @@ dialog::backdrop{background:rgba(10,15,25,.45)}
 dialog form{padding:16px 18px;max-height:calc(100vh - 40px);overflow:auto}
 dialog h3{margin:0 0 12px;font-size:16px}
 .fg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px}
-.fg input,.fg textarea{width:100%;min-width:0}
+.fg input,.fg textarea,.fg select{width:100%;min-width:0}
 .fg input[type="radio"],.fg input[type="checkbox"]{width:16px;flex:none}
 .tekrar .son input{width:auto}
 .fg .f{display:flex;flex-direction:column;gap:4px}
@@ -178,7 +180,8 @@ label.seri{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer
 .help{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px;max-width:900px}
 .help h2{font-size:16px;margin:.2em 0 .6em}.help h3{font-size:14px;margin:1.2em 0 .4em}
 .help table{border-collapse:collapse;font-size:13px}.help td,.help th{border:1px solid var(--line);padding:4px 8px;text-align:left}
-.help td input{width:100%;border:none;background:transparent;padding:2px}
+.kodlar{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:start}
+.kodlar table{width:100%}.kodlar th{text-align:center;background:var(--panel2)}
 [hidden]{display:none!important}
 @media (max-width:700px){
   main{padding:10px 8px 30px}
@@ -287,7 +290,9 @@ label.seri{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer
     <h3>Satır renkleri (Excel'deki koşullu biçimlendirme)</h3>
     <table>
       <tr><th>Renk</th><th>Koşul</th></tr>
-      <tr><td><span class="chip" style="background:var(--st-done)">gri, üstü çizili</span></td><td><b>T</b> Tamamlandı, <b>CV</b> Cevap verildi, <b>DY</b> ya da <b>İ</b> İptal edildi</td></tr>
+      <tr><td><span class="chip" style="background:var(--st-done)">gri, üstü çizili</span></td><td><b>T</b> Tamamlandı, <b>CV</b> Cevap verildi veya <b>İ</b> İptal edildi</td></tr>
+      <tr><td><span class="chip" style="background:var(--st-bym);color:var(--st-bgvh);font-weight:700">kırmızı, kalın</span></td><td><b>A</b> Acil (listenin en üstünde)</td></tr>
+      <tr><td><span class="chip" style="background:var(--st-done);color:var(--st-bgvh)">gri, kırmızı yazı</span></td><td><b>SD</b> Süresi doldu</td></tr>
       <tr><td><span class="chip" style="background:var(--st-soon)">pembe</span></td><td>Bitiş tarihi bugün ile 5 gün sonrası arasında</td></tr>
       <tr><td><span class="chip" style="background:var(--st-today)">yeşil</span></td><td>Başlangıç ya da bitiş tarihi bugün</td></tr>
       <tr><td><span class="chip" style="color:var(--st-bgvh);font-weight:700">kırmızı yazı</span></td><td><b>BGVH</b> Belirli gün ve hafta</td></tr>
@@ -296,12 +301,12 @@ label.seri{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer
       <tr><td><span class="chip" style="background:var(--st-by)">turkuaz</span></td><td><b>BY</b> Başvuru yapıldı</td></tr>
       <tr><td><span class="chip" style="background:var(--st-bym)">somon</span></td><td><b>BYM</b> Başvuru yapılmadı</td></tr>
       <tr><td><span class="chip" style="background:var(--st-cvm)">mavi</span></td><td><b>CVM</b> Cevap verilemedi</td></tr>
-      <tr><td><span class="chip" style="background:var(--st-er)">turuncu</span></td><td><b>ER</b> / <b>E</b> Ertelendi</td></tr>
+      <tr><td><span class="chip" style="background:var(--st-er)">turuncu</span></td><td><b>E</b> Ertelendi</td></tr>
     </table>
 
-    <h3>Kod açıklamaları</h3>
-    <p style="color:var(--muted);font-size:12px">Tabloda bir kodun üzerine gelince anlamı görünür. Açıklamaları buradan değiştirebilirsiniz.</p>
-    <table id="kodTablo"></table>
+    <h3>Kodlar</h3>
+    <p style="color:var(--muted);font-size:12px">Tabloda bir kodun üzerine gelince anlamı görünür.</p>
+    <div id="kodTablo" class="kodlar"></div>
   </div>
 </section>
 </main>
@@ -316,12 +321,11 @@ label.seri{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer
       <label class="f"><span>Bitiş tarihi</span><input type="date" name="bit"></label>
       <label class="f"><span>Saat (baş.)</span><input type="time" name="saatBas"></label>
       <label class="f"><span>Saat (bit.)</span><input type="time" name="saatBit"></label>
-      <label class="f"><span>Süre kodu 1 (Aİ/Hİ/Gİ/YB…)</span><input name="b" list="kodList"></label>
-      <label class="f"><span>Süre kodu 2</span><input name="c" list="kodList"></label>
-      <label class="f"><span>Süre kodu 3</span><input name="d" list="kodList"></label>
-      <label class="f"><span>Durum</span><input name="e" list="durumList"></label>
-      <label class="f"><span>Kapanış (T / CV / DY)</span><input name="f" list="tamamList"></label>
-      <label class="f"><span>Yazının tarihi</span><input type="date" name="yaziTar"></label>
+      <label class="f"><span>Süre kodu 1</span><select name="b"></select></label>
+      <label class="f"><span>Süre kodu 2</span><select name="c"></select></label>
+      <label class="f"><span>Süre kodu 3</span><select name="d"></select></label>
+      <label class="f"><span>Durum</span><select name="durum"></select></label>
+      <label class="f w2"><span>Yazının tarihi</span><input type="date" name="yaziTar"></label>
       <label class="f w2"><span>Yazının sayısı</span><input name="yaziNo"></label>
       <fieldset class="w4 tekrar" id="tekrarAlan">
         <legend>Tekrar</legend>
@@ -330,6 +334,7 @@ label.seri{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer
           <label><input type="radio" name="tekrar" value="gun"> Günlük rutin</label>
           <label><input type="radio" name="tekrar" value="hafta"> Haftalık rutin</label>
           <label><input type="radio" name="tekrar" value="ay"> Aylık rutin</label>
+          <label><input type="radio" name="tekrar" value="yil"> Yıllık rutin</label>
           <label class="son">Son tarih <input type="date" name="tekrarSon"></label>
         </div>
         <div class="ipucu" id="tekrarBilgi"></div>
@@ -363,9 +368,6 @@ label.seri{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer
   </form>
 </dialog>
 
-<datalist id="kodList"><option value="Aİ">Ay içi</option><option value="Hİ">Hafta içi</option><option value="Gİ">Gün içi</option><option value="Hİ/Gİ">Hafta içi / Gün içi</option><option value="Aİ/Hİ">Ay içi / Hafta içi</option><option value="BGVH">Belirli gün ve hafta</option><option value="YB">Yıl boyu</option></datalist>
-<datalist id="durumList"><option value="DE">Devam ediyor</option><option value="ER">Ertelendi</option><option value="CVM">Cevap verilemedi</option><option value="BY">Başvuru yapıldı</option><option value="BYM">Başvuru yapılmadı</option><option value="İ">İptal edildi</option></datalist>
-<datalist id="tamamList"><option value="T">Tamamlandı</option><option value="CV">Cevap verildi</option><option value="DY">DY</option></datalist>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -374,11 +376,18 @@ const KEY = "dinamikTakvim.v1";
 const GUNLER = ["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
 const AYLAR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const DONE = new Set(["T","CV","DY"]);
-const KODLAR = ["Aİ","Hİ","Gİ","BGVH","YB","DE","ER","E","CVM","CV","T","İ","Y","BY","BYM","DY"];
-// Kısaltmaların varsayılan anlamları (Açıklamalar sekmesinden değiştirilebilir)
-const KOD_ACIKLAMA = {"Aİ":"Ay içi","Hİ":"Hafta içi","Gİ":"Gün içi","BGVH":"Belirli gün ve hafta","BGHV":"Belirli gün ve hafta","YB":"Yıl boyu",
-  "DE":"Devam ediyor","ER":"Ertelendi","E":"Ertelendi","CVM":"Cevap verilemedi","CV":"Cevap verildi","T":"Tamamlandı","İ":"İptal edildi","BY":"Başvuru yapıldı","BYM":"Başvuru yapılmadı"};
-const kodAd = k => (S.kod[k] ?? KOD_ACIKLAMA[k]) || "";
+// Kod tabloları (kullanıcının verdiği listeye göre)
+const KOD1 = {DY:"Ders yılı başında",DYB:"Ders yılı boyunca","DYİ":"Ders yılı içerisinde",DYS:"Ders yılı sonunda",TB:"Takvime bağlı",
+  YBA:"Yıl başında",YBO:"Yıl boyunca","Yİ":"Yıl içerisinde",YS:"Yıl sonunda"};
+const KOD2 = {AB:"Ay başında","Aİ":"Ay içerisinde",AS:"Ay sonunda",A1H:"Ayın birinci haftası",A2H:"Ayın ikinci haftası",A3H:"Ayın üçüncü haftası",
+  A4H:"Ayın dördüncü haftası",A5H:"Ayın beşinci haftası"};
+const KOD3 = {"Aİ":"Ay içerisinde","Aİ/Gİ":"Ay/gün içerisinde","Aİ/Hİ":"Ay/hafta içerisinde",BGVH:"Belirli gün ve hafta","Gİ":"Gün içerisinde",
+  HB:"Hafta başında","Hİ":"Hafta içerisinde","Hİ/Gİ":"Hafta/gün içerisinde",HS:"Hafta sonunda"};
+const DURUM_KOD = {A:"Acil",BE:"Bekliyor",BY:"Başvuru yapıldı",BYM:"Başvuru yapılmadı",CV:"Cevap verildi",CVM:"Cevap verilemedi",
+  DE:"Devam ediyor",E:"Ertelendi","İ":"İptal edildi",S:"Sürekli/süresiz",SD:"Süresi doldu",T:"Tamamlandı"};
+// Eski / Excel'den gelen kodlar
+const KOD_EK = {"Hİ":"Hafta içerisinde","Gİ":"Gün içerisinde",BGHV:"Belirli gün ve hafta",YB:"Yıl boyu",ER:"Ertelendi"};
+const kodAd = (k, sozluk) => (sozluk && sozluk[k]) || KOD1[k] || KOD2[k] || KOD3[k] || DURUM_KOD[k] || KOD_EK[k] || "";
 
 /* ---------- tarih yardımcıları (yerel saat, ISO yyyy-mm-dd) ---------- */
 const iso = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
@@ -433,11 +442,13 @@ const $ = id => document.getElementById(id);
 function rowClass(x, today, soonEnd){
   // Excel'deki koşullu biçimlendirme önceliğine göre tek sınıf
   if (isDone(x)) return "r-done";
+  if (x.e === "A") return "r-acil";
   if (x.bit && x.bit >= today && x.bit <= soonEnd) return "r-soon";
   if (x.e === "Y") return "r-y";
   if (x.d === "BGVH") return "r-bgvh";
   if (x.e === "DE") return "r-de";
   if (isErt(x)) return "r-er";
+  if (x.e === "SD") return "r-sd";
   if (x.e === "BY") return "r-by";
   if (x.e === "BYM") return "r-bym";
   if (x.e === "CVM") return "r-cvm";
@@ -449,9 +460,10 @@ function rowClass(x, today, soonEnd){
 const isDone = x => DONE.has(x.f) || x.e === "İ";
 const isErt = x => x.e === "ER" || x.e === "E";   // E ve ER: Ertelendi
 // Tek "durum" değeri: kapanış (f sütunu: T/DY tamamlandı, CV cevap verildi) ya da e sütunu (DE, ER/E, CVM, İ)
-const DURUMLAR = [["","— Açık —"],["DE","Devam ediyor"],["ER","Ertelendi"],["CVM","Cevap verilemedi"],["CV","Cevap verildi"],["BY","Başvuru yapıldı"],["BYM","Başvuru yapılmadı"],["T","Tamamlandı"],["İ","İptal edildi"]];
-const ACIK_DURUM = new Set(["DE","ER","E","CVM","İ","BY","BYM"]);
-function durum(x){ if (x.f === "CV") return "CV"; if (DONE.has(x.f)) return "T"; if (isErt(x)) return "ER"; return ACIK_DURUM.has(x.e) ? x.e : ""; }
+// Tek "durum" değeri. T ve CV kapanış sütununda (f), diğerleri durum sütununda (e) saklanır.
+const DURUMLAR = [["","— Açık —"], ...Object.entries(DURUM_KOD)];
+const ACIK_DURUM = new Set([...Object.keys(DURUM_KOD).filter(k => k!=="T" && k!=="CV"), "ER"]);
+function durum(x){ if (x.f === "CV") return "CV"; if (DONE.has(x.f)) return "T"; if (isErt(x)) return "E"; return ACIK_DURUM.has(x.e) ? x.e : ""; }
 function setDurum(x, d){
   const kapali = isDone(x);
   if (d === "T" || d === "CV") { x.f = d; if (ACIK_DURUM.has(x.e)) x.e = ""; }
@@ -471,6 +483,7 @@ function gruplar(list, today, wS, wE){
   const hBas = iso(monday(new Date())), hBit = iso(addDays(parse(hBas),6));
   const acik = list.filter(x => !isDone(x)), kullan = new Set();
   const al = f => { const r = acik.filter(x => !kullan.has(x) && f(x)).sort(tarihSira); r.forEach(x=>kullan.add(x)); return r; };
+  const acil  = al(x => x.e === "A");
   const de    = al(x => x.e === "DE");
   const hafta = al(x => !isErt(x) && x.e !== "CVM" && x.bas && x.bas <= hBit && endOf(x) >= hBas);
   const cvm   = al(x => x.e === "CVM");
@@ -478,6 +491,7 @@ function gruplar(list, today, wS, wE){
   const gecik = al(x => endOf(x) && endOf(x) < today);
   const diger = al(x => !S.ayar.isDonem || !x.bas || (x.bas <= wE && endOf(x) >= wS));
   return [
+    {k:"acil",  ad:"Acil işler", list:acil},
     {k:"de",    ad:"Devam edenler (DE)", list:de},
     {k:"hafta", ad:`Bu hafta yapılacaklar (${fmt(hBas).slice(0,5)} – ${fmt(hBit).slice(0,5)})`, list:hafta},
     {k:"cvm",   ad:"Cevap verilemeyenler", list:cvm},
@@ -537,8 +551,9 @@ function renderIs(){
        <th class="stk c-is" rowspan="3" ${st(6)}>Görev / Yapılacak İş ve İşlemler</th>${h1}</tr>
    <tr>${h2}</tr><tr>${h3}</tr></thead><tbody>`;
 
-  const kodTip = c => { const t = c.split("/").map(k => kodAd(k) ? `${k}: ${kodAd(k)}` : "").filter(Boolean).join(" · "); return t ? ` title="${esc(t)}"` : ""; };
-  const chips = (...cs) => cs.filter(Boolean).map(c=>`<span class="chip"${kodTip(c)}>${esc(c)}</span>`).join("");
+  const kodTip = (c, sz) => { const t = kodAd(c, sz) ? `${c}: ${kodAd(c, sz)}` : c.split("/").map(k => kodAd(k, sz) ? `${k}: ${kodAd(k, sz)}` : "").filter(Boolean).join(" · "); return t ? ` title="${esc(t)}"` : ""; };
+  const chip = (c, sz) => c ? `<span class="chip"${kodTip(c, sz)}>${esc(c)}</span>` : "";
+  const chips = (...cs) => cs.map(c => chip(c)).join("");
   for (const g of bolumler){
    if (!g.list.length) continue;
    html += `<tr class="grp g-${g.k}"><td colspan="${7+N}"><div>${esc(g.ad)} <span>${g.list.length}</span></div></td></tr>`;
@@ -549,7 +564,7 @@ function renderIs(){
                   isDone(x) && x.tamamTar ? `${x.f==="CV"?"Cevap verildi":DONE.has(x.f)?"Tamamlandı":"İptal edildi"}: ${fmt(x.tamamTar)}` : ""].filter(Boolean).map(t=>`<div class="y">${t}</div>`).join("");
     html += `<tr class="${rowClass(x,today,soonEnd)} ${isDone(x)?"done":""}" data-id="${x.id}">
       <td class="stk c-hf" ${st(0)} title="${s?fmt(s):""}">${s?`${isoWeek(parse(s))}<small>${s.slice(0,4)}</small>`:""}</td>
-      <td class="stk c-kod" ${st(1)}>${chips(x.b,x.c,x.d)}</td>
+      <td class="stk c-kod" ${st(1)}>${chip(x.b,KOD1)}${chip(x.c,KOD2)}${chip(x.d,KOD3)}</td>
       <td class="stk c-dur" ${st(2)}><input type="checkbox" class="tm" title="${isDone(x)?"Açık işlere geri al":"Tamamlandı olarak işaretle"}" ${isDone(x)?"checked":""}> ${durumSec(x)}${ACIK_DURUM.has(x.e)?"":chips(x.e)}${x.f&&x.f!=="T"&&x.f!=="CV"?chips(x.f):""}</td>
       <td class="stk c-tar" ${st(3)}>${fmt(x.bas)}</td><td class="stk c-tar" ${st(4)}>${fmt(x.bit)}</td>
       <td class="stk c-saat" ${st(5)}>${esc(saat)}</td>
@@ -590,88 +605,128 @@ $("isWrap").addEventListener("change", e => {
   const x = S.isler.find(r => r.id == t.closest("tr").dataset.id);
   durumDegis(x, t.classList.contains("tm") ? (t.checked ? "T" : "") : t.value);
 });
-const DURUM_MESAJ = {T:"Tamamlananlar listesine taşındı",CV:"Cevap verilenler listesine taşındı",ER:"Ertelenenlere taşındı (yeni tarih için işe tıklayın)",CVM:"Cevap verilemeyenlere taşındı",DE:"Devam edenlere taşındı",BY:"Başvuru yapıldı olarak işaretlendi",BYM:"Başvuru yapılmadı olarak işaretlendi","İ":"İptal edildi olarak kapatıldı","":"Açık işlere alındı"};
-function durumDegis(x, d){ setDurum(x, d); save(); toast(DURUM_MESAJ[d]); renderIs(); }
+const DURUM_MESAJ_ESKI = {T:"Tamamlananlar listesine taşındı",CV:"Cevap verilenler listesine taşındı",ER:"Ertelenenlere taşındı (yeni tarih için işe tıklayın)",CVM:"Cevap verilemeyenlere taşındı",DE:"Devam edenlere taşındı",BY:"Başvuru yapıldı olarak işaretlendi",BYM:"Başvuru yapılmadı olarak işaretlendi","İ":"İptal edildi olarak kapatıldı","":"Açık işlere alındı"};
+function durumDegis(x, d){ setDurum(x, d); save(); toast(d==="E" ? DURUM_MESAJ_ESKI.ER : (DURUM_MESAJ_ESKI[d] || `${DURUM_KOD[d]} olarak işaretlendi`)); renderIs(); }
 $("isWrap").addEventListener("click", e => {
   if (e.target.closest(".c-is .t")) openIs(+e.target.closest("tr").dataset.id);
 });
 $("isYeni").onclick = () => openIs(null);
 
 /* ---------- tekrarlayan işler ---------- */
-const TEKRAR_AD = {hafta:"Haftalık", ay:"Aylık"};
+const TEKRAR_AD = {gun:"Günlük", hafta:"Haftalık", ay:"Aylık", yil:"Yıllık"};
+const ALANLAR = ["is","bas","bit","saatBas","saatBit","b","c","d","yaziTar","yaziNo"];
+const SERI_ALAN = ["is","saatBas","saatBit","b","c","d","yaziTar","yaziNo"];
 // Eğitim-öğretim yılı sonu: Temmuz ve sonrası için ertesi yılın 30 Haziranı
 function yilSonu(t){ const d = parse(t) || new Date(); return (d.getMonth() >= 6 ? d.getFullYear()+1 : d.getFullYear()) + "-06-30"; }
+function ayEkle(d0, n){ const d = new Date(d0.getFullYear(), d0.getMonth()+n, 1); d.setDate(Math.min(d0.getDate(), new Date(d.getFullYear(), d.getMonth()+1, 0).getDate())); return d; }
 function tekrarTarihleri(bas, bit, tip, son){
   const b0 = parse(bas), sure = bit ? Math.round((parse(bit) - b0) / 864e5) : null, out = [];
   for (let k = 0; k < 400; k++){
-    let d;
-    if (tip === "hafta") d = addDays(b0, 7*k);
-    else { d = new Date(b0.getFullYear(), b0.getMonth()+k, 1); d.setDate(Math.min(b0.getDate(), new Date(d.getFullYear(), d.getMonth()+1, 0).getDate())); }
+    const d = tip === "hafta" ? addDays(b0, 7*k) : ayEkle(b0, (tip === "yil" ? 12 : 1) * k);
     if (iso(d) > son) break;
     out.push([iso(d), sure == null ? null : iso(addDays(d, sure))]);
   }
   return out;
 }
+const seriSonraki = x => x && x.seri ? S.isler.filter(r => r.seri === x.seri && r.id !== x.id && (r.bas||"") >= (x.bas||"")) : [];
+const seriSon = x => x && x.seri ? S.isler.filter(r => r.seri === x.seri).reduce((m, r) => (r.bas||"") > m ? r.bas : m, "") : "";
+
+let editId = null, dlgEski = {tip:"", son:""};
 function tekrarBilgi(){
   const f = $("isForm"), tip = f.elements.tekrar.value, bas = f.elements.bas.value, son = f.elements.tekrarSon.value;
-  f.elements.tekrarSon.disabled = !(tip === "hafta" || tip === "ay");
+  f.elements.tekrarSon.disabled = !(tip === "hafta" || tip === "ay" || tip === "yil");
+  const x = editId && S.isler.find(r=>r.id===editId), sonraki = seriSonraki(x).length;
+  const degisti = tip !== dlgEski.tip || (tip && son !== dlgEski.son);
   let m = "";
-  if (tip === "gun") m = "Günlük İş Programı'ndaki kontrol listesine eklenir ve her iş günü otomatik olarak çıkar.";
+  if (tip === "gun") m = "Günlük İş Programı'ndaki kontrol listesine eklenir ve her iş günü otomatik olarak çıkar." + (x ? " Bu kayıt iş programından kaldırılır." : "");
   else if (tip && !bas) m = "Tekrar için başlangıç tarihi gerekli.";
+  else if (tip && son && !degisti) m = `${TEKRAR_AD[tip]} rutin. Tekrar türü ya da son tarih değiştirilirse sonraki kayıtlar yeniden oluşturulur.`;
   else if (tip && son) { const n = tekrarTarihleri(bas, f.elements.bit.value, tip, son).length;
-    m = `${TEKRAR_AD[tip]} olarak ${fmt(son)} tarihine kadar <b>${n}</b> kayıt oluşturulacak` + (tip==="hafta" ? ` (her ${["pazar","pazartesi","salı","çarşamba","perşembe","cuma","cumartesi"][parse(bas).getDay()]}).` : ` (her ayın ${parse(bas).getDate()}. günü${parse(bas).getDate()>28?", kısa aylarda ayın son günü":""}).`); }
+    const ne = tip==="hafta" ? `her ${["pazar","pazartesi","salı","çarşamba","perşembe","cuma","cumartesi"][parse(bas).getDay()]}`
+             : tip==="ay" ? `her ayın ${parse(bas).getDate()}. günü${parse(bas).getDate()>28?", kısa aylarda ayın son günü":""}`
+             : `her yıl ${fmt(bas).slice(0,5)}`;
+    m = `${TEKRAR_AD[tip]} olarak ${fmt(son)} tarihine kadar <b>${n}</b> kayıt (bu kayıt dahil, ${ne}).`; }
+  else if (!tip && x && x.seri) m = "Bu kayıt seriden ayrılır.";
+  if (sonraki && degisti && tip !== "gun") m += ` Serinin sonraki <b>${sonraki}</b> kaydı silinecek.`;
+  if (sonraki && tip === "gun") m += ` Serinin sonraki ${sonraki} kaydı da kaldırılır.`;
   $("tekrarBilgi").innerHTML = m;
 }
+$("isForm").addEventListener("change", e => {
+  if (e.target.name === "tekrar") {   // yıllık tekrar için son tarihi birkaç yıl ileri al
+    const f = $("isForm"), bas = f.elements.bas.value || todayIso();
+    if (e.target.value === "yil" && f.elements.tekrarSon.value < iso(ayEkle(parse(bas), 12))) f.elements.tekrarSon.value = iso(addDays(ayEkle(parse(bas), 60), -1));
+    if ((e.target.value === "hafta" || e.target.value === "ay") && !dlgEski.tip && f.elements.tekrarSon.value > yilSonu(bas)) f.elements.tekrarSon.value = yilSonu(bas);
+  }
+});
 ["change","input"].forEach(ev => $("isForm").addEventListener(ev, e => { if (["tekrar","tekrarSon","bas","bit"].includes(e.target.name)) tekrarBilgi(); }));
 
-let editId = null;
+function secenekler(sel, sozluk, deger, bos){
+  const ops = [["", bos], ...Object.entries(sozluk)];
+  if (deger && !ops.some(([k]) => k === deger)) ops.push([deger, kodAd(deger) || deger]);
+  sel.innerHTML = ops.map(([k,ad]) => `<option value="${esc(k)}">${k ? esc(k)+" – "+esc(ad) : esc(ad)}</option>`).join("");
+  sel.value = deger || "";
+}
 function openIs(id){
   editId = id; const f = $("isForm"); const x = id ? S.isler.find(r=>r.id===id) : {bas:todayIso(),bit:todayIso()};
-  for (const k of ["is","bas","bit","saatBas","saatBit","b","c","d","e","f","yaziTar","yaziNo"]) f.elements[k].value = x[k] || "";
+  for (const k of ALANLAR) if (!["b","c","d"].includes(k)) f.elements[k].value = x[k] || "";
+  secenekler(f.elements.b, KOD1, x.b, "—"); secenekler(f.elements.c, KOD2, x.c, "—"); secenekler(f.elements.d, KOD3, x.d, "—");
+  secenekler(f.elements.durum, Object.fromEntries(DURUMLAR.slice(1)), durum(x), "— Açık —");
   $("isDlgBaslik").textContent = id ? "İşi düzenle" : "Yeni iş"; $("isSil").hidden = $("isKopya").hidden = !id;
-  f.elements.tekrar.value = ""; f.elements.tekrarSon.value = yilSonu(x.bas); f.elements.seriyeUygula.checked = false;
-  $("tekrarAlan").hidden = !!id; tekrarBilgi();
+  dlgEski = {tip: x.tekrar || "", son: x.seri ? seriSon(x) : ""};
+  f.elements.tekrar.value = dlgEski.tip; f.elements.tekrarSon.value = dlgEski.son || (x.tekrar==="yil" ? iso(addDays(ayEkle(parse(x.bas)||new Date(),60),-1)) : yilSonu(x.bas));
+  f.elements.seriyeUygula.checked = false; tekrarBilgi();
   const seri = id && x.seri ? S.isler.filter(r => r.seri === x.seri) : [];
   $("seriAlan").hidden = $("isSeriSil").hidden = !seri.length;
-  if (seri.length) { const sonraki = seri.filter(r => (r.bas||"") > (x.bas||"")).length;
-    $("seriYazi").textContent = `${TEKRAR_AD[x.tekrar]||""} rutin (${seri.length} kayıt). Metin, saat ve kod değişikliklerini sonraki ${sonraki} kayda da uygula`; }
+  if (seri.length) $("seriYazi").textContent = `${TEKRAR_AD[x.tekrar]||""} rutin (${seri.length} kayıt). Metin, saat ve kod değişikliklerini sonraki ${seriSonraki(x).length} kayda da uygula`;
   $("isDlg").showModal();
 }
+function formVerisi(f, eski){
+  const data = {}; for (const k of ALANLAR) data[k] = f.elements[k].value.trim() || (/(bas|bit|Tar)$/.test(k)?null:"");
+  if (data.bas && data.bit && data.bit < data.bas) [data.bas, data.bit] = [data.bit, data.bas];
+  const t = {e: eski ? eski.e : "", f: eski ? eski.f : "", tamamTar: eski ? eski.tamamTar : undefined};
+  setDurum(t, f.elements.durum.value); data.e = t.e; data.f = t.f; data.tamamTar = t.tamamTar;
+  return data;
+}
+function seriSil(liste){ const ids = new Set(liste.map(r=>r.id)); S.isler = S.isler.filter(r=>!ids.has(r.id)); }
 $("isDlg").addEventListener("close", () => {
-  const v = $("isDlg").returnValue, f = $("isForm");
-  const SERI_ALAN = ["is","saatBas","saatBit","b","c","d","yaziTar","yaziNo"];
+  const v = $("isDlg").returnValue, f = $("isForm"), eski = editId && S.isler.find(r=>r.id===editId);
+  const tip = f.elements.tekrar.value, son = f.elements.tekrarSon.value;
   if (v === "sil") { if (confirm("Bu iş silinsin mi?")) { S.isler = S.isler.filter(r=>r.id!==editId); save(); toast("İş silindi"); } }
   else if (v === "seriSil") {
-    const x = S.isler.find(r=>r.id===editId), sil = S.isler.filter(r => r.seri === x.seri && (r.bas||"") >= (x.bas||""));
-    if (confirm(`Bu rutin işin bu ve sonraki ${sil.length} kaydı silinsin mi?`)) { const ids = new Set(sil.map(r=>r.id)); S.isler = S.isler.filter(r=>!ids.has(r.id)); save(); toast(`${sil.length} kayıt silindi`); }
+    const sil = [eski, ...seriSonraki(eski)];
+    if (confirm(`Bu rutin işin bu ve sonraki ${sil.length} kaydı silinsin mi?`)) { seriSil(sil); save(); toast(`${sil.length} kayıt silindi`); }
   }
-  else if (v === "kaydet" && !editId && f.elements.tekrar.value === "gun") {
+  else if (v === "kopya") {
+    const data = formVerisi(f, null); data.id = ++S.sonId;
+    S.isler.splice(S.isler.findIndex(r=>r.id===editId)+1, 0, data); save(); toast("Kopya oluşturuldu");
+  }
+  else if (v === "kaydet" && tip === "gun") {
     const ad = f.elements.is.value.trim();
-    if (ad) { S.gunlukIsler.push(ad); save(); toast("Günlük İş Programı'na eklendi"); renderG(); }
-  }
-  else if (v === "kaydet" && !editId && f.elements.tekrar.value && f.elements.bas.value) {
-    const data = {}; for (const k of ["is","bas","bit","saatBas","saatBit","b","c","d","e","f","yaziTar","yaziNo"]) data[k] = f.elements[k].value.trim() || (/(bas|bit|Tar)$/.test(k)?null:"");
-    if (data.bas && data.bit && data.bit < data.bas) [data.bas, data.bit] = [data.bit, data.bas];
-    data.f = ""; if (!ACIK_DURUM.has(data.e)) data.e = data.e || "";
-    const tip = f.elements.tekrar.value, seri = "s" + Date.now();
-    const t = tekrarTarihleri(data.bas, data.bit, tip, f.elements.tekrarSon.value || yilSonu(data.bas));
-    for (const [b, e] of t) S.isler.push(Object.assign({}, data, {id: ++S.sonId, bas: b, bit: e, seri, tekrar: tip}));
-    save(); toast(`${TEKRAR_AD[tip]} rutin: ${t.length} kayıt oluşturuldu`);
-  }
-  else if (v === "kaydet" || v === "kopya") {
-    const data = {}; for (const k of ["is","bas","bit","saatBas","saatBit","b","c","d","e","f","yaziTar","yaziNo"]) data[k] = f.elements[k].value.trim() || (/(bas|bit|Tar)$/.test(k)?null:"");
-    if (data.bas && data.bit && data.bit < data.bas) [data.bas, data.bit] = [data.bit, data.bas];
-    const eski = editId && S.isler.find(r=>r.id===editId);
-    if (DONE.has(data.f) && ACIK_DURUM.has(data.e)) data.e = "";
-    if (isDone(data)) data.tamamTar = (eski && isDone(eski) && eski.tamamTar) || todayIso(); else data.tamamTar = undefined;
-    if (v === "kopya") { data.f = ""; data.tamamTar = undefined; data.seri = undefined; data.tekrar = undefined; }
-    if (v === "kaydet" && editId) {
-      Object.assign(eski, data);
-      if (eski.seri && f.elements.seriyeUygula.checked)
-        S.isler.filter(r => r.seri === eski.seri && (r.bas||"") > (eski.bas||"")).forEach(r => SERI_ALAN.forEach(k => r[k] = eski[k]));
+    if (ad && (!eski || confirm("Bu iş Günlük İş Programı'na taşınacak ve iş programından kaldırılacak. Devam edilsin mi?"))) {
+      if (eski) seriSil([eski, ...seriSonraki(eski)]);
+      S.gunlukIsler.push(ad); save(); toast("Günlük İş Programı'na eklendi"); renderG();
     }
-    else { data.id = ++S.sonId; const i = editId ? S.isler.findIndex(r=>r.id===editId)+1 : S.isler.length; S.isler.splice(i,0,data); }
-    save(); toast(v==="kopya" ? "Kopya oluşturuldu" : "Kaydedildi");
+  }
+  else if (v === "kaydet") {
+    const data = formVerisi(f, eski);
+    let x = eski; if (x) Object.assign(x, data); else { x = Object.assign(data, {id: ++S.sonId}); S.isler.push(x); }
+    const degisti = tip !== dlgEski.tip || (tip && son !== dlgEski.son);
+    let mesaj = "Kaydedildi";
+    if (degisti) {
+      const sonraki = seriSonraki(x);
+      if (sonraki.length) seriSil(sonraki);
+      if (!tip) { delete x.seri; delete x.tekrar; }
+      else if (!x.bas) mesaj = "Kaydedildi (tekrar için başlangıç tarihi gerekli)";
+      else {
+        x.seri = x.seri || "s" + Date.now(); x.tekrar = tip;
+        const t = tekrarTarihleri(x.bas, x.bit, tip, son || yilSonu(x.bas)).slice(1);
+        const acikE = ACIK_DURUM.has(x.e) && !["İ","E","ER","SD"].includes(x.e) ? x.e : (ACIK_DURUM.has(x.e) ? "" : x.e);
+        for (const [b, e] of t) S.isler.push(Object.assign({}, x, {id: ++S.sonId, bas: b, bit: e, f: "", e: acikE, tamamTar: undefined}));
+        mesaj = `${TEKRAR_AD[tip]} rutin: ${t.length + 1} kayıt`;
+      }
+    } else if (x.seri && f.elements.seriyeUygula.checked)
+      seriSonraki(x).forEach(r => SERI_ALAN.forEach(k => r[k] = x[k]));
+    save(); toast(mesaj);
   }
   renderIs();
 });
@@ -797,9 +852,9 @@ $("gDlg").addEventListener("close", () => {
    AÇIKLAMALAR & VERİ
    ================================================================= */
 function renderKod(){
-  $("kodTablo").innerHTML = `<tr><th>Kod</th><th>Açıklama</th></tr>` + KODLAR.map(k=>`<tr><td><b>${esc(k)}</b></td><td><input data-k="${esc(k)}" value="${esc(kodAd(k))}" placeholder="açıklama yazın…"></td></tr>`).join("");
+  const tablo = (baslik, sz) => `<table><tr><th colspan="2">${baslik}</th></tr>${Object.entries(sz).map(([k,ad])=>`<tr><td><b>${esc(k)}</b></td><td>${esc(ad)}</td></tr>`).join("")}</table>`;
+  $("kodTablo").innerHTML = tablo("Süre kodu 1", KOD1) + tablo("Süre kodu 2", KOD2) + tablo("Süre kodu 3", KOD3) + tablo("Durum", DURUM_KOD);
 }
-$("kodTablo").addEventListener("change", e => { const k = e.target.dataset.k; if(!k) return; const v = e.target.value.trim(); if (v === (KOD_ACIKLAMA[k]||"")) delete S.kod[k]; else S.kod[k] = v; save(); renderIs(); });
 function download(name, text, type){ const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text],{type})); a.download = name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000); }
 $("disaJson").onclick = () => download(`dinamik-takvim-yedek-${todayIso()}.json`, JSON.stringify(S,null,1), "application/json");
 $("iceJson").onclick = () => $("dosya").click();

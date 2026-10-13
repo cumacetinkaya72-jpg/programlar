@@ -19,8 +19,10 @@
 - Kutu ile "tamamlandı" işaretlenen iş listeden çıkar ve tamamlanma tarihiyle **Tamamlananlar** listesine geçer
   (oradan kutuyu kaldırarak geri alınabilir).
 - Tüm listeler **başlangıç tarihine** göre sıralanır (Hft sütununda yıl da yazar; 2026'da başlayıp 2027'de biten işler karışmaz).
-- **Rutin işler:** "Yeni iş" penceresinde Tekrar seçilebilir. *Günlük rutin* Günlük İş Programı'na eklenir;
-  *Haftalık* / *Aylık rutin* seçilen son tarihe kadar (varsayılan: eğitim yılı sonu 30 Haziran) otomatik kayıtlar oluşturur.
+- **Rutin işler:** Yeni iş eklerken ve düzenlerken Tekrar seçilebilir (tek seferlik, günlük, haftalık, aylık, yıllık).
+  *Günlük rutin* Günlük İş Programı'na eklenir; *haftalık / aylık / yıllık rutin* seçilen son tarihe kadar
+  (varsayılan: eğitim yılı sonu 30 Haziran, yıllıkta 5 yıl) otomatik kayıtlar oluşturur. Düzenlerken tekrar türü
+  değiştirilirse sonraki kayıtlar yeniden oluşturulur; "Tek seferlik" seçilirse kayıt seriden ayrılır.
   Rutin bir kaydı düzenlerken değişiklikler sonraki kayıtlara da uygulanabilir; "Seriyi sil" ile bu ve sonraki kayıtlar silinir.
 - Özet kartları ile filtreleme, arama; göreve tıklayınca düzenleme / silme / kopyalama; yeni iş ekleme.
 
@@ -44,14 +46,19 @@ python3 tools/excel_to_html.py Dinamik_Takvim_2026-2027.xlsx   # index.html yeni
 
 Sayfa tasarımı `src/takvim.template.html` içindedir; betik Excel verisini bu şablona gömer.
 
-## Kısaltmalar
+## Kodlar
 
-| Kod | Anlamı | Kod | Anlamı |
-|---|---|---|---|
-| Aİ | Ay içi | DE | Devam ediyor |
-| Hİ | Hafta içi | ER, E | Ertelendi |
-| Gİ | Gün içi | CVM | Cevap verilemedi |
-| BGVH | Belirli gün ve hafta | CV | Cevap verildi |
-| YB | Yıl boyu | T | Tamamlandı |
-| BY | Başvuru yapıldı | İ | İptal edildi |
-| BYM | Başvuru yapılmadı | | |
+| Süre kodu 1 | | Süre kodu 2 | | Süre kodu 3 | | Durum | |
+|---|---|---|---|---|---|---|---|
+| DY | Ders yılı başında | AB | Ay başında | Aİ | Ay içerisinde | A | Acil |
+| DYB | Ders yılı boyunca | Aİ | Ay içerisinde | Aİ/Gİ | Ay/gün içerisinde | BE | Bekliyor |
+| DYİ | Ders yılı içerisinde | AS | Ay sonunda | Aİ/Hİ | Ay/hafta içerisinde | BY | Başvuru yapıldı |
+| DYS | Ders yılı sonunda | A1H | Ayın birinci haftası | BGVH | Belirli gün ve hafta | BYM | Başvuru yapılmadı |
+| TB | Takvime bağlı | A2H | Ayın ikinci haftası | Gİ | Gün içerisinde | CV | Cevap verildi |
+| YBA | Yıl başında | A3H | Ayın üçüncü haftası | HB | Hafta başında | CVM | Cevap verilemedi |
+| YBO | Yıl boyunca | A4H | Ayın dördüncü haftası | Hİ | Hafta içerisinde | DE | Devam ediyor |
+| Yİ | Yıl içerisinde | A5H | Ayın beşinci haftası | Hİ/Gİ | Hafta/gün içerisinde | E | Ertelendi |
+| YS | Yıl sonunda | | | HS | Hafta sonunda | İ | İptal edildi |
+| | | | | | | S | Sürekli/süresiz |
+| | | | | | | SD | Süresi doldu |
+| | | | | | | T | Tamamlandı |
