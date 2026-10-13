@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maaş Kesim Raporu</title>
+<style>
+  :root {
+    --ink: #1f2937; --muted: #64748b; --line: #e2e8f0; --bg: #e8edf4; --card: #fff;
+    --acc: #e11d48; --acc2: #be123c; --ok: #059669; --err: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--ink);
+  }
+  .app-header {
+    background: linear-gradient(115deg, #4f46e5 0%, #7c3aed 46%, #db2777 100%);
+    color: #fff; padding: 18px clamp(16px, 2.6vw, 42px);
+  }
+  .app-header h1 { margin: 0; font-size: 1.35rem; }
+  .app-header p { margin: 4px 0 0; font-size: .85rem; opacity: .85; }
+  main { max-width: 1200px; margin: 0 auto; padding: 18px 16px 40px; }
+  .card {
+    background: var(--card); border-radius: 14px; padding: 16px 18px; margin-bottom: 14px;
+    box-shadow: 0 1px 2px rgba(15,23,42,.06), 0 6px 18px -10px rgba(15,23,42,.25);
+  }
+  h2 { margin: 0 0 4px; font-size: 1.15rem; }
+  h3 { margin: 0 0 6px; font-size: 1rem; }
+  .bd-desc { color: #475569; font-size: .92rem; line-height: 1.6; margin: 6px 0 10px; }
+  .bd-note {
+    background: #fff1f2; border-left: 4px solid var(--acc); border-radius: 10px;
+    padding: 10px 14px; font-size: .86rem; line-height: 1.6; color: #334155; margin: 8px 0 4px;
+  }
+  .bd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 10px 14px; margin: 10px 0; }
+  .bd-f { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; }
+  .bd-f span { font-weight: 600; color: #475569; font-size: .8rem; }
+  .bd-f input, .bd-f select {
+    padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #f8fafc;
+    font: inherit; font-size: .88rem; color: var(--ink);
+  }
+  .bd-f input:focus, .bd-f select:focus { outline: 2px solid #c7d2fe; border-color: #818cf8; background: #fff; }
+  .bd-f input.invalid { border-color: var(--err); background: #fef2f2; }
+  .bd-btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+  .btn {
+    border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer; font: inherit; font-size: .88rem; font-weight: 600;
+    background: linear-gradient(120deg, var(--acc), var(--acc2)); color: #fff;
+  }
+  .btn:hover { filter: brightness(1.07); }
+  .btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid var(--line); }
+  .btn-ghost { background: transparent; color: #334155; border: 1px dashed #cbd5e1; }
+  .bd-tablewrap { overflow-x: auto; }
+  .bd-table { width: 100%; border-collapse: collapse; font-size: .82rem; min-width: 820px; }
+  .bd-table th {
+    background: #fff1f2; color: #334155; font-weight: 700; padding: 8px 10px; text-align: left;
+    white-space: nowrap; border-bottom: 2px solid var(--line);
+  }
+  .bd-table td { padding: 7px 10px; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
+  .bd-table tbody tr:nth-child(2n) { background: #fafbff; }
+  .bd-table tbody tr.editing { background: #fef9c3; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .bd-table tfoot td { background: #f8fafc; border-top: 2px solid var(--line); }
+  .bd-mini { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 3px 7px; cursor: pointer; font-size: .85rem; margin-left: 4px; }
+  .bd-mini:hover { background: #f1f5f9; }
+  .empty { color: var(--muted); text-align: center; padding: 18px; }
+  .msg { font-size: .85rem; font-weight: 600; }
+  .msg.ok { color: var(--ok); } .msg.err { color: var(--err); }
+  .yazi { margin-top: 8px; font-size: .86rem; color: #334155; }
+  input[type=file] { display: none; }
+
+  /* ---------- Yazdırma (PDF) görünümü ---------- */
+  #print-area { display: none; }
+  @media print {
+    @page { size: A4 landscape; margin: 12mm; }
+    body { background: #fff; }
+    .app-header, main { display: none !important; }
+    #print-area { display: block; color: #000; font-family: "Times New Roman", Times, serif; font-size: 11pt; }
+    .p-head { text-align: center; line-height: 1.45; margin-bottom: 10px; }
+    .p-head .t1 { font-weight: bold; font-size: 12pt; }
+    .p-head .t2 { font-weight: bold; font-size: 13pt; margin-top: 6px; }
+    .p-info { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+    .p-info td { padding: 3px 6px; border: 1px solid #000; }
+    .p-info td.l { font-weight: bold; width: 18%; }
+    .p-tab { width: 100%; border-collapse: collapse; }
+    .p-tab th, .p-tab td { border: 1px solid #000; padding: 4px 5px; font-size: 10pt; }
+    .p-tab th { background: #e5e7eb; text-align: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .p-tab td.c { text-align: center; }
+    .p-tab tfoot td { font-weight: bold; }
+    .p-yazi { margin: 10px 0 4px; }
+    .p-aciklama { font-size: 9.5pt; margin-top: 4px; }
+    .p-sign { display: flex; justify-content: space-around; margin-top: 36px; text-align: center; }
+    .p-sign div { min-width: 220px; line-height: 1.6; }
+    .p-sign .tarih { margin-bottom: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>✂️ Maaş Kesim — Rapor Kesinti &amp; İade Bordrosu</h1>
+  <p>Okul Yönetim Araçları · tek dosyalık, çevrimdışı çalışan program</p>
+</header>
+
+<main>
+  <div class="card">
+    <h2>✂️ Rapor Kesintisi Bordrosu</h2>
+    <p class="bd-desc">Sağlık raporu alan personelin yan ödeme, özel hizmet tazminatı ve ek tazminatından yapılan
+      <strong>%25 rapor kesintisinin</strong> bordrosu. Tutarları kişinin maaş bordrosundan alınız.
+      Veriler yalnızca bu tarayıcıda saklanır, hiçbir yere gönderilmez.</p>
+    <p class="bd-note">ℹ️ Hesap: (yan ödeme + ÖHT + ek tazminat) ÷ 30 × kesinti günü × %25 − damga vergisi (binde 7,59).
+      Rapor istisnası "Evet" seçilirse ilk 7 gün kesinti dışıdır.</p>
+  </div>
+
+  <div class="card">
+    <h3>👤 Personel ve Bordro Bilgileri</h3>
+    <div class="bd-grid">
+      <label class="bd-f"><span>Okul / kurum adı</span><input type="text" data-s="kurum" placeholder="... İLKOKULU MÜDÜRLÜĞÜ"></label>
+      <label class="bd-f"><span>Adı Soyadı</span><input type="text" data-s="adsoyad" list="personel-list" autocomplete="off"></label>
+      <label class="bd-f"><span>T.C. Kimlik No</span><input type="text" data-s="tc" inputmode="numeric" maxlength="11" placeholder="isteğe bağlı"></label>
+      <label class="bd-f"><span>Ünvanı</span><input type="text" data-s="unvan" placeholder="isteğe bağlı"></label>
+      <label class="bd-f"><span>Bordro ayı</span><select data-s="bordroAy" class="ay-select"></select></label>
+      <label class="bd-f"><span>Bordro yılı</span><input type="text" data-s="bordroYil" inputmode="numeric"></label>
+      <label class="bd-f"><span>Düzenleyen</span><input type="text" data-s="duzenleyen"></label>
+      <label class="bd-f"><span>Düzenleyen ünvanı</span><input type="text" data-s="duzenleyenUnvan"></label>
+      <label class="bd-f"><span>Onaylayan</span><input type="text" data-s="onaylayan"></label>
+      <label class="bd-f"><span>Onaylayan ünvanı</span><input type="text" data-s="onaylayanUnvan"></label>
+    </div>
+    <datalist id="personel-list"></datalist>
+    <div class="bd-btnrow">
+      <button class="btn btn-secondary" id="mk-kisi-kaydet" title="Adı ve T.C. numarasını kayıtlı personel listesine ekler">💾 Personeli listeye kaydet</button>
+      <span class="msg" id="mk-kisi-msg"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 id="mk-form-baslik">📅 Rapor Dönemi Ekle</h3>
+    <div class="bd-grid">
+      <label class="bd-f"><span>Ay</span><select data-f="ay" class="ay-select"></select></label>
+      <label class="bd-f"><span>Yıl</span><input type="text" data-f="yil" inputmode="numeric"></label>
+      <label class="bd-f"><span>Yan ödeme aylığı tutarı</span><input type="text" data-f="yan" inputmode="decimal" placeholder="maaş bordrosundan"></label>
+      <label class="bd-f"><span>Özel hizmet tazminatı tutarı</span><input type="text" data-f="oht" inputmode="decimal" placeholder="maaş bordrosundan"></label>
+      <label class="bd-f"><span>Ek tazminat tutarı</span><input type="text" data-f="ek" inputmode="decimal" placeholder="0"></label>
+      <label class="bd-f"><span>Toplam rapor günü</span><input type="text" data-f="gun" inputmode="numeric" placeholder="ör. 5"></label>
+      <label class="bd-f"><span>Rapor istisnası (ilk 7 gün)</span>
+        <select data-f="istisna"><option value="Hayır">Hayır</option><option value="Evet">Evet</option></select></label>
+    </div>
+    <div class="bd-btnrow">
+      <button class="btn" id="mk-ekle">➕ Dönem Ekle</button>
+      <button class="btn btn-secondary" id="mk-iptal" hidden>✖ Düzenlemeyi iptal et</button>
+      <span class="msg" id="mk-form-msg"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 id="mk-liste-baslik">📋 Dönemler (0)</h3>
+    <div class="bd-tablewrap">
+      <table class="bd-table">
+        <thead><tr>
+          <th>#</th><th>Dönem</th><th class="num">Yan Ödeme</th><th class="num">ÖHT</th><th class="num">Ek Taz.</th>
+          <th class="num">Günlük</th><th class="num">Rapor Günü</th><th>İstisna</th><th class="num">Kesinti Günü</th>
+          <th class="num">%25 Kesinti</th><th class="num">D.V.</th><th class="num">NET</th><th></th>
+        </tr></thead>
+        <tbody id="mk-tbody"></tbody>
+        <tfoot><tr>
+          <td colspan="9" style="text-align:right"><strong>GENEL TOPLAM</strong></td>
+          <td class="num"><strong id="t-kesinti">0,00</strong></td>
+          <td class="num"><strong id="t-dv">0,00</strong></td>
+          <td class="num"><strong id="t-net">0,00</strong></td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+    </div>
+    <div class="yazi" id="mk-yazi"></div>
+    <div class="bd-btnrow">
+      <button class="btn" id="mk-pdf">📄 PDF Bordro İndir / Yazdır</button>
+      <button class="btn btn-secondary" id="mk-csv">📊 Excel (CSV) İndir</button>
+      <button class="btn btn-secondary" id="mk-yedek">💾 Yedek Al (JSON)</button>
+      <button class="btn btn-secondary" id="mk-yukle">📂 Yedekten Yükle</button>
+      <input type="file" id="mk-dosya" accept=".json,application/json">
+      <button class="btn btn-ghost" id="mk-temizle">🗑️ Listeyi temizle</button>
+    </div>
+    <p class="bd-desc" style="margin-top:10px">PDF için açılan yazdırma penceresinde hedef olarak <strong>"PDF olarak kaydet"</strong> seçin.</p>
+  </div>
+</main>
+
+<div id="print-area"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var AYLAR = ['OCAK', 'ŞUBAT', 'MART', 'NİSAN', 'MAYIS', 'HAZİRAN', 'TEMMUZ', 'AĞUSTOS', 'EYLÜL', 'EKİM', 'KASIM', 'ARALIK'];
+  var AY_ADI = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+  var KESINTI_ORANI = 0.25;
+  var DAMGA_ORANI = 0.00759;
+  var ISTISNA_GUN = 7;
+  var STORE_KEY = 'oya.maaskesim.v1';
+  var PERSONEL_KEY = 'oya.maaskesim.personel.v1';
+
+  var now = new Date();
+  var buAy = AYLAR[now.getMonth()];
+  var buYil = String(now.getFullYear());
+
+  var state = {
+    s: { kurum: '', adsoyad: '', tc: '', unvan: '', bordroAy: buAy, bordroYil: buYil,
+         duzenleyen: '', duzenleyenUnvan: '', onaylayan: '', onaylayanUnvan: '' },
+    donemler: []
+  };
+  var personel = [];
+  var editIndex = -1;
+
+  // ---------- yardımcılar ----------
+  function $(sel) { return document.querySelector(sel); }
+  function $all(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* depolama kapalı */ }
+  }
+  function savePersonel() {
+    try { localStorage.setItem(PERSONEL_KEY, JSON.stringify(personel)); } catch (e) { /* depolama kapalı */ }
+  }
+
+  // "12.345,67", "12345,67", "12345.67" → 12345.67
+  function parseTutar(v) {
+    var s = String(v == null ? '' : v).trim().replace(/\s|₺|TL/gi, '');
+    if (!s) return 0;
+    if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.');
+    else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, '');
+    var n = Number(s);
+    return isFinite(n) ? n : NaN;
+  }
+  function r2(n) { return Math.round((n + Number.EPSILON) * 100) / 100; }
+  function fmt(n) {
+    return (Number(n) || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function ayAdi(ay) { var i = AYLAR.indexOf(ay); return i >= 0 ? AY_ADI[i] : ay; }
+
+  function hesapla(d) {
+    var toplam = d.yan + d.oht + d.ek;
+    var gunluk = toplam / 30;
+    var kesintiGun = d.istisna === 'Evet' ? Math.max(0, d.gun - ISTISNA_GUN) : d.gun;
+    var kesinti = r2(gunluk * kesintiGun * KESINTI_ORANI);
+    var dv = r2(kesinti * DAMGA_ORANI);
+    return { gunluk: r2(gunluk), kesintiGun: kesintiGun, kesinti: kesinti, dv: dv, net: r2(kesinti - dv) };
+  }
+  function toplamlar() {
+    var t = { kesinti: 0, dv: 0, net: 0 };
+    state.donemler.forEach(function (d) {
+      var h = hesapla(d); t.kesinti += h.kesinti; t.dv += h.dv; t.net += h.net;
+    });
+    t.kesinti = r2(t.kesinti); t.dv = r2(t.dv); t.net = r2(t.net);
+    return t;
+  }
+
+  // Tutarı yazıyla (Türkçe)
+  function sayiYazi(n) {
+    var bir = ['', 'Bir', 'İki', 'Üç', 'Dört', 'Beş', 'Altı', 'Yedi', 'Sekiz', 'Dokuz'];
+    var on = ['', 'On', 'Yirmi', 'Otuz', 'Kırk', 'Elli', 'Altmış', 'Yetmiş', 'Seksen', 'Doksan'];
+    var bolum = ['', 'Bin', 'Milyon', 'Milyar', 'Trilyon'];
+    if (n === 0) return 'Sıfır';
+    var out = '', i = 0;
+    while (n > 0) {
+      var g = n % 1000;
+      if (g) {
+        var y = Math.floor(g / 100), o = Math.floor((g % 100) / 10), b = g % 10;
+        var parca = [];
+        if (y) parca.push((y > 1 ? bir[y] + ' ' : '') + 'Yüz');
+        if (o) parca.push(on[o]);
+        if (b && !(i === 1 && g === 1)) parca.push(bir[b]);
+        if (bolum[i]) parca.push(bolum[i]);
+        out = parca.join(' ') + (out ? ' ' + out : '');
+      }
+      n = Math.floor(n / 1000); i++;
+    }
+    return out;
+  }
+  function tutarYazi(t) {
+    var tl = Math.floor(t + 1e-9);
+    var kr = Math.round((t - tl) * 100);
+    if (kr === 100) { tl += 1; kr = 0; }
+    return 'Yalnız ' + sayiYazi(tl) + ' Türk Lirası' + (kr ? ' ' + sayiYazi(kr) + ' Kuruş' : '') + '.';
+  }
+
+  // ---------- form ----------
+  function fillAySelects() {
+    $all('.ay-select').forEach(function (sel) {
+      sel.innerHTML = AYLAR.map(function (a, i) { return '<option value="' + a + '">' + AY_ADI[i] + '</option>'; }).join('');
+    });
+  }
+  function bindSettings() {
+    $all('[data-s]').forEach(function (el) {
+      var k = el.getAttribute('data-s');
+      el.value = state.s[k] != null ? state.s[k] : '';
+      var h = function () {
+        state.s[k] = el.value;
+        if (k === 'adsoyad') autoFillPersonel();
+        save();
+      };
+      el.addEventListener('input', h); el.addEventListener('change', h);
+    });
+  }
+  function resetForm() {
+    editIndex = -1;
+    $('[data-f="ay"]').value = state.s.bordroAy || buAy;
+    $('[data-f="yil"]').value = state.s.bordroYil || buYil;
+    ['yan', 'oht', 'ek', 'gun'].forEach(function (k) { $('[data-f="' + k + '"]').value = ''; });
+    $('[data-f="istisna"]').value = 'Hayır';
+    $('#mk-ekle').textContent = '➕ Dönem Ekle';
+    $('#mk-form-baslik').textContent = '📅 Rapor Dönemi Ekle';
+    $('#mk-iptal').hidden = true;
+    $all('[data-f]').forEach(function (el) { el.classList.remove('invalid'); });
+  }
+  function msg(id, text, ok) {
+    var el = $(id); el.textContent = text; el.className = 'msg ' + (ok ? 'ok' : 'err');
+    clearTimeout(el._t); el._t = setTimeout(function () { el.textContent = ''; }, 3500);
+  }
+
+  function readForm() {
+    var d = {
+      ay: $('[data-f="ay"]').value,
+      yil: $('[data-f="yil"]').value.trim(),
+      yan: parseTutar($('[data-f="yan"]').value),
+      oht: parseTutar($('[data-f="oht"]').value),
+      ek: parseTutar($('[data-f="ek"]').value),
+      gun: parseTutar($('[data-f="gun"]').value),
+      istisna: $('[data-f="istisna"]').value
+    };
+    var hatalar = [];
+    function bad(k, cond) { $('[data-f="' + k + '"]').classList.toggle('invalid', cond); if (cond) hatalar.push(k); }
+    bad('yil', !/^\d{4}$/.test(d.yil));
+    bad('yan', isNaN(d.yan) || d.yan < 0);
+    bad('oht', isNaN(d.oht) || d.oht < 0);
+    bad('ek', isNaN(d.ek) || d.ek < 0);
+    bad('gun', isNaN(d.gun) || d.gun <= 0 || d.gun > 31 || Math.floor(d.gun) !== d.gun);
+    if (!hatalar.length && d.yan + d.oht + d.ek <= 0) {
+      bad('yan', true); hatalar.push('tutar');
+    }
+    return hatalar.length ? null : d;
+  }
+
+  function ekleVeyaGuncelle() {
+    var d = readForm();
+    if (!d) { msg('#mk-form-msg', 'Kırmızı alanları kontrol edin (rapor günü 1–31, en az bir tutar girilmeli).', false); return; }
+    if (editIndex >= 0) {
+      state.donemler[editIndex] = d;
+      msg('#mk-form-msg', 'Dönem güncellendi.', true);
+    } else {
+      state.donemler.push(d);
+      msg('#mk-form-msg', 'Dönem eklendi.', true);
+    }
+    save(); resetForm(); render();
+  }
+
+  function duzenle(i) {
+    var d = state.donemler[i]; if (!d) return;
+    editIndex = i;
+    $('[data-f="ay"]').value = d.ay;
+    $('[data-f="yil"]').value = d.yil;
+    $('[data-f="yan"]').value = d.yan ? fmt(d.yan) : '';
+    $('[data-f="oht"]').value = d.oht ? fmt(d.oht) : '';
+    $('[data-f="ek"]').value = d.ek ? fmt(d.ek) : '';
+    $('[data-f="gun"]').value = d.gun;
+    $('[data-f="istisna"]').value = d.istisna;
+    $('#mk-ekle').textContent = '✔ Dönemi Güncelle';
+    $('#mk-form-baslik').textContent = '✏️ ' + (i + 1) + '. Dönemi Düzenle';
+    $('#mk-iptal').hidden = false;
+    render();
+    $('#mk-form-baslik').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function sil(i) {
+    if (!confirm((i + 1) + '. dönem silinsin mi?')) return;
+    state.donemler.splice(i, 1);
+    if (editIndex === i) resetForm(); else if (editIndex > i) editIndex--;
+    save(); render();
+  }
+
+  // ---------- tablo ----------
+  function render() {
+    var tb = $('#mk-tbody');
+    $('#mk-liste-baslik').textContent = '📋 Dönemler (' + state.donemler.length + ')';
+    if (!state.donemler.length) {
+      tb.innerHTML = '<tr><td colspan="13" class="empty">Henüz dönem eklenmedi. Yukarıdaki formdan rapor dönemi ekleyin.</td></tr>';
+    } else {
+      tb.innerHTML = state.donemler.map(function (d, i) {
+        var h = hesapla(d);
+        return '<tr' + (i === editIndex ? ' class="editing"' : '') + '>' +
+          '<td>' + (i + 1) + '</td><td>' + esc(ayAdi(d.ay) + ' ' + d.yil) + '</td>' +
+          '<td class="num">' + fmt(d.yan) + '</td><td class="num">' + fmt(d.oht) + '</td><td class="num">' + fmt(d.ek) + '</td>' +
+          '<td class="num">' + fmt(h.gunluk) + '</td><td class="num">' + d.gun + '</td><td>' + esc(d.istisna) + '</td>' +
+          '<td class="num">' + h.kesintiGun + '</td><td class="num">' + fmt(h.kesinti) + '</td><td class="num">' + fmt(h.dv) + '</td>' +
+          '<td class="num"><strong>' + fmt(h.net) + '</strong></td>' +
+          '<td><button class="bd-mini" data-edit="' + i + '" title="Düzenle">✏️</button>' +
+          '<button class="bd-mini" data-del="' + i + '" title="Sil">🗑️</button></td></tr>';
+      }).join('');
+    }
+    var t = toplamlar();
+    $('#t-kesinti').textContent = fmt(t.kesinti);
+    $('#t-dv').textContent = fmt(t.dv);
+    $('#t-net').textContent = fmt(t.net);
+    $('#mk-yazi').textContent = state.donemler.length ? 'Toplam kesinti: ' + tutarYazi(t.kesinti) : '';
+  }
+
+  // ---------- personel listesi ----------
+  function renderPersonel() {
+    $('#personel-list').innerHTML = personel.map(function (p) { return '<option value="' + esc(p.ad) + '">'; }).join('');
+  }
+  function autoFillPersonel() {
+    var ad = state.s.adsoyad.trim().toLocaleUpperCase('tr-TR');
+    var p = personel.filter(function (x) { return x.ad.toLocaleUpperCase('tr-TR') === ad; })[0];
+    if (!p) return;
+    if (p.tc) { state.s.tc = p.tc; $('[data-s="tc"]').value = p.tc; }
+    if (p.unvan) { state.s.unvan = p.unvan; $('[data-s="unvan"]').value = p.unvan; }
+  }
+  function kisiKaydet() {
+    var ad = state.s.adsoyad.trim();
+    if (!ad) { msg('#mk-kisi-msg', 'Önce adı soyadı girin.', false); return; }
+    if (state.s.tc && !/^\d{11}$/.test(state.s.tc)) { msg('#mk-kisi-msg', 'T.C. Kimlik No 11 haneli olmalı.', false); return; }
+    var key = ad.toLocaleUpperCase('tr-TR');
+    personel = personel.filter(function (x) { return x.ad.toLocaleUpperCase('tr-TR') !== key; });
+    personel.push({ ad: ad, tc: state.s.tc.trim(), unvan: state.s.unvan.trim() });
+    personel.sort(function (a, b) { return a.ad.localeCompare(b.ad, 'tr'); });
+    savePersonel(); renderPersonel();
+    msg('#mk-kisi-msg', 'Kaydedildi. Ad alanına yazınca listede çıkar.', true);
+  }
+
+  // ---------- PDF (yazdırma) ----------
+  function yazdir() {
+    if (!state.donemler.length) { alert('Bordroya eklenecek dönem yok.'); return; }
+    var s = state.s, t = toplamlar();
+    var satirlar = state.donemler.map(function (d, i) {
+      var h = hesapla(d);
+      return '<tr><td class="c">' + (i + 1) + '</td><td class="c">' + esc(ayAdi(d.ay) + ' ' + d.yil) + '</td>' +
+        '<td class="num">' + fmt(d.yan) + '</td><td class="num">' + fmt(d.oht) + '</td><td class="num">' + fmt(d.ek) + '</td>' +
+        '<td class="num">' + fmt(d.yan + d.oht + d.ek) + '</td><td class="num">' + fmt(h.gunluk) + '</td>' +
+        '<td class="c">' + d.gun + '</td><td class="c">' + esc(d.istisna) + '</td><td class="c">' + h.kesintiGun + '</td>' +
+        '<td class="num">' + fmt(h.kesinti) + '</td><td class="num">' + fmt(h.dv) + '</td><td class="num">' + fmt(h.net) + '</td></tr>';
+    }).join('');
+    var tarih = new Date().toLocaleDateString('tr-TR');
+    $('#print-area').innerHTML =
+      '<div class="p-head"><div class="t1">T.C.</div>' +
+      '<div class="t1">' + esc((s.kurum || '').toLocaleUpperCase('tr-TR')) + '</div>' +
+      '<div class="t2">SAĞLIK RAPORU KESİNTİSİ (%25) BORDROSU</div>' +
+      '<div>' + esc(ayAdi(s.bordroAy) + ' ' + s.bordroYil) + ' Dönemi</div></div>' +
+      '<table class="p-info"><tr><td class="l">Adı Soyadı</td><td>' + esc(s.adsoyad) + '</td>' +
+      '<td class="l">T.C. Kimlik No</td><td>' + esc(s.tc) + '</td></tr>' +
+      '<tr><td class="l">Ünvanı</td><td>' + esc(s.unvan) + '</td>' +
+      '<td class="l">Bordro Dönemi</td><td>' + esc(ayAdi(s.bordroAy) + ' ' + s.bordroYil) + '</td></tr></table>' +
+      '<table class="p-tab"><thead><tr><th>Sıra</th><th>Rapor Dönemi</th><th>Yan Ödeme</th><th>Özel Hizmet Taz.</th>' +
+      '<th>Ek Tazminat</th><th>Toplam</th><th>Günlük (÷30)</th><th>Rapor Günü</th><th>İstisna (7 gün)</th>' +
+      '<th>Kesinti Günü</th><th>%25 Kesinti</th><th>Damga V. (‰7,59)</th><th>Net</th></tr></thead>' +
+      '<tbody>' + satirlar + '</tbody>' +
+      '<tfoot><tr><td colspan="10" style="text-align:right">GENEL TOPLAM</td>' +
+      '<td class="num">' + fmt(t.kesinti) + '</td><td class="num">' + fmt(t.dv) + '</td><td class="num">' + fmt(t.net) + '</td></tr></tfoot></table>' +
+      '<div class="p-yazi"><strong>Toplam kesinti tutarı:</strong> ' + fmt(t.kesinti) + ' TL — ' + esc(tutarYazi(t.kesinti)) + '</div>' +
+      '<div class="p-aciklama">Hesap: (yan ödeme + özel hizmet tazminatı + ek tazminat) ÷ 30 × kesinti günü × %25; ' +
+      'damga vergisi kesinti tutarı üzerinden binde 7,59 oranında hesaplanmıştır. Rapor istisnası uygulanan dönemlerde ilk 7 gün kesinti dışı tutulmuştur.</div>' +
+      '<div class="p-sign"><div><div class="tarih">' + tarih + '</div><strong>Düzenleyen</strong><br>' + esc(s.duzenleyen) + '<br>' + esc(s.duzenleyenUnvan) + '</div>' +
+      '<div><div class="tarih">' + tarih + '</div><strong>Onaylayan</strong><br>' + esc(s.onaylayan) + '<br>' + esc(s.onaylayanUnvan) + '</div></div>';
+    var eskiBaslik = document.title;
+    document.title = 'Rapor_Kesinti_Bordrosu_' + (s.adsoyad || 'personel').replace(/\s+/g, '_') + '_' + ayAdi(s.bordroAy) + '_' + s.bordroYil;
+    window.print();
+    setTimeout(function () { document.title = eskiBaslik; }, 500);
+  }
+
+  // ---------- dışa / içe aktarma ----------
+  function indir(ad, icerik, tip) {
+    var blob = new Blob([icerik], { type: tip });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = ad;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+  function csv() {
+    if (!state.donemler.length) { alert('Dışa aktarılacak dönem yok.'); return; }
+    var q = function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; };
+    var rows = [['Sıra', 'Dönem', 'Yan Ödeme', 'ÖHT', 'Ek Tazminat', 'Günlük', 'Rapor Günü', 'İstisna', 'Kesinti Günü', '%25 Kesinti', 'Damga V.', 'Net']];
+    state.donemler.forEach(function (d, i) {
+      var h = hesapla(d);
+      rows.push([i + 1, ayAdi(d.ay) + ' ' + d.yil, fmt(d.yan), fmt(d.oht), fmt(d.ek), fmt(h.gunluk), d.gun, d.istisna, h.kesintiGun, fmt(h.kesinti), fmt(h.dv), fmt(h.net)]);
+    });
+    var t = toplamlar();
+    rows.push(['', 'GENEL TOPLAM', '', '', '', '', '', '', '', fmt(t.kesinti), fmt(t.dv), fmt(t.net)]);
+    var head = [['Kurum', state.s.kurum], ['Adı Soyadı', state.s.adsoyad], ['T.C. Kimlik No', state.s.tc], ['Bordro Dönemi', ayAdi(state.s.bordroAy) + ' ' + state.s.bordroYil], []];
+    var text = head.concat(rows).map(function (r) { return r.map(q).join(';'); }).join('\r\n');
+    indir('rapor_kesinti_' + (state.s.adsoyad || 'bordro').replace(/\s+/g, '_') + '.csv', '﻿' + text, 'text/csv;charset=utf-8');
+  }
+  function yedekAl() {
+    var data = { surum: 1, bordro: state, personel: personel };
+    indir('maas_kesim_yedek_' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(data, null, 2), 'application/json');
+  }
+  function yedekYukle(file) {
+    var fr = new FileReader();
+    fr.onload = function () {
+      try {
+        var data = JSON.parse(fr.result);
+        if (!data || !data.bordro || !Array.isArray(data.bordro.donemler)) throw new Error('biçim');
+        if (!confirm('Mevcut bilgiler yedekteki bilgilerle değiştirilsin mi?')) return;
+        state.s = Object.assign({}, state.s, data.bordro.s || {});
+        state.donemler = data.bordro.donemler.map(normalizeDonem);
+        if (Array.isArray(data.personel)) personel = data.personel;
+        save(); savePersonel();
+        $all('[data-s]').forEach(function (el) { el.value = state.s[el.getAttribute('data-s')] || ''; });
+        renderPersonel(); resetForm(); render();
+        alert('Yedek yüklendi.');
+      } catch (e) { alert('Dosya okunamadı: geçerli bir yedek dosyası değil.'); }
+    };
+    fr.readAsText(file, 'utf-8');
+  }
+  function normalizeDonem(d) {
+    return {
+      ay: AYLAR.indexOf(d.ay) >= 0 ? d.ay : buAy, yil: String(d.yil || buYil),
+      yan: Number(d.yan) || 0, oht: Number(d.oht) || 0, ek: Number(d.ek) || 0,
+      gun: Number(d.gun) || 0, istisna: d.istisna === 'Evet' ? 'Evet' : 'Hayır'
+    };
+  }
+
+  // ---------- başlat ----------
+  var kayit = load(STORE_KEY, null);
+  if (kayit && kayit.s) {
+    state.s = Object.assign(state.s, kayit.s);
+    state.donemler = Array.isArray(kayit.donemler) ? kayit.donemler.map(normalizeDonem) : [];
+  }
+  personel = load(PERSONEL_KEY, []);
+  if (!Array.isArray(personel)) personel = [];
+
+  fillAySelects();
+  bindSettings();
+  renderPersonel();
+  resetForm();
+  render();
+
+  $('#mk-ekle').addEventListener('click', ekleVeyaGuncelle);
+  $('#mk-iptal').addEventListener('click', function () { resetForm(); render(); });
+  $all('[data-f]').forEach(function (el) {
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter') ekleVeyaGuncelle(); });
+  });
+  $('#mk-tbody').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.hasAttribute('data-edit')) duzenle(Number(b.getAttribute('data-edit')));
+    if (b.hasAttribute('data-del')) sil(Number(b.getAttribute('data-del')));
+  });
+  $('#mk-kisi-kaydet').addEventListener('click', kisiKaydet);
+  $('#mk-pdf').addEventListener('click', yazdir);
+  $('#mk-csv').addEventListener('click', csv);
+  $('#mk-yedek').addEventListener('click', yedekAl);
+  $('#mk-yukle').addEventListener('click', function () { $('#mk-dosya').click(); });
+  $('#mk-dosya').addEventListener('change', function () { if (this.files[0]) yedekYukle(this.files[0]); this.value = ''; });
+  $('#mk-temizle').addEventListener('click', function () {
+    if (!state.donemler.length || !confirm('Tüm dönemler silinsin mi?')) return;
+    state.donemler = []; save(); resetForm(); render();
+  });
+})();
+</script>
+</body>
+</html>
