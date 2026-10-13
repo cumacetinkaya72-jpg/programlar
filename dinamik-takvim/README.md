@@ -8,8 +8,11 @@
 **İş Programı** (Excel'deki "İŞ PROGRAMI" sayfası)
 - Başlangıç tarihi + sayfa numarası ile kayan Gantt görünümü (Excel'deki `BAŞLANGIÇ` / `SAYFA` hücreleri gibi); 1, 2, 5 veya 10 haftalık görünüm.
 - Excel'deki koşullu biçimlendirmeler: tamamlanan (T/CV/DY) gri, 5 gün içinde bitecek pembe, bugün yeşil, DE sarı, BGVH kırmızı vb.
-- Özet kartları ile filtreleme: açık, bugün süren, 5 gün içinde bitecek, süresi geçmiş, tamamlanan.
-- Arama, sıralama, satırdaki kutu ile "tamamlandı" işaretleme; göreve tıklayınca düzenleme / silme / kopyalama; yeni iş ekleme.
+- Açık işler sırasıyla: **Devam edenler (DE)** tarih sırasına göre en üstte, altında **Bu hafta yapılacaklar**,
+  sonra **Süresi geçmiş, tamamlanmamış** işler ve en altta dönemdeki diğer işler.
+- Kutu ile "tamamlandı" işaretlenen iş listeden çıkar ve tamamlanma tarihiyle **Tamamlananlar** listesine geçer
+  (oradan kutuyu kaldırarak geri alınabilir).
+- Özet kartları ile filtreleme, arama; göreve tıklayınca düzenleme / silme / kopyalama; yeni iş ekleme.
 
 **Günlük İş Programı** (Excel'deki "GÜNLÜK İŞ PROGRAMI" sayfası)
 - Bugünün kontrol listesi ve ilerleme çubuğu.

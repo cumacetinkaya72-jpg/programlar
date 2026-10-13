@@ -96,6 +96,10 @@ tr.r-bym td:not(.day){background:var(--st-bym)}
 tr.r-cvm td:not(.day){background:var(--st-cvm)}
 tr.r-today td:not(.day){background:var(--st-today)}
 tr.r-ie td:not(.day){background:var(--st-ie)}
+.grid tr.grp td{background:var(--panel2);padding:0;border-bottom:1px solid var(--line)}
+.grid tr.grp td div{position:sticky;left:0;display:inline-block;padding:7px 10px;font-weight:650;font-size:13px}
+.grid tr.grp td div span{display:inline-block;min-width:22px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-size:11px;text-align:center;font-weight:600}
+.grid tr.g-de td div span{background:var(--st-de)}.grid tr.g-gecik td div{color:var(--st-bgvh)}.grid tr.g-tamam td div{color:var(--muted)}
 .empty{padding:30px;text-align:center;color:var(--muted)}
 /* günlük */
 .today-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)}
@@ -194,8 +198,7 @@ dialog h3{margin:0 0 12px;font-size:16px}
     </div>
     <div class="sep"></div>
     <div class="grp s"><input type="search" id="isAra" placeholder="İşlerde ara…"></div>
-    <div class="grp"><select id="isSirala" title="Sıralama"><option value="sira">Excel sırası</option><option value="bas">Başlangıca göre</option><option value="bit">Bitişe göre</option></select></div>
-    <div class="grp"><label><input type="checkbox" id="isDonem" checked> Yalnız bu dönemdekiler</label></div>
+    <div class="grp"><label title="Kapalıysa ileri tarihli tüm açık işler de listelenir"><input type="checkbox" id="isDonem" checked> Diğer işlerde yalnız bu dönem</label></div>
     <div class="grow"></div>
     <button class="btn primary" id="isYeni">+ Yeni iş</button>
     <button class="btn" onclick="window.print()">Yazdır</button>
@@ -364,7 +367,7 @@ document.querySelectorAll("nav.tabs [data-tab]").forEach(b => b.onclick = () => 
 /* =================================================================
    İŞ PROGRAMI
    ================================================================= */
-let isFiltre = "hepsi";
+let isFiltre = "acik";
 const $ = id => document.getElementById(id);
 
 function rowClass(x, today, soonEnd){
@@ -386,36 +389,51 @@ const endOf = x => x.bit || x.bas;
 
 function windowStart(){ return addDays(monday(parse(S.ayar.isBas) || new Date()), S.ayar.isGun*(S.ayar.isSayfa-1)); }
 
-function filters(list, today, soonEnd){
-  return {
-    hepsi:   list,
-    acik:    list.filter(x => !isDone(x)),
-    bugun:   list.filter(x => x.bas && x.bas <= today && endOf(x) >= today),
-    yakin:   list.filter(x => !isDone(x) && x.bit && x.bit >= today && x.bit <= soonEnd),
-    gecik:   list.filter(x => !isDone(x) && endOf(x) && endOf(x) < today),
-    tamam:   list.filter(isDone),
-  };
+const tarihSira = (x,y) => (x.bas||"9").localeCompare(y.bas||"9") || (endOf(x)||"9").localeCompare(endOf(y)||"9") || x.id-y.id;
+
+// Açık işler gruplara ayrılır: önce devam edenler (DE), sonra bu hafta yapılacaklar,
+// sonra süresi geçmiş olanlar, en altta dönemdeki diğer işler. Tamamlananlar ayrı listededir.
+function gruplar(list, today, wS, wE){
+  const hBas = iso(monday(new Date())), hBit = iso(addDays(parse(hBas),6));
+  const acik = list.filter(x => !isDone(x)), kullan = new Set();
+  const al = f => { const r = acik.filter(x => !kullan.has(x) && f(x)).sort(tarihSira); r.forEach(x=>kullan.add(x)); return r; };
+  const de    = al(x => x.e === "DE");
+  const hafta = al(x => x.bas && x.bas <= hBit && endOf(x) >= hBas);
+  const gecik = al(x => endOf(x) && endOf(x) < today);
+  const diger = al(x => !S.ayar.isDonem || !x.bas || (x.bas <= wE && endOf(x) >= wS));
+  return [
+    {k:"de",    ad:"Devam edenler (DE)", list:de},
+    {k:"hafta", ad:`Bu hafta yapılacaklar (${fmt(hBas).slice(0,5)} – ${fmt(hBit).slice(0,5)})`, list:hafta},
+    {k:"gecik", ad:"Süresi geçmiş, tamamlanmamış", list:gecik},
+    {k:"diger", ad:S.ayar.isDonem ? "Dönemdeki diğer işler" : "Diğer işler", list:diger},
+  ];
 }
 
 function renderIs(){
   const a = S.ayar;
   $("isBas").value = a.isBas || ""; $("isSayfa").value = a.isSayfa; $("isGun").value = a.isGun;
-  $("isDonem").checked = a.isDonem; $("isSirala").value = a.isSirala;
+  $("isDonem").checked = a.isDonem;
 
   const today = todayIso(), soonEnd = iso(addDays(new Date(),5));
   const w0 = windowStart(), N = a.isGun, days = [...Array(N)].map((_,i)=>addDays(w0,i)), dIso = days.map(iso);
   const wS = dIso[0], wE = dIso[N-1];
   const q = $("isAra").value.trim().toLocaleLowerCase("tr");
 
-  let list = S.isler.slice();
-  if (a.isDonem) list = list.filter(x => x.bas ? (x.bas <= wE && (endOf(x)) >= wS) : true);
-  if (q) list = list.filter(x => [x.is,x.b,x.c,x.d,x.e,x.f,x.yaziNo].join(" ").toLocaleLowerCase("tr").includes(q));
-  const F = filters(list, today, soonEnd);
-  const etiket = {hepsi:"Gösterilen iş",acik:"Açık",bugun:"Bugün sürenler",yakin:"5 gün içinde bitecek",gecik:"Süresi geçmiş (açık)",tamam:"Tamamlanan"};
-  $("isStats").innerHTML = Object.keys(etiket).map(k => `<div class="stat ${isFiltre===k?"on":""}" data-f="${k}"><b>${F[k].length}</b><span>${etiket[k]}</span></div>`).join("");
-  list = F[isFiltre];
-  if (a.isSirala === "bas") list.sort((x,y)=>(x.bas||"9").localeCompare(y.bas||"9") || (endOf(x)||"").localeCompare(endOf(y)||""));
-  if (a.isSirala === "bit") list.sort((x,y)=>(endOf(x)||"9").localeCompare(endOf(y)||"9"));
+  let tum = S.isler.slice();
+  if (q) tum = tum.filter(x => [x.is,x.b,x.c,x.d,x.e,x.f,x.yaziNo].join(" ").toLocaleLowerCase("tr").includes(q));
+  const G = gruplar(tum, today, wS, wE);
+  const tamam = tum.filter(isDone).sort((x,y)=>(y.tamamTar||"").localeCompare(x.tamamTar||"") || (endOf(y)||"").localeCompare(endOf(x)||""));
+  const yakin = G.flatMap(g=>g.list).filter(x => x.bit && x.bit >= today && x.bit <= soonEnd);
+  const kart = [["acik","Açık işler",G.reduce((n,g)=>n+g.list.length,0)],["de","Devam eden (DE)",G[0].list.length],["hafta","Bu hafta",G[1].list.length],
+                ["yakin","5 gün içinde bitecek",yakin.length],["gecik","Süresi geçmiş",G[2].list.length],["tamam","Tamamlananlar",tamam.length]];
+  $("isStats").innerHTML = kart.map(([k,ad,n]) => `<div class="stat ${isFiltre===k?"on":""}" data-f="${k}"><b>${n}</b><span>${ad}</span></div>`).join("");
+
+  let bolumler;
+  if (isFiltre === "tamam") bolumler = [{k:"tamam", ad:"Tamamlananlar (son tamamlanan en üstte)", list:tamam}];
+  else if (isFiltre === "yakin") bolumler = [{k:"yakin", ad:"5 gün içinde bitecek işler", list:yakin.sort((x,y)=>x.bit.localeCompare(y.bit))}];
+  else if (isFiltre === "acik") bolumler = G;
+  else bolumler = G.filter(g => g.k === isFiltre);
+  const list = bolumler.flatMap(g=>g.list);
 
   $("isLegend").innerHTML = `<span><b>${fmt(wS)} – ${fmt(wE)}</b></span>
     <span><i style="background:var(--bar)"></i>İş süresi</span><span><i style="background:var(--bar-done)"></i>Tamamlanan iş süresi</span>
@@ -439,14 +457,18 @@ function renderIs(){
 
   const kodTip = c => S.kod[c] ? ` title="${esc(c+": "+S.kod[c])}"` : "";
   const chips = (...cs) => cs.filter(Boolean).map(c=>`<span class="chip"${kodTip(c)}>${esc(c)}</span>`).join("");
-  for (const x of list){
+  for (const g of bolumler){
+   if (!g.list.length) continue;
+   html += `<tr class="grp g-${g.k}"><td colspan="${7+N}"><div>${esc(g.ad)} <span>${g.list.length}</span></div></td></tr>`;
+   for (const x of g.list){
     const s = x.bas, e = endOf(x);
     const saat = [x.saatBas,x.saatBit].filter(Boolean).join("–");
-    const yazi = (x.yaziTar||x.yaziNo) ? `<div class="y">Yazı: ${fmt(x.yaziTar)}${x.yaziNo?" · Sayı: "+esc(x.yaziNo):""}</div>` : "";
+    const yazi = [x.yaziTar||x.yaziNo ? `Yazı: ${fmt(x.yaziTar)}${x.yaziNo?" · Sayı: "+esc(x.yaziNo):""}` : "",
+                  isDone(x) && x.tamamTar ? `Tamamlandı: ${fmt(x.tamamTar)}` : ""].filter(Boolean).map(t=>`<div class="y">${t}</div>`).join("");
     html += `<tr class="${rowClass(x,today,soonEnd)} ${isDone(x)?"done":""}" data-id="${x.id}">
       <td class="stk c-hf" ${st(0)}>${s?isoWeek(parse(s)):""}</td>
       <td class="stk c-kod" ${st(1)}>${chips(x.b,x.c,x.d)}</td>
-      <td class="stk c-dur" ${st(2)}><input type="checkbox" class="tm" title="Tamamlandı (T)" ${isDone(x)?"checked":""}> ${chips(x.e)}${x.f&&x.f!=="T"?chips(x.f):""}</td>
+      <td class="stk c-dur" ${st(2)}><input type="checkbox" class="tm" title="${isDone(x)?"Tamamlanmadı olarak geri al":"Tamamlandı olarak işaretle"}" ${isDone(x)?"checked":""}> ${chips(x.e)}${x.f&&x.f!=="T"?chips(x.f):""}</td>
       <td class="stk c-tar" ${st(3)}>${fmt(x.bas)}</td><td class="stk c-tar" ${st(4)}>${fmt(x.bit)}</td>
       <td class="stk c-saat" ${st(5)}>${esc(saat)}</td>
       <td class="stk c-is" ${st(6)}><div class="t" title="${esc(x.is)}">${esc(x.is)}</div>${yazi}</td>`;
@@ -455,9 +477,10 @@ function renderIs(){
       const cls = `day ${dw===0||dw===6?"we":""} ${d===today?"td":""} ${dw===1?"wk0":""}`;
       html += `<td class="${cls}">${on?`<span class="b ${d===s?"s":""} ${d===e?"e":""}"></span>`:""}</td>`; }
     html += `</tr>`;
+   }
   }
   html += `</tbody></table>`;
-  if (!list.length) html += `<div class="empty">Bu görünümde iş yok. ${a.isDonem?"“Yalnız bu dönemdekiler” seçeneğini kapatmayı ya da başka sayfaya geçmeyi deneyin.":""}</div>`;
+  if (!list.length) html += `<div class="empty">Bu görünümde iş yok.</div>`;
   $("isWrap").innerHTML = html;
   fixSticky($("isWrap"));
 }
@@ -478,12 +501,13 @@ $("isIleri").onclick = () => { S.ayar.isSayfa++; save(); renderIs(); };
 $("isGun").onchange = e => { const w0 = windowStart(); S.ayar.isGun = +e.target.value; S.ayar.isBas = iso(w0); S.ayar.isSayfa = 1; save(); renderIs(); };
 $("isBugun").onclick = () => { S.ayar.isBas = todayIso(); S.ayar.isSayfa = 1; save(); renderIs(); };
 $("isDonem").onchange = e => { S.ayar.isDonem = e.target.checked; save(); renderIs(); };
-$("isSirala").onchange = e => { S.ayar.isSirala = e.target.value; save(); renderIs(); };
 $("isAra").oninput = () => { clearTimeout(renderIs.h); renderIs.h = setTimeout(renderIs, 150); };
 $("isWrap").addEventListener("change", e => {
   if (!e.target.classList.contains("tm")) return;
   const x = S.isler.find(r => r.id == e.target.closest("tr").dataset.id);
-  x.f = e.target.checked ? "T" : ""; save(); renderIs();
+  if (e.target.checked) { x.f = "T"; x.tamamTar = todayIso(); toast("Tamamlananlar listesine taşındı"); }
+  else { x.f = ""; delete x.tamamTar; toast("Açık işlere geri alındı"); }
+  save(); renderIs();
 });
 $("isWrap").addEventListener("click", e => {
   if (e.target.closest(".c-is .t")) openIs(+e.target.closest("tr").dataset.id);
@@ -503,7 +527,10 @@ $("isDlg").addEventListener("close", () => {
   else if (v === "kaydet" || v === "kopya") {
     const data = {}; for (const k of ["is","bas","bit","saatBas","saatBit","b","c","d","e","f","yaziTar","yaziNo"]) data[k] = f.elements[k].value.trim() || (/(bas|bit|Tar)$/.test(k)?null:"");
     if (data.bas && data.bit && data.bit < data.bas) [data.bas, data.bit] = [data.bit, data.bas];
-    if (v === "kaydet" && editId) Object.assign(S.isler.find(r=>r.id===editId), data);
+    const eski = editId && S.isler.find(r=>r.id===editId);
+    if (DONE.has(data.f)) data.tamamTar = (eski && DONE.has(eski.f) && eski.tamamTar) || todayIso(); else data.tamamTar = undefined;
+    if (v === "kopya") { data.f = ""; data.tamamTar = undefined; }
+    if (v === "kaydet" && editId) Object.assign(eski, data);
     else { data.id = ++S.sonId; const i = editId ? S.isler.findIndex(r=>r.id===editId)+1 : S.isler.length; S.isler.splice(i,0,data); }
     save(); toast(v==="kopya" ? "Kopya oluşturuldu" : "Kaydedildi");
   }
