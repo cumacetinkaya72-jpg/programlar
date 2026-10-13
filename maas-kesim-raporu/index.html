@@ -298,9 +298,15 @@
         <select id="s-bordroAy" data-s="bordroAy" class="ay-select"></select>
         <span class="hint">Kesintinin yapılacağı maaş ayı.</span>
       </div>
-      <div class="field">
+      <div class="field" data-for="bordroYil">
         <label for="s-bordroYil">Bordro yılı</label>
-        <select id="s-bordroYil" data-s="bordroYil" class="yil-select"></select>
+        <div class="stepper">
+          <button type="button" data-yil="-1" data-target="s-bordroYil" aria-label="Bir yıl geri">−</button>
+          <input id="s-bordroYil" data-s="bordroYil" class="yil-input" inputmode="numeric" maxlength="4" placeholder="Örn: 2026">
+          <button type="button" data-yil="1" data-target="s-bordroYil" aria-label="Bir yıl ileri">+</button>
+        </div>
+        <span class="hint">İstediğiniz yılı yazabilir veya − / + ile değiştirebilirsiniz.</span>
+        <span class="err-text">Yılı 4 rakamla yazın. Örn: 2026</span>
       </div>
     </div>
 
@@ -345,9 +351,15 @@
         <label for="f-ay">Rapor hangi ayda alındı?</label>
         <select id="f-ay" data-f="ay" class="ay-select"></select>
       </div>
-      <div class="field">
+      <div class="field" data-for="yil">
         <label for="f-yil">Hangi yıl?</label>
-        <select id="f-yil" data-f="yil" class="yil-select"></select>
+        <div class="stepper">
+          <button type="button" data-yil="-1" data-target="f-yil" aria-label="Bir yıl geri">−</button>
+          <input id="f-yil" data-f="yil" class="yil-input" inputmode="numeric" maxlength="4" placeholder="Örn: 2026">
+          <button type="button" data-yil="1" data-target="f-yil" aria-label="Bir yıl ileri">+</button>
+        </div>
+        <span class="hint">Geçmiş veya ileri her yılı yazabilirsiniz.</span>
+        <span class="err-text">Yılı 4 rakamla yazın. Örn: 2026</span>
       </div>
       <div class="field" data-for="yan">
         <label for="f-yan">Yan ödeme tutarı <span class="tag req">Zorunlu</span></label>
@@ -621,11 +633,6 @@
     $all('.ay-select').forEach(function (sel) {
       sel.innerHTML = AYLAR.map(function (a, i) { return '<option value="' + a + '">' + AY_ADI[i] + '</option>'; }).join('');
     });
-    var y = now.getFullYear(), yillar = [];
-    for (var k = y + 1; k >= y - 6; k--) yillar.push(String(k));
-    $all('.yil-select').forEach(function (sel) {
-      sel.innerHTML = yillar.map(function (v) { return '<option>' + v + '</option>'; }).join('');
-    });
   }
   function setSelect(sel, val) {
     if (val && !Array.prototype.some.call(sel.options, function (o) { return o.value === val; })) {
@@ -653,8 +660,10 @@
       if (el.tagName === 'SELECT') setSelect(el, state.s[k]); else el.value = state.s[k] || '';
     });
   }
+  function yilGecerli(v) { return /^\d{4}$/.test(String(v).trim()) && Number(v) > 0; }
   function checkStep1(show) {
     var bad = [];
+    if (!yilGecerli(state.s.bordroYil)) bad.push('bordroYil');
     if (!state.s.kurum.trim()) bad.push('kurum');
     if (!state.s.adsoyad.trim()) bad.push('adsoyad');
     if (state.s.tc.trim() && !/^\d{11}$/.test(state.s.tc.trim())) bad.push('tc');
@@ -694,6 +703,7 @@
       istisna: istisnaVal()
     };
     var bad = {};
+    if (!yilGecerli(d.yil)) bad.yil = 1;
     if (isNaN(d.yan) || d.yan < 0 || formEl('yan').value.trim() === '') bad.yan = 1;
     if (isNaN(d.oht) || d.oht < 0 || formEl('oht').value.trim() === '') bad.oht = 1;
     if (isNaN(d.ek) || d.ek < 0) bad.ek = 1;
@@ -728,7 +738,7 @@
   function resetForm() {
     editIndex = -1;
     setSelect(formEl('ay'), state.s.bordroAy || buAy);
-    setSelect(formEl('yil'), state.s.bordroYil || buYil);
+    formEl('yil').value = state.s.bordroYil || buYil;
     ['yan', 'oht', 'ek', 'gun'].forEach(function (k) { formEl(k).value = ''; });
     $('input[name=istisna][value="Hayır"]').checked = true;
     $all('#step-2 .field').forEach(function (f) { f.classList.remove('invalid'); });
@@ -754,7 +764,7 @@
   function editPeriod(i) {
     var d = state.donemler[i]; if (!d) return;
     editIndex = i;
-    setSelect(formEl('ay'), d.ay); setSelect(formEl('yil'), d.yil);
+    setSelect(formEl('ay'), d.ay); formEl('yil').value = d.yil;
     formEl('yan').value = fmt(d.yan); formEl('oht').value = fmt(d.oht);
     formEl('ek').value = d.ek ? fmt(d.ek) : ''; formEl('gun').value = d.gun;
     $('input[name=istisna][value="' + d.istisna + '"]').checked = true;
@@ -834,6 +844,7 @@
     if (!state.s.kurum.trim()) p.push({ text: 'Okulun adı yazılmamış.', step: 1 });
     if (!state.s.adsoyad.trim()) p.push({ text: 'Personelin adı soyadı yazılmamış.', step: 1 });
     if (state.s.tc.trim() && !/^\d{11}$/.test(state.s.tc.trim())) p.push({ text: 'T.C. Kimlik No 11 rakam olmalı.', step: 1 });
+    if (!yilGecerli(state.s.bordroYil)) p.push({ text: 'Bordro yılı 4 rakam olmalı.', step: 1 });
     if (!state.donemler.length) p.push({ text: 'Hiç rapor dönemi eklenmemiş.', step: 2 });
     return p;
   }
@@ -886,7 +897,14 @@
       b.querySelector('.no').textContent = done && k !== n ? '✓' : k;
       b.setAttribute('aria-current', k === n ? 'step' : 'false');
     });
-    if (n === 2) { renderPeriods(); renderLive(); }
+    if (n === 2) {
+      // yeni dönem formu boşsa ay/yıl bordro dönemini takip etsin
+      if (editIndex < 0 && !['yan', 'oht', 'ek', 'gun'].some(function (k) { return formEl(k).value.trim(); })) {
+        setSelect(formEl('ay'), state.s.bordroAy || buAy);
+        formEl('yil').value = state.s.bordroYil || buYil;
+      }
+      renderPeriods(); renderLive();
+    }
     if (n === 3) renderStep3();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1042,6 +1060,20 @@
   $('#s-tc').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 11); state.s.tc = this.value; save(); });
   formEl('gun').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 2); });
   $all('input[name=istisna]').forEach(function (r) { r.addEventListener('change', renderLive); });
+  $all('.yil-input').forEach(function (el) {
+    el.addEventListener('input', function () {
+      var v = this.value.replace(/\D/g, '').slice(0, 4);
+      if (v !== this.value) { this.value = v; this.dispatchEvent(new Event('change')); }
+    });
+  });
+  $all('[data-yil]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var el = document.getElementById(b.getAttribute('data-target'));
+      var y = parseInt(el.value, 10) || now.getFullYear();
+      el.value = String(Math.max(1000, Math.min(9999, y + Number(b.getAttribute('data-yil')))));
+      el.dispatchEvent(new Event('input'));
+    });
+  });
   $all('[data-gun]').forEach(function (b) {
     b.addEventListener('click', function () {
       var g = parseInt(formEl('gun').value, 10) || 0;
