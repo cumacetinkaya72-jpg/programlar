@@ -5,6 +5,12 @@
 
 ## Sekmeler
 
+**Pano**
+- Kartlar: **Devam edenler**, **Günlük işler** (bugün yapılan / toplam), **Tamamlananlar**,
+  **Cevap verilemeyenler**, **Ertelenenler**, **Cevap verilenler**. Karta tıklayınca o listedeki işler açılır.
+- Her işin durumu açılır listeden değiştirilebilir: Devam ediyor (DE), Ertelendi (ER), Cevap verilemedi (CVM),
+  Cevap verildi (CV), Tamamlandı (T).
+
 **İş Programı** (Excel'deki "İŞ PROGRAMI" sayfası)
 - Başlangıç tarihi + sayfa numarası ile kayan Gantt görünümü (Excel'deki `BAŞLANGIÇ` / `SAYFA` hücreleri gibi); 1, 2, 5 veya 10 haftalık görünüm.
 - Excel'deki koşullu biçimlendirmeler: tamamlanan (T/CV/DY) gri, 5 gün içinde bitecek pembe, bugün yeşil, DE sarı, BGVH kırmızı vb.

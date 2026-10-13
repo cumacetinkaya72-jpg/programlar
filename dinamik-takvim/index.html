@@ -9,19 +9,19 @@
   --bg:#f5f6f8;--panel:#fff;--panel2:#f0f2f5;--text:#1d2330;--muted:#6b7385;--line:#dde1e8;--line2:#eceef2;
   --accent:#2f6fdb;--accent-soft:#e3ecfc;--bar:#e05ad6;--bar-done:#c9b3c8;--weekend:#f3f4f7;--today:#36b37e;--today-soft:#e2f6ec;
   --st-done:#eef0f3;--st-done-text:#8a91a0;--st-soon:#ffe3fb;--st-bgvh:#d92d2d;--st-de:#fff6bf;--st-by:#d5f4f3;--st-bym:#ffe0e1;
-  --st-cvm:#d6ecff;--st-ie:#e5f0ff;--st-today:#dcfadc;--shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+  --st-cvm:#d6ecff;--st-er:#ffe8cc;--st-ie:#e5f0ff;--st-today:#dcfadc;--shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#12151b;--panel:#1a1e26;--panel2:#222733;--text:#e6e9ef;--muted:#9aa2b2;--line:#2e3442;--line2:#252a35;
   --accent:#6d9cf0;--accent-soft:#22324f;--bar:#d65ccd;--bar-done:#5a4a58;--weekend:#1e222b;--today:#3fbf88;--today-soft:#173327;
   --st-done:#1d2028;--st-done-text:#6f7686;--st-soon:#3d2240;--st-bgvh:#ff6b6b;--st-de:#3b3615;--st-by:#173a39;--st-bym:#40232a;
-  --st-cvm:#16324b;--st-ie:#1b2a42;--st-today:#1d3a20;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  --st-cvm:#16324b;--st-er:#46301a;--st-ie:#1b2a42;--st-today:#1d3a20;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
 }}
 :root[data-theme="dark"]{
   --bg:#12151b;--panel:#1a1e26;--panel2:#222733;--text:#e6e9ef;--muted:#9aa2b2;--line:#2e3442;--line2:#252a35;
   --accent:#6d9cf0;--accent-soft:#22324f;--bar:#d65ccd;--bar-done:#5a4a58;--weekend:#1e222b;--today:#3fbf88;--today-soft:#173327;
   --st-done:#1d2028;--st-done-text:#6f7686;--st-soon:#3d2240;--st-bgvh:#ff6b6b;--st-de:#3b3615;--st-by:#173a39;--st-bym:#40232a;
-  --st-cvm:#16324b;--st-ie:#1b2a42;--st-today:#1d3a20;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  --st-cvm:#16324b;--st-er:#46301a;--st-ie:#1b2a42;--st-today:#1d3a20;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
@@ -75,7 +75,9 @@ table.grid{border-collapse:separate;border-spacing:0;font-size:12.5px}
 .grid tr.done td.day .b{background:var(--bar-done)}
 .c-hf{width:40px;min-width:40px;text-align:center;color:var(--muted)}
 .c-kod{width:118px;min-width:118px}
-.c-dur{width:74px;min-width:74px;text-align:center}
+.c-dur{width:150px;min-width:150px;text-align:left;white-space:nowrap}
+.c-dur .chip{margin-top:3px}
+select.ds{padding:2px 4px;font-size:12px;border-radius:5px;max-width:118px;margin-left:4px}
 .c-tar{width:84px;min-width:84px;text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
 .c-saat{width:62px;min-width:62px;text-align:center;font-size:11.5px;white-space:nowrap}
 .c-is{width:380px;min-width:300px;max-width:380px}
@@ -96,11 +98,34 @@ tr.r-bym td:not(.day){background:var(--st-bym)}
 tr.r-cvm td:not(.day){background:var(--st-cvm)}
 tr.r-today td:not(.day){background:var(--st-today)}
 tr.r-ie td:not(.day){background:var(--st-ie)}
+tr.r-er td:not(.day){background:var(--st-er)}
 .grid tr.grp td{background:var(--panel2);padding:0;border-bottom:1px solid var(--line)}
 .grid tr.grp td div{position:sticky;left:0;display:inline-block;padding:7px 10px;font-weight:650;font-size:13px}
 .grid tr.grp td div span{display:inline-block;min-width:22px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-size:11px;text-align:center;font-weight:600}
 .grid tr.g-de td div span{background:var(--st-de)}.grid tr.g-gecik td div{color:var(--st-bgvh)}.grid tr.g-tamam td div{color:var(--muted)}
 .empty{padding:30px;text-align:center;color:var(--muted)}
+/* pano */
+.pano{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.pk{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--pk);border-radius:10px;padding:12px 14px;cursor:pointer;box-shadow:var(--shadow)}
+.pk:hover{border-color:var(--accent);border-left-color:var(--pk)}
+.pk.on{outline:2px solid var(--accent);outline-offset:-1px}
+.pk .pa{font-weight:600;font-size:13px}.pk b{font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}.pk b small{font-size:16px;color:var(--muted);font-weight:500}
+.pk .pb{color:var(--muted);font-size:12px}.pk .prog{width:100%;max-width:none;margin-top:4px;flex:none}
+.pnot{grid-column:1/-1;color:var(--muted);font-size:13px}
+.pliste{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow)}
+.pliste h2{font-size:15px;margin:0 0 10px}.pliste h2 .say{font-size:12px;color:var(--muted);font-weight:500;margin-left:4px}
+.plt{width:100%;border-collapse:collapse;font-size:13px}
+.plt th{text-align:left;color:var(--muted);font-weight:500;font-size:12px;border-bottom:1px solid var(--line);padding:6px 8px}
+.plt td{border-bottom:1px solid var(--line2);padding:7px 8px;vertical-align:top}
+.plt td.d{white-space:nowrap;font-variant-numeric:tabular-nums}
+.plt .t{cursor:pointer}.plt .t:hover{color:var(--accent)}.plt .y{color:var(--muted);font-size:11px}
+.plt select.ds{margin:0}
+.kg{font-size:12px;padding:1px 7px;border-radius:10px;background:var(--panel2)}.kg.yak{background:var(--st-soon)}.kg.bug{background:var(--st-today)}.kg.gec{color:var(--st-bgvh);background:transparent;padding:0}
+@media (max-width:1100px){.pano{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px){.pano{grid-template-columns:repeat(2,minmax(0,1fr))}.pk b{font-size:24px}
+  .plt thead{display:none}.plt,.plt tbody,.plt tr{display:block}
+  .plt tr{padding:8px 0;border-bottom:1px solid var(--line2)}.plt td{display:block;border:none;padding:3px 0}
+  .plt td.d{display:inline-block;margin-right:10px;color:var(--muted);font-size:12px}}
 /* günlük */
 .today-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)}
 .today-card h2{font-size:15px;margin:0 0 8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -175,7 +200,8 @@ dialog h3{margin:0 0 12px;font-size:16px}
     <div class="sub" id="bugunYazi"></div>
   </div>
   <nav class="tabs" role="tablist">
-    <button role="tab" data-tab="is" aria-selected="true">İş Programı</button>
+    <button role="tab" data-tab="pano" aria-selected="true">Pano</button>
+    <button role="tab" data-tab="is" aria-selected="false">İş Programı</button>
     <button role="tab" data-tab="gunluk" aria-selected="false">Günlük İş Programı</button>
     <button role="tab" data-tab="yardim" aria-selected="false">Açıklamalar &amp; Veri</button>
     <button class="btn" id="temaBtn" title="Açık / koyu tema">Tema</button>
@@ -184,7 +210,12 @@ dialog h3{margin:0 0 12px;font-size:16px}
 
 <main>
 <!-- =============== İŞ PROGRAMI =============== -->
-<section id="tab-is">
+<section id="tab-pano">
+  <div class="pano" id="pKart"></div>
+  <div class="pliste" id="pListe"></div>
+</section>
+
+<section id="tab-is" hidden>
   <div class="toolbar">
     <div class="grp"><label for="isBas">Başlangıç</label><input type="date" id="isBas"></div>
     <div class="grp">
@@ -245,7 +276,7 @@ dialog h3{margin:0 0 12px;font-size:16px}
     <h3>Satır renkleri (Excel'deki koşullu biçimlendirme)</h3>
     <table>
       <tr><th>Renk</th><th>Koşul</th></tr>
-      <tr><td><span class="chip" style="background:var(--st-done)">gri, üstü çizili</span></td><td>2. durum sütunu <b>T</b>, <b>CV</b> veya <b>DY</b></td></tr>
+      <tr><td><span class="chip" style="background:var(--st-done)">gri, üstü çizili</span></td><td>Kapanış sütunu <b>T</b> (tamamlandı), <b>CV</b> (cevap verildi) veya <b>DY</b></td></tr>
       <tr><td><span class="chip" style="background:var(--st-soon)">pembe</span></td><td>Bitiş tarihi bugün ile 5 gün sonrası arasında</td></tr>
       <tr><td><span class="chip" style="background:var(--st-today)">yeşil</span></td><td>Başlangıç ya da bitiş tarihi bugün</td></tr>
       <tr><td><span class="chip" style="color:var(--st-bgvh);font-weight:700">kırmızı yazı</span></td><td>Kod sütunu <b>BGVH</b></td></tr>
@@ -253,7 +284,8 @@ dialog h3{margin:0 0 12px;font-size:16px}
       <tr><td><span class="chip" style="font-weight:700">kalın</span></td><td>Durum <b>Y</b></td></tr>
       <tr><td><span class="chip" style="background:var(--st-by)">turkuaz</span></td><td>Durum <b>BY</b></td></tr>
       <tr><td><span class="chip" style="background:var(--st-bym)">somon</span></td><td>Durum <b>BYM</b></td></tr>
-      <tr><td><span class="chip" style="background:var(--st-cvm)">mavi</span></td><td>Durum <b>CVM</b></td></tr>
+      <tr><td><span class="chip" style="background:var(--st-cvm)">mavi</span></td><td>Durum <b>CVM</b> (cevap verilemedi)</td></tr>
+      <tr><td><span class="chip" style="background:var(--st-er)">turuncu</span></td><td>Durum <b>ER</b> (ertelendi)</td></tr>
       <tr><td><span class="chip" style="background:var(--st-ie)">açık mavi</span></td><td>Durum <b>İ</b> veya <b>E</b></td></tr>
     </table>
 
@@ -278,7 +310,7 @@ dialog h3{margin:0 0 12px;font-size:16px}
       <label class="f"><span>Süre kodu 2</span><input name="c" list="kodList"></label>
       <label class="f"><span>Süre kodu 3</span><input name="d" list="kodList"></label>
       <label class="f"><span>Durum</span><input name="e" list="durumList"></label>
-      <label class="f"><span>Tamamlanma (T / CV / DY)</span><input name="f" list="tamamList"></label>
+      <label class="f"><span>Kapanış (T / CV / DY)</span><input name="f" list="tamamList"></label>
       <label class="f"><span>Yazının tarihi</span><input type="date" name="yaziTar"></label>
       <label class="f w2"><span>Yazının sayısı</span><input name="yaziNo"></label>
     </div>
@@ -309,7 +341,7 @@ dialog h3{margin:0 0 12px;font-size:16px}
 </dialog>
 
 <datalist id="kodList"><option>Aİ</option><option>Hİ</option><option>Gİ</option><option>Hİ/Gİ</option><option>Aİ/Hİ</option><option>BGVH</option><option>YB</option></datalist>
-<datalist id="durumList"><option>DE</option><option>E</option><option>İ</option><option>Y</option><option>BY</option><option>BYM</option><option>CVM</option></datalist>
+<datalist id="durumList"><option>DE</option><option>E</option><option>İ</option><option>Y</option><option>BY</option><option>BYM</option><option>CVM</option><option>ER</option></datalist>
 <datalist id="tamamList"><option>T</option><option>CV</option><option>DY</option></datalist>
 <div class="toast" id="toast"></div>
 
@@ -319,7 +351,7 @@ const KEY = "dinamikTakvim.v1";
 const GUNLER = ["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
 const AYLAR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const DONE = new Set(["T","CV","DY"]);
-const KODLAR = ["Aİ","Hİ","Gİ","BGVH","YB","DE","E","İ","Y","BY","BYM","CVM","T","CV","DY"];
+const KODLAR = ["Aİ","Hİ","Gİ","BGVH","YB","DE","ER","CVM","CV","T","E","İ","Y","BY","BYM","DY"];
 
 /* ---------- tarih yardımcıları (yerel saat, ISO yyyy-mm-dd) ---------- */
 const iso = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
@@ -359,6 +391,7 @@ applyTheme();
 document.querySelectorAll("nav.tabs [data-tab]").forEach(b => b.onclick = () => {
   document.querySelectorAll("nav.tabs [data-tab]").forEach(x => x.setAttribute("aria-selected", x===b));
   document.querySelectorAll("main > section").forEach(s => s.hidden = s.id !== "tab-"+b.dataset.tab);
+  ["isWrap","gWrap"].forEach(id => { const w = document.getElementById(id); if (w && w.firstChild) fixSticky(w); });
   try { sessionStorage.setItem(KEY+".tab", b.dataset.tab); } catch(e){}
 });
 (function(){ let t; try { t = sessionStorage.getItem(KEY+".tab"); } catch(e){} if(t){ const b = document.querySelector(`nav.tabs [data-tab="${t}"]`); if(b) b.click(); } })();
@@ -377,6 +410,7 @@ function rowClass(x, today, soonEnd){
   if (x.e === "Y") return "r-y";
   if (x.d === "BGVH") return "r-bgvh";
   if (x.e === "DE") return "r-de";
+  if (x.e === "ER") return "r-er";
   if (x.e === "BY") return "r-by";
   if (x.e === "BYM") return "r-bym";
   if (x.e === "CVM") return "r-cvm";
@@ -385,6 +419,15 @@ function rowClass(x, today, soonEnd){
   return "";
 }
 const isDone = x => DONE.has(x.f);
+// Tek "durum" değeri: kapanış (f sütunu: T/DY tamamlandı, CV cevap verildi) ya da açık durum (e sütunu: DE, CVM, ER)
+const DURUMLAR = [["","— Açık —"],["DE","Devam ediyor"],["ER","Ertelendi"],["CVM","Cevap verilemedi"],["CV","Cevap verildi"],["T","Tamamlandı"]];
+const ACIK_DURUM = new Set(["DE","ER","CVM"]);
+function durum(x){ if (x.f === "CV") return "CV"; if (DONE.has(x.f)) return "T"; return ACIK_DURUM.has(x.e) ? x.e : ""; }
+function setDurum(x, d){
+  if (d === "T" || d === "CV") { if (!DONE.has(x.f)) x.tamamTar = todayIso(); x.f = d; if (ACIK_DURUM.has(x.e)) x.e = ""; }
+  else { x.f = ""; delete x.tamamTar; x.e = d ? d : (ACIK_DURUM.has(x.e) ? "" : x.e); }
+}
+const durumSec = x => `<select class="ds" title="Durumu değiştir">${DURUMLAR.map(([k,ad])=>`<option value="${k}" ${durum(x)===k?"selected":""}>${ad}</option>`).join("")}</select>`;
 const endOf = x => x.bit || x.bas;
 
 function windowStart(){ return addDays(monday(parse(S.ayar.isBas) || new Date()), S.ayar.isGun*(S.ayar.isSayfa-1)); }
@@ -398,12 +441,16 @@ function gruplar(list, today, wS, wE){
   const acik = list.filter(x => !isDone(x)), kullan = new Set();
   const al = f => { const r = acik.filter(x => !kullan.has(x) && f(x)).sort(tarihSira); r.forEach(x=>kullan.add(x)); return r; };
   const de    = al(x => x.e === "DE");
-  const hafta = al(x => x.bas && x.bas <= hBit && endOf(x) >= hBas);
+  const hafta = al(x => x.e !== "ER" && x.e !== "CVM" && x.bas && x.bas <= hBit && endOf(x) >= hBas);
+  const cvm   = al(x => x.e === "CVM");
+  const er    = al(x => x.e === "ER");
   const gecik = al(x => endOf(x) && endOf(x) < today);
   const diger = al(x => !S.ayar.isDonem || !x.bas || (x.bas <= wE && endOf(x) >= wS));
   return [
     {k:"de",    ad:"Devam edenler (DE)", list:de},
     {k:"hafta", ad:`Bu hafta yapılacaklar (${fmt(hBas).slice(0,5)} – ${fmt(hBit).slice(0,5)})`, list:hafta},
+    {k:"cvm",   ad:"Cevap verilemeyenler", list:cvm},
+    {k:"er",    ad:"Ertelenenler", list:er},
     {k:"gecik", ad:"Süresi geçmiş, tamamlanmamış", list:gecik},
     {k:"diger", ad:S.ayar.isDonem ? "Dönemdeki diğer işler" : "Diğer işler", list:diger},
   ];
@@ -424,12 +471,15 @@ function renderIs(){
   const G = gruplar(tum, today, wS, wE);
   const tamam = tum.filter(isDone).sort((x,y)=>(y.tamamTar||"").localeCompare(x.tamamTar||"") || (endOf(y)||"").localeCompare(endOf(x)||""));
   const yakin = G.flatMap(g=>g.list).filter(x => x.bit && x.bit >= today && x.bit <= soonEnd);
-  const kart = [["acik","Açık işler",G.reduce((n,g)=>n+g.list.length,0)],["de","Devam eden (DE)",G[0].list.length],["hafta","Bu hafta",G[1].list.length],
-                ["yakin","5 gün içinde bitecek",yakin.length],["gecik","Süresi geçmiş",G[2].list.length],["tamam","Tamamlananlar",tamam.length]];
+  const gs = k => G.find(g=>g.k===k).list.length;
+  const kart = [["acik","Açık işler",G.reduce((n,g)=>n+g.list.length,0)],["de","Devam eden",gs("de")],["hafta","Bu hafta",gs("hafta")],
+                ["cvm","Cevap verilemeyen",gs("cvm")],["er","Ertelenen",gs("er")],
+                ["yakin","5 gün içinde bitecek",yakin.length],["gecik","Süresi geçmiş",gs("gecik")],["tamam","Kapananlar",tamam.length]];
   $("isStats").innerHTML = kart.map(([k,ad,n]) => `<div class="stat ${isFiltre===k?"on":""}" data-f="${k}"><b>${n}</b><span>${ad}</span></div>`).join("");
 
   let bolumler;
-  if (isFiltre === "tamam") bolumler = [{k:"tamam", ad:"Tamamlananlar (son tamamlanan en üstte)", list:tamam}];
+  if (isFiltre === "tamam") bolumler = [{k:"tamam", ad:"Tamamlananlar (son tamamlanan en üstte)", list:tamam.filter(x=>x.f!=="CV")},
+                                         {k:"tamam", ad:"Cevap verilenler", list:tamam.filter(x=>x.f==="CV")}];
   else if (isFiltre === "yakin") bolumler = [{k:"yakin", ad:"5 gün içinde bitecek işler", list:yakin.sort((x,y)=>x.bit.localeCompare(y.bit))}];
   else if (isFiltre === "acik") bolumler = G;
   else bolumler = G.filter(g => g.k === isFiltre);
@@ -464,11 +514,11 @@ function renderIs(){
     const s = x.bas, e = endOf(x);
     const saat = [x.saatBas,x.saatBit].filter(Boolean).join("–");
     const yazi = [x.yaziTar||x.yaziNo ? `Yazı: ${fmt(x.yaziTar)}${x.yaziNo?" · Sayı: "+esc(x.yaziNo):""}` : "",
-                  isDone(x) && x.tamamTar ? `Tamamlandı: ${fmt(x.tamamTar)}` : ""].filter(Boolean).map(t=>`<div class="y">${t}</div>`).join("");
+                  isDone(x) && x.tamamTar ? `${x.f==="CV"?"Cevap verildi":"Tamamlandı"}: ${fmt(x.tamamTar)}` : ""].filter(Boolean).map(t=>`<div class="y">${t}</div>`).join("");
     html += `<tr class="${rowClass(x,today,soonEnd)} ${isDone(x)?"done":""}" data-id="${x.id}">
       <td class="stk c-hf" ${st(0)}>${s?isoWeek(parse(s)):""}</td>
       <td class="stk c-kod" ${st(1)}>${chips(x.b,x.c,x.d)}</td>
-      <td class="stk c-dur" ${st(2)}><input type="checkbox" class="tm" title="${isDone(x)?"Tamamlanmadı olarak geri al":"Tamamlandı olarak işaretle"}" ${isDone(x)?"checked":""}> ${chips(x.e)}${x.f&&x.f!=="T"?chips(x.f):""}</td>
+      <td class="stk c-dur" ${st(2)}><input type="checkbox" class="tm" title="${isDone(x)?"Açık işlere geri al":"Tamamlandı olarak işaretle"}" ${isDone(x)?"checked":""}> ${durumSec(x)}${ACIK_DURUM.has(x.e)?"":chips(x.e)}${x.f&&x.f!=="T"&&x.f!=="CV"?chips(x.f):""}</td>
       <td class="stk c-tar" ${st(3)}>${fmt(x.bas)}</td><td class="stk c-tar" ${st(4)}>${fmt(x.bit)}</td>
       <td class="stk c-saat" ${st(5)}>${esc(saat)}</td>
       <td class="stk c-is" ${st(6)}><div class="t" title="${esc(x.is)}">${esc(x.is)}</div>${yazi}</td>`;
@@ -483,6 +533,7 @@ function renderIs(){
   if (!list.length) html += `<div class="empty">Bu görünümde iş yok.</div>`;
   $("isWrap").innerHTML = html;
   fixSticky($("isWrap"));
+  if (typeof renderPano === "function") renderPano();
 }
 // sabit (sticky) sol sütunların konumlarını ölçerek ayarla
 function fixSticky(wrap){
@@ -503,12 +554,12 @@ $("isBugun").onclick = () => { S.ayar.isBas = todayIso(); S.ayar.isSayfa = 1; sa
 $("isDonem").onchange = e => { S.ayar.isDonem = e.target.checked; save(); renderIs(); };
 $("isAra").oninput = () => { clearTimeout(renderIs.h); renderIs.h = setTimeout(renderIs, 150); };
 $("isWrap").addEventListener("change", e => {
-  if (!e.target.classList.contains("tm")) return;
-  const x = S.isler.find(r => r.id == e.target.closest("tr").dataset.id);
-  if (e.target.checked) { x.f = "T"; x.tamamTar = todayIso(); toast("Tamamlananlar listesine taşındı"); }
-  else { x.f = ""; delete x.tamamTar; toast("Açık işlere geri alındı"); }
-  save(); renderIs();
+  const t = e.target; if (!t.classList.contains("tm") && !t.classList.contains("ds")) return;
+  const x = S.isler.find(r => r.id == t.closest("tr").dataset.id);
+  durumDegis(x, t.classList.contains("tm") ? (t.checked ? "T" : "") : t.value);
 });
+const DURUM_MESAJ = {T:"Tamamlananlar listesine taşındı",CV:"Cevap verilenler listesine taşındı",ER:"Ertelenenlere taşındı (yeni tarih için işe tıklayın)",CVM:"Cevap verilemeyenlere taşındı",DE:"Devam edenlere taşındı","":"Açık işlere alındı"};
+function durumDegis(x, d){ setDurum(x, d); save(); toast(DURUM_MESAJ[d]); renderIs(); }
 $("isWrap").addEventListener("click", e => {
   if (e.target.closest(".c-is .t")) openIs(+e.target.closest("tr").dataset.id);
 });
@@ -528,6 +579,7 @@ $("isDlg").addEventListener("close", () => {
     const data = {}; for (const k of ["is","bas","bit","saatBas","saatBit","b","c","d","e","f","yaziTar","yaziNo"]) data[k] = f.elements[k].value.trim() || (/(bas|bit|Tar)$/.test(k)?null:"");
     if (data.bas && data.bit && data.bit < data.bas) [data.bas, data.bit] = [data.bit, data.bas];
     const eski = editId && S.isler.find(r=>r.id===editId);
+    if (DONE.has(data.f) && ACIK_DURUM.has(data.e)) data.e = "";
     if (DONE.has(data.f)) data.tamamTar = (eski && DONE.has(eski.f) && eski.tamamTar) || todayIso(); else data.tamamTar = undefined;
     if (v === "kopya") { data.f = ""; data.tamamTar = undefined; }
     if (v === "kaydet" && editId) Object.assign(eski, data);
@@ -536,6 +588,54 @@ $("isDlg").addEventListener("close", () => {
   }
   renderIs();
 });
+
+/* =================================================================
+   PANO
+   ================================================================= */
+let panoSec = "de";
+function kalanGun(x, today){
+  const e = endOf(x); if (!e) return "";
+  const n = Math.round((parse(e) - parse(today)) / 864e5);
+  if (n < 0) return `<span class="kg gec">${-n} gün gecikti</span>`;
+  if (n === 0) return `<span class="kg bug">bugün bitiyor</span>`;
+  return `<span class="kg ${n<=5?"yak":""}">${n} gün kaldı</span>`;
+}
+function renderPano(){
+  const today = todayIso(), T = S.gunlukIsler;
+  const gYap = T.filter((_,i)=>yapildi(today,i)).length;
+  const acik = S.isler.filter(x=>!isDone(x));
+  const K = {
+    de:   {ad:"Devam edenler",        list:acik.filter(x=>x.e==="DE").sort(tarihSira), renk:"#e0b100"},
+    gun:  {ad:"Günlük işler",         sayi:`${gYap}<small> / ${T.length}</small>`, alt:"bugün yapılan", renk:"var(--today)"},
+    tamam:{ad:"Tamamlananlar",        list:S.isler.filter(x=>isDone(x)&&x.f!=="CV"), kapali:true, renk:"#8a91a0"},
+    cvm:  {ad:"Cevap verilemeyenler", list:acik.filter(x=>x.e==="CVM").sort(tarihSira), renk:"#2b8fe0"},
+    er:   {ad:"Ertelenenler",         list:acik.filter(x=>x.e==="ER").sort(tarihSira), renk:"#f08c2e"},
+    cv:   {ad:"Cevap verilenler",     list:S.isler.filter(x=>x.f==="CV"), kapali:true, renk:"#1fb5ad"},
+  };
+  for (const k of ["tamam","cv"]) K[k].list.sort((x,y)=>(y.tamamTar||"").localeCompare(x.tamamTar||"") || (endOf(y)||"").localeCompare(endOf(x)||""));
+  const gecik = gruplar(S.isler, today, "", "").find(g=>g.k==="gecik").list.length, yakin = acik.filter(x=>x.bit && x.bit>=today && x.bit<=iso(addDays(new Date(),5))).length;
+  $("pKart").innerHTML = Object.entries(K).map(([k,c]) => `<button class="pk ${panoSec===k?"on":""}" data-k="${k}" style="--pk:${c.renk}">
+      <span class="pa">${c.ad}</span><b>${c.sayi ?? c.list.length}</b><span class="pb">${c.alt ?? (c.kapali?"kapanan iş":"açık iş")}</span>
+      ${k==="gun"?`<span class="prog"><i style="width:${T.length?gYap/T.length*100:0}%"></i></span>`:""}</button>`).join("")
+    + `<div class="pnot">Açık iş: <b>${acik.length}</b> · 5 gün içinde bitecek: <b>${yakin}</b> · Süresi geçmiş: <b style="color:var(--st-bgvh)">${gecik}</b></div>`;
+
+  const c = K[panoSec];
+  if (panoSec === "gun") {
+    $("pListe").innerHTML = `<h2>Günlük işler — ${fmt(today)} ${GUNLER[new Date().getDay()]}</h2><ul class="checklist">${T.map((t,i)=>`<li><label class="${yapildi(today,i)?"ok":""}"><input type="checkbox" class="pg" data-i="${i}" ${yapildi(today,i)?"checked":""}><span title="${esc(t)}">${esc(t)}</span></label></li>`).join("")}</ul>`;
+    return;
+  }
+  $("pListe").innerHTML = `<h2>${c.ad} <span class="say">${c.list.length}</span></h2>` + (c.list.length ? `<table class="plt"><thead><tr><th>Durum</th><th>Görev / Yapılacak İş ve İşlemler</th><th>Başlangıç</th><th>Bitiş</th><th>${c.kapali?"Kapanış":"Kalan"}</th></tr></thead><tbody>` +
+    c.list.map(x => `<tr data-id="${x.id}"><td>${durumSec(x)}</td><td><div class="t" title="${esc(x.is)}">${esc(x.is)}</div>${x.yaziNo?`<div class="y">Yazı: ${fmt(x.yaziTar)} · Sayı: ${esc(x.yaziNo)}</div>`:""}</td>
+      <td class="d">${fmt(x.bas)}</td><td class="d">${fmt(x.bit)}</td><td class="d">${c.kapali ? fmt(x.tamamTar) : kalanGun(x,today)}</td></tr>`).join("") + `</tbody></table>`
+    : `<div class="empty">Bu listede iş yok.${panoSec==="er"||panoSec==="cvm"||panoSec==="cv"?" Bir işin durumunu açılır listeden değiştirerek buraya ekleyebilirsiniz.":""}</div>`);
+}
+$("pKart").addEventListener("click", e => { const b = e.target.closest(".pk"); if(!b) return; panoSec = b.dataset.k; try{ sessionStorage.setItem(KEY+".pano", panoSec); }catch(_){} renderPano(); });
+try { panoSec = sessionStorage.getItem(KEY+".pano") || "de"; } catch(_){}
+$("pListe").addEventListener("change", e => {
+  if (e.target.classList.contains("ds")) { durumDegis(S.isler.find(r => r.id == e.target.closest("tr").dataset.id), e.target.value); }
+  else if (e.target.classList.contains("pg")) { toggleG(todayIso(), +e.target.dataset.i, e.target.checked); renderG(); }
+});
+$("pListe").addEventListener("click", e => { if (e.target.closest(".t")) openIs(+e.target.closest("tr").dataset.id); });
 
 /* =================================================================
    GÜNLÜK İŞ PROGRAMI
@@ -575,8 +675,8 @@ function renderG(){
   });
   html += `</tbody><tfoot><tr><td class="stk c-gis" data-s="0">Tamamlanan</td><td class="stk c-pct" data-s="1"></td>${dIso.map(d=>`<td class="day">${(S.gunlukYapilan[d]||[]).length||""}</td>`).join("")}<td class="noprint"></td></tr></tfoot></table>`;
   $("gWrap").innerHTML = html;
-  // dar ekranda sabit sütun genişliği
-  if (matchMedia("(max-width:700px)").matches) $("gWrap").querySelectorAll('[data-s="1"]').forEach(e=>e.style.left="200px");
+  fixSticky($("gWrap"));
+  renderPano();
 }
 $("gBugunKart").addEventListener("change", e => { if(e.target.dataset.i!=null){ toggleG(todayIso(), +e.target.dataset.i, e.target.checked); renderG(); } });
 $("gBugunKart").addEventListener("click", e => { if(e.target.id==="gHepsi"){ e.preventDefault(); const t=todayIso(), all=S.gunlukIsler.every((_,i)=>yapildi(t,i)); S.gunlukIsler.forEach((_,i)=>toggleG(t,i,!all)); renderG(); } });
