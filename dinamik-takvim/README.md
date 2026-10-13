@@ -43,3 +43,14 @@ python3 tools/excel_to_html.py Dinamik_Takvim_2026-2027.xlsx   # index.html yeni
 ```
 
 Sayfa tasarımı `src/takvim.template.html` içindedir; betik Excel verisini bu şablona gömer.
+
+## Kısaltmalar
+
+| Kod | Anlamı | Kod | Anlamı |
+|---|---|---|---|
+| Aİ | Ay içi | DE | Devam ediyor |
+| Hİ | Hafta içi | ER, E | Ertelendi |
+| Gİ | Gün içi | CVM | Cevap verilemedi |
+| BGVH | Belirli gün ve hafta | CV | Cevap verildi |
+| YB | Yıl boyu | T | Tamamlandı |
+| | | İ | İptal edildi |
